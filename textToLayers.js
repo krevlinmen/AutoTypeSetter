@@ -511,7 +511,7 @@ function userInterface() {
 
 
 
-  close.onClick = dialog.close
+  //close.onClick = dialog.close
   return { dialog: dialog, progressbar1: progressbar1 }
 }
 
