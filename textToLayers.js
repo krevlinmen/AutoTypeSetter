@@ -6,6 +6,8 @@
 </javascriptresource>
 */
 
+#target 'photoshop'
+
 /* -------------------------------------------------------------------------- */
 /*                                Documentation                               */
 /*            https://www.adobe.com/devnet/photoshop/scripting.html           */
@@ -35,6 +37,7 @@ const defaultTextFormat = {
 
 /* ---------------------------- Global Variables ---------------------------- */
 
+//$.sleep(1000);
 var textFile;
 var duplicatedLayer;
 
@@ -49,18 +52,21 @@ function main() {
   //? Change Configurations
   app.displayDialogs = DialogModes.ERROR //change to NO by the End
 
-  
-  
-  processText()
+  const UI = formatUserInterface(UI)
+
+  UI.Executing = function () {
+    processText(UI.arrayFiles)
+  }
+
+  $.writeln(UI.win.show());
 
   //? Restaure Configurations
   app.displayDialogs = savedDialogMode
 }
 
-function processText() {
+function processText(arrayFiles) {
 
-  const arrayFiles = app.openDialog()
-  const uiObj = userInterface()
+
   var multipleArchives = false
 
   if (arrayFiles.length === 0)
@@ -93,7 +99,6 @@ function processText() {
       cleanFile()
       insertPageTexts(content[key]) //Page text Writing Loop
       saveAndClosefile(found)
-      uiObj.progressBar.value += 1/imageArrayDir.length
     }
   } else {
 
@@ -234,7 +239,7 @@ function filterFiles(arrayFiles) {
   const imageArray = []
   for (i in arrayFiles) {
     var file = arrayFiles[i]
-    if (!file.name.endsWithArray(['.txt', '.png', '.jpeg', '.jpg', 'psd', 'psb']))
+    if (!file.name.endsWithArray(['.txt', '.png', '.jpeg', '.jpg', '.psd', '.psb']))
       throwError("One or more files are not supported by this script!\nThis script supports the extensions:\n.png, .jpg, .jpeg, .psd, .psb, .txt")
     else if (file.name.endsWith('.txt'))
       textFile = file
@@ -414,252 +419,231 @@ function cleanFile() {
 /*                               User Interface                               */
 /* -------------------------------------------------------------------------- */
 
-function userInterface() {
-
-  
-/*
-Code for Import https://scriptui.joonas.me — (Triple click to select): 
-{"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"AutoTypeSetting","preferredSize":[500,400],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"EditText","parentId":3,"style":{"enabled":true,"varName":"identifier_Start","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"[","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":null}},"item-2":{"id":2,"type":"StaticText","parentId":3,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Identifier in Start","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-3":{"id":3,"type":"Group","parentId":4,"style":{"enabled":true,"varName":"","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":"fill"}},"item-4":{"id":4,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Page Indentifiers","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null}},"item-5":{"id":5,"type":"Group","parentId":4,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"fill"}},"item-6":{"id":6,"type":"StaticText","parentId":5,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Identifier in End","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-7":{"id":7,"type":"EditText","parentId":5,"style":{"enabled":true,"varName":"identifier_End","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"]","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":null}},"item-8":{"id":8,"type":"Divider","parentId":4,"style":{"enabled":true,"varName":null}},"item-10":{"id":10,"type":"Checkbox","parentId":4,"style":{"enabled":true,"varName":"ignorePageNumber","text":"Ignore Page Number","preferredSize":[0,0],"alignment":"center","helpTip":"This will ignore or not numbers between both identifiers","checked":false}},"item-11":{"id":11,"type":"Button","parentId":15,"style":{"enabled":true,"varName":"close","text":"Cancel","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-12":{"id":12,"type":"Button","parentId":15,"style":{"enabled":true,"varName":"runScript","text":"Execute","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-13":{"id":13,"type":"Progressbar","parentId":0,"style":{"enabled":true,"varName":"progressBar","preferredSize":[0,15],"alignment":"fill","helpTip":null}},"item-15":{"id":15,"type":"Group","parentId":0,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-16":{"id":16,"type":"StaticText","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"by KrevlinMen and ImSamuka","justify":"left","preferredSize":[0,0],"alignment":"right","helpTip":null}},"item-17":{"id":17,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Files","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["center","top"],"alignment":null}},"item-18":{"id":18,"type":"Group","parentId":17,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-20":{"id":20,"type":"EditText","parentId":18,"style":{"enabled":true,"varName":null,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"...","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-21":{"id":21,"type":"Group","parentId":17,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-22":{"id":22,"type":"Panel","parentId":21,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Files Found","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["center","top"],"alignment":null}},"item-23":{"id":23,"type":"Checkbox","parentId":18,"style":{"enabled":true,"varName":null,"text":"Folder Directory","preferredSize":[0,0],"alignment":null,"helpTip":null,"checked":true}},"item-24":{"id":24,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Text Format","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["center","top"],"alignment":null}},"item-25":{"id":25,"type":"Group","parentId":24,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-26":{"id":26,"type":"StaticText","parentId":25,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Font","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-28":{"id":28,"type":"Group","parentId":24,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":11,"alignChildren":["center","center"],"alignment":"fill"}},"item-29":{"id":29,"type":"StaticText","parentId":28,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Font size","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-31":{"id":31,"type":"Group","parentId":24,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-34":{"id":34,"type":"Group","parentId":24,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-35":{"id":35,"type":"StaticText","parentId":34,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Justification","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-37":{"id":37,"type":"Checkbox","parentId":31,"style":{"enabled":true,"varName":null,"text":"Bounding Text Box","preferredSize":[0,0],"alignment":null,"helpTip":null,"checked":true}},"item-40":{"id":40,"type":"Checkbox","parentId":34,"style":{"enabled":true,"varName":null,"text":"Justified","preferredSize":[0,0],"alignment":null,"helpTip":null,"checked":false}},"item-41":{"id":41,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":""}},"item-42":{"id":42,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":null}},"item-43":{"id":43,"type":"DropDownList","parentId":25,"style":{"enabled":true,"varName":null,"text":"DropDownList","listItems":"font1,font2,font3","preferredSize":[0,0],"alignment":null,"selection":0,"helpTip":null}},"item-44":{"id":44,"type":"Slider","parentId":28,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"alignment":"fill","helpTip":null}},"item-45":{"id":45,"type":"EditText","parentId":28,"style":{"enabled":true,"varName":null,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"16","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-46":{"id":46,"type":"StaticText","parentId":22,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":true,"scrolling":true},"softWrap":false,"text":"File1.jpg\nFile2.jpg\nFile3.txt","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-47":{"id":47,"type":"Group","parentId":17,"style":{"enabled":true,"varName":"","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-48":{"id":48,"type":"Checkbox","parentId":47,"style":{"enabled":true,"varName":null,"text":"File Directory","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-49":{"id":49,"type":"EditText","parentId":47,"style":{"enabled":true,"varName":null,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"...","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-50":{"id":50,"type":"DropDownList","parentId":34,"style":{"enabled":true,"varName":null,"text":"DropDownList","listItems":"Left, Center, Right","preferredSize":[0,0],"alignment":null,"selection":1,"helpTip":null}}},"order":[0,4,3,2,1,5,6,7,8,10,17,18,23,20,47,48,49,21,22,46,24,25,26,43,28,29,44,45,31,37,34,35,50,40,15,11,12,41,13,42,16],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
-*/ 
-
-// WIN
-// ===
-var win = new Window("window"); 
-win.text = "AutoTypeSetting"; 
-win.preferredSize.width = 500; 
-win.preferredSize.height = 400; 
-win.orientation = "column"; 
-win.alignChildren = ["center","top"]; 
-win.spacing = 10; 
-win.margins = 16; 
-
-// PANEL1
-// ======
-var panel1 = win.add("panel", undefined, undefined, {name: "panel1"}); 
-panel1.text = "Page Indentifiers"; 
-panel1.orientation = "column"; 
-panel1.alignChildren = ["left","top"]; 
-panel1.spacing = 10; 
-panel1.margins = 10; 
-
-// GROUP1
-// ======
-var group1 = panel1.add("group", undefined, {name: "group1"}); 
-group1.orientation = "row"; 
-group1.alignChildren = ["left","center"]; 
-group1.spacing = 10; 
-group1.margins = 0; 
-group1.alignment = ["fill","top"]; 
-
-var statictext1 = group1.add("statictext", undefined, undefined, {name: "statictext1"}); 
-statictext1.text = "Identifier in Start"; 
-
-var identifier_Start = group1.add('edittext {properties: {name: "identifier_Start"}}'); 
-identifier_Start.text = "["; 
-identifier_Start.preferredSize.width = 50; 
-
-// GROUP2
-// ======
-var group2 = panel1.add("group", undefined, {name: "group2"}); 
-group2.orientation = "row"; 
-group2.alignChildren = ["right","center"]; 
-group2.spacing = 10; 
-group2.margins = 0; 
-group2.alignment = ["fill","top"]; 
-
-var statictext2 = group2.add("statictext", undefined, undefined, {name: "statictext2"}); 
-statictext2.text = "Identifier in End"; 
-
-var identifier_End = group2.add('edittext {properties: {name: "identifier_End"}}'); 
-identifier_End.text = "]"; 
-identifier_End.preferredSize.width = 50; 
-
-// PANEL1
-// ======
-var divider1 = panel1.add("panel", undefined, undefined, {name: "divider1"}); 
-divider1.alignment = "fill"; 
-
-var ignorePageNumber = panel1.add("checkbox", undefined, undefined, {name: "ignorePageNumber"}); 
-ignorePageNumber.helpTip = "This will ignore or not numbers between both identifiers"; 
-ignorePageNumber.text = "Ignore Page Number"; 
-ignorePageNumber.alignment = ["center","top"]; 
-
-// PANEL2
-// ======
-var panel2 = win.add("panel", undefined, undefined, {name: "panel2"}); 
-panel2.text = "Files"; 
-panel2.orientation = "column"; 
-panel2.alignChildren = ["center","top"]; 
-panel2.spacing = 10; 
-panel2.margins = 10; 
-
-// GROUP3
-// ======
-var group3 = panel2.add("group", undefined, {name: "group3"}); 
-group3.orientation = "row"; 
-group3.alignChildren = ["left","center"]; 
-group3.spacing = 10; 
-group3.margins = 0; 
-
-var checkbox1 = group3.add("checkbox", undefined, undefined, {name: "checkbox1"}); 
-checkbox1.text = "Folder Directory"; 
-checkbox1.value = true; 
-
-var edittext1 = group3.add('edittext {properties: {name: "edittext1"}}'); 
-edittext1.text = "..."; 
-
-// GROUP4
-// ======
-var group4 = panel2.add("group", undefined, {name: "group4"}); 
-group4.orientation = "row"; 
-group4.alignChildren = ["left","center"]; 
-group4.spacing = 10; 
-group4.margins = 0; 
-
-var checkbox2 = group4.add("checkbox", undefined, undefined, {name: "checkbox2"}); 
-checkbox2.text = "File Directory"; 
-
-var edittext2 = group4.add('edittext {properties: {name: "edittext2"}}'); 
-edittext2.text = "..."; 
-
-// GROUP5
-// ======
-var group5 = panel2.add("group", undefined, {name: "group5"}); 
-group5.orientation = "column"; 
-group5.alignChildren = ["center","center"]; 
-group5.spacing = 10; 
-group5.margins = 0; 
-
-// PANEL3
-// ======
-var panel3 = group5.add("panel", undefined, undefined, {name: "panel3"}); 
-panel3.text = "Files Found"; 
-panel3.orientation = "column"; 
-panel3.alignChildren = ["center","top"]; 
-panel3.spacing = 10; 
-panel3.margins = 10; 
-
-var statictext3 = panel3.add("group"); 
-statictext3.orientation = "column"; 
-statictext3.alignChildren = ["left","center"]; 
-statictext3.spacing = 0; 
-
-statictext3.add("statictext", undefined, "File1.jpg", {name: "statictext3", multiline: true, scrolling: true}); 
-statictext3.add("statictext", undefined, "File2.jpg", {name: "statictext3", multiline: true, scrolling: true}); 
-statictext3.add("statictext", undefined, "File3.txt", {name: "statictext3", multiline: true, scrolling: true}); 
-
-// PANEL4
-// ======
-var panel4 = win.add("panel", undefined, undefined, {name: "panel4"}); 
-panel4.text = "Text Format"; 
-panel4.orientation = "column"; 
-panel4.alignChildren = ["center","top"]; 
-panel4.spacing = 10; 
-panel4.margins = 10; 
-
-// GROUP6
-// ======
-var group6 = panel4.add("group", undefined, {name: "group6"}); 
-group6.orientation = "row"; 
-group6.alignChildren = ["left","center"]; 
-group6.spacing = 10; 
-group6.margins = 0; 
-
-var statictext4 = group6.add("statictext", undefined, undefined, {name: "statictext4"}); 
-statictext4.text = "Font"; 
-
-var dropdown1_array = ["font1","font2","font3"]; 
-var dropdown1 = group6.add("dropdownlist", undefined, undefined, {name: "dropdown1", items: dropdown1_array}); 
-dropdown1.selection = 0; 
-
-// GROUP7
-// ======
-var group7 = panel4.add("group", undefined, {name: "group7"}); 
-group7.orientation = "row"; 
-group7.alignChildren = ["center","center"]; 
-group7.spacing = 11; 
-group7.margins = 0; 
-group7.alignment = ["fill","top"]; 
-
-var statictext5 = group7.add("statictext", undefined, undefined, {name: "statictext5"}); 
-statictext5.text = "Font size"; 
-
-var slider1 = group7.add("slider", undefined, undefined, undefined, undefined, {name: "slider1"}); 
-slider1.minvalue = 0; 
-slider1.maxvalue = 100; 
-slider1.value = 50; 
-slider1.alignment = ["center","fill"]; 
-
-var edittext3 = group7.add('edittext {properties: {name: "edittext3"}}'); 
-edittext3.text = "16"; 
-
-// GROUP8
-// ======
-var group8 = panel4.add("group", undefined, {name: "group8"}); 
-group8.orientation = "row"; 
-group8.alignChildren = ["left","center"]; 
-group8.spacing = 10; 
-group8.margins = 0; 
-
-var checkbox3 = group8.add("checkbox", undefined, undefined, {name: "checkbox3"}); 
-checkbox3.text = "Bounding Text Box"; 
-checkbox3.value = true; 
-
-// GROUP9
-// ======
-var group9 = panel4.add("group", undefined, {name: "group9"}); 
-group9.orientation = "row"; 
-group9.alignChildren = ["left","center"]; 
-group9.spacing = 10; 
-group9.margins = 0; 
-
-var statictext6 = group9.add("statictext", undefined, undefined, {name: "statictext6"}); 
-statictext6.text = "Justification"; 
-
-var dropdown2_array = ["Left","Center","Right"]; 
-var dropdown2 = group9.add("dropdownlist", undefined, undefined, {name: "dropdown2", items: dropdown2_array}); 
-dropdown2.selection = 1; 
-
-var checkbox4 = group9.add("checkbox", undefined, undefined, {name: "checkbox4"}); 
-checkbox4.text = "Justified"; 
-
-// GROUP10
-// =======
-var group10 = win.add("group", undefined, {name: "group10"}); 
-group10.orientation = "row"; 
-group10.alignChildren = ["left","center"]; 
-group10.spacing = 10; 
-group10.margins = 0; 
-
-var close = group10.add("button", undefined, undefined, {name: "close"}); 
-close.text = "Cancel"; 
-
-var runScript = group10.add("button", undefined, undefined, {name: "runScript"}); 
-runScript.text = "Execute"; 
-
-// WIN
-// ===
-var divider2 = win.add("panel", undefined, undefined, {name: "divider2"}); 
-divider2.alignment = "fill"; 
-
-var progressBar = win.add("progressbar", undefined, undefined, {name: "progressBar"}); 
-progressBar.maxvalue = 100; 
-progressBar.value = 50; 
-progressBar.preferredSize.height = 15; 
-progressBar.alignment = ["fill","top"]; 
-
-var divider3 = win.add("panel", undefined, undefined, {name: "divider3"}); 
-divider3.alignment = "fill"; 
-
-var statictext7 = win.add("statictext", undefined, undefined, {name: "statictext7"}); 
-statictext7.text = "by KrevlinMen and ImSamuka"; 
-statictext7.alignment = ["right","top"]; 
-
-win.show();
+function createUserInterface() {
 
 
+  /*
+  Code for Import https://scriptui.joonas.me — (Triple click to select): 
+  {"activeId":47,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"text":"Auto TypeSetter","preferredSize":[0,0],"margins":16,"orientation":"row","spacing":10,"alignChildren":["left","top"],"varName":null,"windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"enabled":true}},"item-1":{"id":1,"type":"Panel","parentId":20,"style":{"text":"Page Indentifiers","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"enabled":true}},"item-4":{"id":4,"type":"StaticText","parentId":6,"style":{"text":"Start","justify":"left","preferredSize":[0,0],"alignment":null,"varName":null,"helpTip":null,"softWrap":true,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"enabled":true}},"item-5":{"id":5,"type":"EditText","parentId":6,"style":{"text":"[","preferredSize":[60,0],"alignment":null,"varName":"startIdentifierBox","helpTip":null,"softWrap":false,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"enabled":true,"justify":"left"}},"item-6":{"id":6,"type":"Group","parentId":1,"style":{"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"center","varName":null,"enabled":true}},"item-9":{"id":9,"type":"Panel","parentId":20,"style":{"text":"Text Formats","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"enabled":true}},"item-19":{"id":19,"type":"Group","parentId":0,"style":{"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"enabled":true}},"item-20":{"id":20,"type":"Group","parentId":0,"style":{"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"enabled":true}},"item-21":{"id":21,"type":"Panel","parentId":19,"style":{"text":"Files","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"enabled":true}},"item-22":{"id":22,"type":"StaticText","parentId":21,"style":{"text":"Select a Folder including:\n- A '.txt' file containing the text\n- Image Files ('1.png', '2.jpg')\n\n(if you don't select images, \nthe script will run on a open\ndocument)","justify":"left","preferredSize":[0,0],"alignment":null,"varName":null,"helpTip":null,"softWrap":true,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"enabled":true}},"item-36":{"id":36,"type":"Group","parentId":0,"style":{"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"enabled":true}},"item-37":{"id":37,"type":"Button","parentId":36,"style":{"text":"OK","justify":"center","preferredSize":[0,0],"alignment":null,"varName":"runScript","helpTip":null,"enabled":false}},"item-38":{"id":38,"type":"Button","parentId":36,"style":{"text":"Cancel","justify":"center","preferredSize":[0,0],"alignment":null,"varName":"cancel","helpTip":null,"enabled":true}},"item-40":{"id":40,"type":"Checkbox","parentId":1,"style":{"text":"Ignore Page Number","preferredSize":[0,0],"alignment":null,"varName":"IgnorePageNumberCB","helpTip":"This will ignore or not numbers between both identifiers","enabled":true}},"item-45":{"id":45,"type":"Group","parentId":1,"style":{"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"center","varName":null,"enabled":true}},"item-46":{"id":46,"type":"StaticText","parentId":45,"style":{"text":"End","justify":"left","preferredSize":[0,0],"alignment":null,"varName":"","helpTip":null,"softWrap":true,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"enabled":true}},"item-47":{"id":47,"type":"EditText","parentId":45,"style":{"text":"]","preferredSize":[60,0],"alignment":null,"varName":"endIdentifierBox","helpTip":null,"softWrap":false,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"enabled":true,"justify":"left"}},"item-48":{"id":48,"type":"Button","parentId":9,"style":{"enabled":true,"varName":null,"text":"Register JSON","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"Save a JSON with your custom formats to use!  :D"}},"item-49":{"id":49,"type":"Button","parentId":9,"style":{"enabled":true,"varName":null,"text":"Reset With Default","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"This will delete the JSON you registered"}},"item-50":{"id":50,"type":"Button","parentId":9,"style":{"enabled":true,"varName":null,"text":"Open Saved JSON","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"This will open the JSON you already registered"}},"item-51":{"id":51,"type":"Button","parentId":9,"style":{"enabled":true,"varName":null,"text":"Open Default JSON","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"Open default formats JSON and learn to Create your own formats! :D"}},"item-52":{"id":52,"type":"Checkbox","parentId":21,"style":{"enabled":true,"varName":"SelectAllFilesCB","text":"Select All Files Instead","preferredSize":[0,0],"alignment":null,"helpTip":"You need to select all files, not a folder containing these files","checked":true}},"item-53":{"id":53,"type":"StaticText","parentId":21,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"Formats Supported","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"'.png', '.jpeg', '.jpg', '.psd', '.psb'"}},"item-55":{"id":55,"type":"Button","parentId":21,"style":{"enabled":true,"varName":"selectFilesBtn","text":"Select","justify":"center","preferredSize":[0,0],"alignment":"center","helpTip":null}},"item-56":{"id":56,"type":"StaticText","parentId":19,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"Created By \nKrevlinMen and ImSamuka","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}}},"order":[0,20,1,6,4,5,45,46,47,40,9,48,50,51,49,19,21,22,53,52,55,56,36,37,38],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"functionWrapper":false,"compactCode":false,"showDialog":true,"afterEffectsDockable":false,"itemReferenceList":"None"}}
+  */
 
-  return {win: win, progressBar: progressBar}
+  // DIALOG
+  // ======
+  this.win = new Window("dialog");
+  this.win.text = "Auto TypeSetter";
+  this.win.orientation = "row";
+  this.win.alignChildren = ["left", "top"];
+  this.win.spacing = 10;
+  this.win.margins = 16;
+
+  // GROUP1
+  // ======
+  var group1 = this.win.add("group", undefined, { name: "group1" });
+  group1.orientation = "column";
+  group1.alignChildren = ["fill", "top"];
+  group1.spacing = 10;
+  group1.margins = 0;
+
+  // PANEL1
+  // ======
+  var panel1 = group1.add("panel", undefined, undefined, { name: "panel1" });
+  panel1.text = "Page Indentifiers";
+  panel1.orientation = "column";
+  panel1.alignChildren = ["left", "top"];
+  panel1.spacing = 10;
+  panel1.margins = 10;
+
+  // GROUP2
+  // ======
+  var group2 = panel1.add("group", undefined, { name: "group2" });
+  group2.orientation = "row";
+  group2.alignChildren = ["right", "center"];
+  group2.spacing = 10;
+  group2.margins = 0;
+  group2.alignment = ["center", "top"];
+
+  var statictext1 = group2.add("statictext", undefined, undefined, { name: "statictext1" });
+  statictext1.text = "Start";
+
+  this.startIdentifierBox = group2.add('edittext {properties: {name: "startIdentifierBox"}}');
+  this.startIdentifierBox.text = "[";
+  this.startIdentifierBox.preferredSize.width = 60;
+
+  // GROUP3
+  // ======
+  var group3 = panel1.add("group", undefined, { name: "group3" });
+  group3.orientation = "row";
+  group3.alignChildren = ["right", "center"];
+  group3.spacing = 10;
+  group3.margins = 0;
+  group3.alignment = ["center", "top"];
+
+  var statictext2 = group3.add("statictext", undefined, undefined, { name: "statictext2" });
+  statictext2.text = "End";
+
+  this.endIdentifierBox = group3.add('edittext {properties: {name: "endIdentifierBox"}}');
+  this.endIdentifierBox.text = "]";
+  this.endIdentifierBox.preferredSize.width = 60;
+
+  // PANEL1
+  // ======
+  this.IgnorePageNumberCB = panel1.add("checkbox", undefined, undefined, { name: "IgnorePageNumberCB" });
+  this.IgnorePageNumberCB.helpTip = "This will ignore or not numbers between both identifiers";
+  this.IgnorePageNumberCB.text = "Ignore Page Number";
+
+  // PANEL2
+  // ======
+  var panel2 = group1.add("panel", undefined, undefined, { name: "panel2" });
+  panel2.text = "Text Formats";
+  panel2.orientation = "column";
+  panel2.alignChildren = ["left", "top"];
+  panel2.spacing = 10;
+  panel2.margins = 10;
+
+  var button1 = panel2.add("button", undefined, undefined, { name: "button1" });
+  button1.helpTip = "Save a JSON with your custom formats to use!  :D";
+  button1.text = "Register JSON";
+  button1.alignment = ["fill", "top"];
+
+  var button2 = panel2.add("button", undefined, undefined, { name: "button2" });
+  button2.helpTip = "This will open the JSON you already registered";
+  button2.text = "Open Saved JSON";
+  button2.alignment = ["fill", "top"];
+
+  var button3 = panel2.add("button", undefined, undefined, { name: "button3" });
+  button3.helpTip = "Open default formats JSON and learn to Create your own formats! :D";
+  button3.text = "Open Default JSON";
+  button3.alignment = ["fill", "top"];
+
+  var button4 = panel2.add("button", undefined, undefined, { name: "button4" });
+  button4.helpTip = "This will delete the JSON you registered";
+  button4.text = "Reset With Default";
+  button4.alignment = ["fill", "top"];
+
+  // GROUP4
+  // ======
+  var group4 = this.win.add("group", undefined, { name: "group4" });
+  group4.orientation = "column";
+  group4.alignChildren = ["fill", "top"];
+  group4.spacing = 10;
+  group4.margins = 0;
+
+  // PANEL3
+  // ======
+  var panel3 = group4.add("panel", undefined, undefined, { name: "panel3" });
+  panel3.text = "Files";
+  panel3.orientation = "column";
+  panel3.alignChildren = ["fill", "top"];
+  panel3.spacing = 10;
+  panel3.margins = 10;
+
+  var statictext3 = panel3.add("group");
+  statictext3.orientation = "column";
+  statictext3.alignChildren = ["left", "center"];
+  statictext3.spacing = 0;
+
+  statictext3.add("statictext", undefined, "Select a Folder including:", { name: "statictext3" });
+  statictext3.add("statictext", undefined, "- A '.txt' file containing the text", { name: "statictext3" });
+  statictext3.add("statictext", undefined, "- Image Files ('1.png', '2.jpg') ", { name: "statictext3" });
+  statictext3.add("statictext", undefined, "", { name: "statictext3" });
+  statictext3.add("statictext", undefined, "(if you don't select images, ", { name: "statictext3" });
+  statictext3.add("statictext", undefined, "the script will run on a open", { name: "statictext3" });
+  statictext3.add("statictext", undefined, "document)", { name: "statictext3" });
+
+  var statictext4 = panel3.add("statictext", undefined, undefined, { name: "statictext4" });
+  statictext4.helpTip = "'.png', '.jpeg', '.jpg', '.psd', '.psb'";
+  statictext4.text = "Formats Supported";
+  statictext4.justify = "center";
+
+  this.SelectAllFilesCB = panel3.add("checkbox", undefined, undefined, { name: "SelectAllFilesCB" });
+  this.SelectAllFilesCB.helpTip = "You need to select all files, not a folder containing these files";
+  this.SelectAllFilesCB.text = "Select All Files Instead";
+
+  this.selectFilesBtn = panel3.add("button", undefined, undefined, { name: "selectFilesBtn" });
+  this.selectFilesBtn.text = "Select";
+  this.selectFilesBtn.alignment = ["center", "top"];
+
+  // GROUP4
+  // ======
+  var statictext5 = group4.add("group");
+  statictext5.orientation = "column";
+  statictext5.alignChildren = ["left", "center"];
+  statictext5.spacing = 0;
+
+  statictext5.add("statictext", undefined, "Created By ", { name: "statictext5" });
+  statictext5.add("statictext", undefined, "KrevlinMen and ImSamuka", { name: "statictext5" });
+
+  // GROUP5
+  // ======
+  var group5 = this.win.add("group", undefined, { name: "group5" });
+  group5.orientation = "column";
+  group5.alignChildren = ["fill", "top"];
+  group5.spacing = 10;
+  group5.margins = 0;
+
+  this.runScript = group5.add("button", undefined, undefined, { name: "runScript" });
+  this.runScript.enabled = false;
+  this.runScript.text = "OK";
+
+  this.cancel = group5.add("button", undefined, undefined, { name: "cancel" });
+  this.cancel.text = "Cancel";
+
+
+  button1.enabled = false;
+  button2.enabled = false;
+  button3.enabled = false;
+  button4.enabled = false;
+}
+
+function formatUserInterface(UI) {
+  //? Create a new one by default
+  if (UI === undefined)
+    UI = new createUserInterface()
+
+  UI.arrayFiles = []
+
+
+  UI.runScript.text = "Execute";
+  UI.cancel.text = "Cancel";
+
+  UI.win.defaultElement = UI.runScript;
+  UI.win.cancelElement = UI.cancel;
+
+
+  UI.selectFilesBtn.onClick = function () {
+    try {
+      if (UI.SelectAllFilesCB.value)
+        UI.arrayFiles = File.openDialog("Select Files", ["All:*.txt;*.png;*.jpeg;*.jpg;*.psd;*.psb", "Text:*.txt", "Images:*.png;*.jpeg;*.jpg;*.psd;*.psb"], true)
+      else
+        UI.arrayFiles = Folder.selectDialog("Select Folder").getFiles()
+    } catch (error) {
+      UI.arrayFiles = []
+    }
+    if (UI.arrayFiles === null) UI.arrayFiles = []
+
+    if (UI.arrayFiles.length) {
+      UI.runScript.enabled = true;
+      UI.selectFilesBtn.text = "Select Again"
+    } else {
+      UI.runScript.enabled = false;
+      UI.selectFilesBtn.text = "Select"
+    }
+    app.refresh();
+  }
+
+  UI.Executing = function () { }
+
+  UI.runScript.onClick = function () {
+    UI.win.close()
+
+    identifier_Start = UI.startIdentifierBox.text
+    identifier_End = UI.endIdentifierBox.text
+    ignorePageNumber = UI.IgnorePageNumberCB.value
+
+    if (typeof UI.Executing === "function") UI.Executing();
+  }
+
+  return UI
 }
 
 
