@@ -49,8 +49,8 @@ function main() {
   //? Change Configurations
   app.displayDialogs = DialogModes.ERROR //change to NO by the End
 
-  //const UIObj = userInterface()
-
+  const UIObj = userInterface()
+  
   processText()
 
   //? Restaure Configurations
@@ -387,7 +387,7 @@ function createEmptyLayer(name, format) {
     format = defaultFormat
 
   const newLayer = activeDocument.artLayers.add()
-  if (locked) newLayer.allLocked = true
+  if (format.locked) newLayer.allLocked = true
   newLayer.name = name
 
   //if (format.size) txtLayer.textItem.size = format.size
@@ -415,104 +415,106 @@ function cleanFile() {
 function userInterface() {
 
 
-  /*
-  Code for Import https://scriptui.joonas.me — (Triple click to select): 
-  {"activeId":13,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"Dialog","preferredSize":[500,400],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"EditText","parentId":3,"style":{"enabled":true,"varName":"identifier_Start","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"[","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":null}},"item-2":{"id":2,"type":"StaticText","parentId":3,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Identifier in Start","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-3":{"id":3,"type":"Group","parentId":4,"style":{"enabled":true,"varName":"","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":"fill"}},"item-4":{"id":4,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Page Indentifiers","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null}},"item-5":{"id":5,"type":"Group","parentId":4,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"fill"}},"item-6":{"id":6,"type":"StaticText","parentId":5,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Identifier in End","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-7":{"id":7,"type":"EditText","parentId":5,"style":{"enabled":true,"varName":"identifier_End","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"]","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":null}},"item-8":{"id":8,"type":"Divider","parentId":4,"style":{"enabled":true,"varName":null}},"item-10":{"id":10,"type":"Checkbox","parentId":4,"style":{"enabled":true,"varName":"ignorePageNumber","text":"Ignore Page Number","preferredSize":[0,0],"alignment":"center","helpTip":"This will ignore or not numbers between both identifiers","checked":false}},"item-11":{"id":11,"type":"Button","parentId":15,"style":{"enabled":true,"varName":"close","text":"Close","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-12":{"id":12,"type":"Button","parentId":15,"style":{"enabled":true,"varName":"run","text":"Execute","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-13":{"id":13,"type":"Progressbar","parentId":0,"style":{"enabled":true,"varName":null,"preferredSize":[50,10],"alignment":"fill","helpTip":null}},"item-15":{"id":15,"type":"Group","parentId":0,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}}},"order":[0,4,3,2,1,5,6,7,8,10,15,11,12,13],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
-  */
+/*
+Code for Import https://scriptui.joonas.me — (Triple click to select): 
+{"activeId":13,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"AutoTypeSetting","preferredSize":[500,400],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"EditText","parentId":3,"style":{"enabled":true,"varName":"identifier_Start","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"[","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":null}},"item-2":{"id":2,"type":"StaticText","parentId":3,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Identifier in Start","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-3":{"id":3,"type":"Group","parentId":4,"style":{"enabled":true,"varName":"","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":"fill"}},"item-4":{"id":4,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Page Indentifiers","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null}},"item-5":{"id":5,"type":"Group","parentId":4,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"fill"}},"item-6":{"id":6,"type":"StaticText","parentId":5,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Identifier in End","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-7":{"id":7,"type":"EditText","parentId":5,"style":{"enabled":true,"varName":"identifier_End","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"]","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":null}},"item-8":{"id":8,"type":"Divider","parentId":4,"style":{"enabled":true,"varName":null}},"item-10":{"id":10,"type":"Checkbox","parentId":4,"style":{"enabled":true,"varName":"ignorePageNumber","text":"Ignore Page Number","preferredSize":[0,0],"alignment":"center","helpTip":"This will ignore or not numbers between both identifiers","checked":false}},"item-11":{"id":11,"type":"Button","parentId":15,"style":{"enabled":true,"varName":"close","text":"Cancel","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-12":{"id":12,"type":"Button","parentId":15,"style":{"enabled":true,"varName":"runScript","text":"Execute","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-13":{"id":13,"type":"Progressbar","parentId":0,"style":{"enabled":true,"varName":"progressBar","preferredSize":[0,15],"alignment":"fill","helpTip":null}},"item-15":{"id":15,"type":"Group","parentId":0,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-16":{"id":16,"type":"StaticText","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"by KrevlinMen and ImSamuka","justify":"center","preferredSize":[0,0],"alignment":"right","helpTip":null}}},"order":[0,4,3,2,1,5,6,7,8,10,15,11,12,13,16],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
+*/ 
 
-  // DIALOG
-  // ======
-  var dialog = new Window("dialog");
-  dialog.text = "Dialog";
-  dialog.preferredSize.width = 500;
-  dialog.preferredSize.height = 400;
-  dialog.orientation = "column";
-  dialog.alignChildren = ["center", "top"];
-  dialog.spacing = 10;
-  dialog.margins = 16;
+// WIN
+// ===
+var win = new Window("window"); 
+    win.text = "AutoTypeSetting"; 
+    win.preferredSize.width = 500; 
+    win.preferredSize.height = 400; 
+    win.orientation = "column"; 
+    win.alignChildren = ["center","top"]; 
+    win.spacing = 10; 
+    win.margins = 16; 
 
-  // PANEL1
-  // ======
-  var panel1 = dialog.add("panel", undefined, undefined, { name: "panel1" });
-  panel1.text = "Page Indentifiers";
-  panel1.orientation = "column";
-  panel1.alignChildren = ["left", "top"];
-  panel1.spacing = 10;
-  panel1.margins = 10;
+// PANEL1
+// ======
+var panel1 = win.add("panel", undefined, undefined, {name: "panel1"}); 
+    panel1.text = "Page Indentifiers"; 
+    panel1.orientation = "column"; 
+    panel1.alignChildren = ["left","top"]; 
+    panel1.spacing = 10; 
+    panel1.margins = 10; 
 
-  // GROUP1
-  // ======
-  var group1 = panel1.add("group", undefined, { name: "group1" });
-  group1.orientation = "row";
-  group1.alignChildren = ["left", "center"];
-  group1.spacing = 10;
-  group1.margins = 0;
-  group1.alignment = ["fill", "top"];
+// GROUP1
+// ======
+var group1 = panel1.add("group", undefined, {name: "group1"}); 
+    group1.orientation = "row"; 
+    group1.alignChildren = ["left","center"]; 
+    group1.spacing = 10; 
+    group1.margins = 0; 
+    group1.alignment = ["fill","top"]; 
 
-  var statictext1 = group1.add("statictext", undefined, undefined, { name: "statictext1" });
-  statictext1.text = "Identifier in Start";
+var statictext1 = group1.add("statictext", undefined, undefined, {name: "statictext1"}); 
+    statictext1.text = "Identifier in Start"; 
 
-  var identifier_Start = group1.add('edittext {properties: {name: "identifier_Start"}}');
-  identifier_Start.text = "[";
-  identifier_Start.preferredSize.width = 50;
+var identifier_Start = group1.add('edittext {properties: {name: "identifier_Start"}}'); 
+    identifier_Start.text = "["; 
+    identifier_Start.preferredSize.width = 50; 
 
-  // GROUP2
-  // ======
-  var group2 = panel1.add("group", undefined, { name: "group2" });
-  group2.orientation = "row";
-  group2.alignChildren = ["right", "center"];
-  group2.spacing = 10;
-  group2.margins = 0;
-  group2.alignment = ["fill", "top"];
+// GROUP2
+// ======
+var group2 = panel1.add("group", undefined, {name: "group2"}); 
+    group2.orientation = "row"; 
+    group2.alignChildren = ["right","center"]; 
+    group2.spacing = 10; 
+    group2.margins = 0; 
+    group2.alignment = ["fill","top"]; 
 
-  var statictext2 = group2.add("statictext", undefined, undefined, { name: "statictext2" });
-  statictext2.text = "Identifier in End";
+var statictext2 = group2.add("statictext", undefined, undefined, {name: "statictext2"}); 
+    statictext2.text = "Identifier in End"; 
 
-  var identifier_End = group2.add('edittext {properties: {name: "identifier_End"}}');
-  identifier_End.text = "]";
-  identifier_End.preferredSize.width = 50;
+var identifier_End = group2.add('edittext {properties: {name: "identifier_End"}}'); 
+    identifier_End.text = "]"; 
+    identifier_End.preferredSize.width = 50; 
 
-  // PANEL1
-  // ======
-  var divider1 = panel1.add("panel", undefined, undefined, { name: "divider1" });
-  divider1.alignment = "fill";
+// PANEL1
+// ======
+var divider1 = panel1.add("panel", undefined, undefined, {name: "divider1"}); 
+    divider1.alignment = "fill"; 
 
-  var ignorePageNumber = panel1.add("checkbox", undefined, undefined, { name: "ignorePageNumber" });
-  ignorePageNumber.helpTip = "This will ignore or not numbers between both identifiers";
-  ignorePageNumber.text = "Ignore Page Number";
-  ignorePageNumber.alignment = ["center", "top"];
+var ignorePageNumber = panel1.add("checkbox", undefined, undefined, {name: "ignorePageNumber"}); 
+    ignorePageNumber.helpTip = "This will ignore or not numbers between both identifiers"; 
+    ignorePageNumber.text = "Ignore Page Number"; 
+    ignorePageNumber.alignment = ["center","top"]; 
 
-  // GROUP3
-  // ======
-  var group3 = dialog.add("group", undefined, { name: "group3" });
-  group3.orientation = "row";
-  group3.alignChildren = ["left", "center"];
-  group3.spacing = 10;
-  group3.margins = 0;
+// GROUP3
+// ======
+var group3 = win.add("group", undefined, {name: "group3"}); 
+    group3.orientation = "row"; 
+    group3.alignChildren = ["left","center"]; 
+    group3.spacing = 10; 
+    group3.margins = 0; 
 
-  var close = group3.add("button", undefined, undefined, { name: "close" });
-  close.text = "Close";
+var close = group3.add("button", undefined, undefined, {name: "close"}); 
+    close.text = "Cancel"; 
 
-  var run = group3.add("button", undefined, undefined, { name: "run" });
-  run.text = "Execute";
+var runScript = group3.add("button", undefined, undefined, {name: "runScript"}); 
+    runScript.text = "Execute"; 
 
-  // DIALOG
-  // ======
-  var progressbar1 = dialog.add("progressbar", undefined, undefined, { name: "progressbar1" });
-  progressbar1.maxvalue = 100;
-  progressbar1.value = 50;
-  progressbar1.preferredSize.width = 50;
-  progressbar1.preferredSize.height = 10;
-  progressbar1.alignment = ["fill", "top"];
+// WIN
+// ===
+var progressBar = win.add("progressbar", undefined, undefined, {name: "progressBar"}); 
+    progressBar.maxvalue = 100; 
+    progressBar.value = 50; 
+    progressBar.preferredSize.height = 15; 
+    progressBar.alignment = ["fill","top"]; 
 
-  dialog.show();
+var statictext3 = win.add("statictext", undefined, undefined, {name: "statictext3"}); 
+    statictext3.text = "by KrevlinMen and ImSamuka"; 
+    statictext3.justify = "center"; 
+    statictext3.alignment = ["right","top"]; 
 
-
+win.show();
 
 
 
   //close.onClick = dialog.close
-  return { dialog: dialog, progressbar1: progressbar1 }
+  return { win: win, progressBar: progressBar }
 }
 
 
