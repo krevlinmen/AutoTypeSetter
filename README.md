@@ -24,7 +24,7 @@
   groupLayer: {
     groupName: "Types",       // Folder name
     visible: false,           // Visibility of the layer
-    alwaysCreateGroup: false, // With this, even if a folder named by 'groupName' already exists, it will create another
+    alwaysCreateGroup: false, // With this, it will always create a folder named by 'groupName'
     layerColor: null          // TODO: Not yet implemented
   },
   
