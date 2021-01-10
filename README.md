@@ -1,12 +1,11 @@
 
-#Configuration File
+# Configuration File
 
 
 ```javascript
 {
-  // ======> Page Identifiers
-  // These Configurations determine how we will identify
-  // a new 'page' in your .txt file
+  // These 3 Configurations determine how we will identify
+  // a new 'page' in your .txt file:
   
   identifierStart: "[", 
   identifierEnd: "]",
