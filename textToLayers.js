@@ -139,20 +139,19 @@ function readFile(file) {
   return rawText
 }
 
+function removeExtension(str) {
+  return str.slice(0, str.lastIndexOf("."))
+}
+
+function getFileFromScriptPath(filename) {
+  return new File((new File($.fileName)).path + "/" + encodeURI(filename))
+}
 
 function saveAndClosefile(file) {
-  const filePath = file.fullName
   if (isNotUndef(config.groupLayer.visible))
     getTypeFolder().visible = config.groupLayer.visible
 
-  function getSavePath() {
-    const ext = ['.png', '.jpg', '.jpeg']
-    for (i in ext)
-      if (filePath.endsWith(ext[i]))
-        return filePath.slice(0, filePath.length - ext[i].length)
-  }
-
-  const saveFile = File(getSavePath() + '.psd')
+  const saveFile = File(removeExtension(file.fullName) + '.psd')
   activeDocument.saveAs(saveFile)
   activeDocument.close()
 }
@@ -262,10 +261,6 @@ function isEqualObjects(obj, sec) {
 
 
 
-
-
-
-
 function getPageNumber(str) {
   return parseInt(str.slice(config.identifierStart.length, str.length - config.identifierEnd.length))
 }
@@ -273,7 +268,7 @@ function getPageNumber(str) {
 function getSpecificImage(arr, num) {
   for (i in arr) {
     var str = arr[i].name
-    if (num === parseInt(str.slice(0, str.lastIndexOf("."))))
+    if (num === parseInt(removeExtension(str)))
       return arr[i]
   }
   return undefined;
@@ -308,28 +303,13 @@ function getTypeFolder() {
 }
 
 function getConfig() {
-  const files = (new File($.fileName)).parent.getFiles("*Config.json")
-  var cFiles = {}
-  var defaultConfig
-  var savedConfig
-
 
   //* Reading Files
-  for (i in files)
-    if (files[i].name === "defaultConfig.json")
-      try {
-        defaultConfig = JSON.parse(readFile(files[i]))
-        cFiles.defaultConfig = files[i]
-      } catch (error) {
-        throwError("Something went wrong reading 'defaultConfig.json'")
-      }
-    else if (files[i].name === "savedConfig.json")
-      try {
-        savedConfig = JSON.parse(readFile(files[i]))
-        cFiles.savedConfig = files[i]
-      } catch (error) {
-        throwError("Something went wrong reading 'defaultConfig.json'")
-      }
+  var defaultConfig = getFileFromScriptPath("defaultConfig.json")
+  defaultConfig = defaultConfig.exists ? JSON.parse(readFile(defaultConfig)) : undefined
+
+  var savedConfig = getFileFromScriptPath("savedConfig.json")
+  savedConfig = savedConfig.exists ? JSON.parse(readFile(savedConfig)) : undefined
 
 
   //* Setting 'config'
@@ -378,7 +358,7 @@ function getConfig() {
 
   assertIntegrity(necessaryConfigs)
 
-  return { defaultConfig: defaultConfig, savedConfig: savedConfig, cFiles: cFiles }
+  return { defaultConfig: defaultConfig, savedConfig: savedConfig }
 }
 
 
@@ -857,7 +837,7 @@ function formatUserInterface(UI) {
         configObject = JSON.parse(readFile(file))
       }
 
-      const newFile = File(new File($.fileName).path + "/savedConfig.json")
+      const newFile = getFileFromScriptPath("savedConfig.json")
 
       newFile.encoding = 'UTF8'; // set to 'UTF8' or 'UTF-8'
       newFile.open("w");
@@ -896,10 +876,11 @@ function formatUserInterface(UI) {
   }
 
   UI.resetConfigBtn.onClick = function () {
-    if (UI.configs.cFiles.savedConfig === undefined) return;
+    const savedFile = getFileFromScriptPath("savedConfig.json")
+    if (!savedFile.exists) return;
 
     try {
-      UI.configs.cFiles.savedConfig.remove()
+      savedFile.remove()
     } catch (error) {
       throwError("Something went wrong when trying to delete saved configuration.", error)
     }
