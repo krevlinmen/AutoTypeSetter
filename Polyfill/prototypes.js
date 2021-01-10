@@ -35,16 +35,22 @@ String.prototype.endsWithArray = function (subArray) {
 //   return slice
 // }
 
+Array.isArray = function (arg) {
+  return Object.prototype.toString.call(arg) === '[object Array]';
+};
+
 Object.prototype.keys = function () {
   const arr = []
   for (k in this)
-    arr.push(k)
+    if (this.hasOwnProperty(k))
+      arr.push(k)
   return arr
 }
 
 Object.prototype.copy = function () {
-  const copy = {}
+  const copy = Array.isArray(this) ? [] : {}
   for (k in this)
-    copy[k] = this[k]
+    if (this.hasOwnProperty(k))
+      copy[k] = this[k]
   return copy
 }
