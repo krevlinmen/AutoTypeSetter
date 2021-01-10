@@ -1,0 +1,31 @@
+{
+  "identifierStart": "[",
+  "identifierEnd": "]",
+  "ignorePageNumber": false,
+  "selectAllFiles": false,
+  "groupLayer": {
+    "groupName": "Types",
+    "visible": false,
+    "alwaysCreateGroup": false,
+    "layerColor": null
+  },
+  "defaultTextFormat": {
+    "size": 16,
+    "font": "CCWildWordsInt Regular",
+    "boxText": true,
+    "justification": "CENTER",
+    "visible": true,
+    "language": "BRAZILLIANPORTUGUESE",
+    "layerColor": null
+  },
+  "ignoreCustomWith": ".",
+  "customTextFormats": [
+    {
+      "identifier_Start": "#",
+      "size": 12,
+      "font": "Chinacat",
+      "boxText": false,
+      "border": "#FFFFFF-3-outer-false"
+    }
+  ]
+}
