@@ -34,6 +34,7 @@ function main() {
   //? Change Configurations
   app.displayDialogs = DialogModes.ERROR //change to NO by the End
 
+
   const UI = formatUserInterface()
 
   UI.Executing = function () {
@@ -49,6 +50,7 @@ function main() {
 
 function processText(arrayFiles) {
 
+
   var multipleArchives = false
 
   if (arrayFiles.length === 0)
@@ -57,6 +59,9 @@ function processText(arrayFiles) {
     textFile = arrayFiles[0]
   else
     multipleArchives = true
+
+
+
 
   const imageArrayDir = multipleArchives ? createImageArray(arrayFiles) : undefined
   const content = createContentObj()
@@ -274,6 +279,14 @@ function getSpecificImage(arr, num) {
   return undefined;
 }
 
+function getIndexOf(arr, item) {
+  for (i in arr) {
+    if (item === arr[i])
+      return i
+  }
+  return -1;
+}
+
 function getFont(fontName) {
   //? Loop through every font
   for (i = 0; i < app.fonts.length; i++)
@@ -378,16 +391,65 @@ function getConfig() {
 
 function createImageArray(arrayFiles) {
   const imageArray = []
+
   for (i in arrayFiles) {
     var file = arrayFiles[i]
-    if (!file.name.endsWithArray(['.txt', '.png', '.jpeg', '.jpg', '.psd', '.psb']))
+    if (!file.name.endsWithArray(['.txt', '.png', '.jpg', '.jpeg', '.psd', '.psb']))
       throwError("One or more files are not supported by this script!\nThis script supports the extensions:\n.png, .jpg, .jpeg, .psd, .psb, .txt")
     else if (file.name.endsWith('.txt'))
       textFile = file
     else
       imageArray.push(file)
   }
+
+  //* Prioritize Order
+
+  const prioritizeOrder = ['.psd', '.psb', '.png', '.jpg', '.jpeg']
+
+  if (!config.prioritizePSD) {
+    prioritizeOrder.push(prioritizeOrder.shift())
+    prioritizeOrder.push(prioritizeOrder.shift())
+  }
+
+  //* Eliminate Duplicates
+
+  const getExtension = function (str) {
+    return str.slice(str.lastIndexOf("."))
+  }
+
+  const nValue = function (str) {
+    return config.ignorePageNumber ? removeExtension(str) : parseInt(removeExtension(str))
+  }
+
+
+  for (i = 0; i < imageArray.length; i++) {
+
+    var n = nValue(imageArray[i].name)
+    var duplicates = []
+
+    for (j in imageArray)
+      if (n == nValue(imageArray[j].name))
+        duplicates.push(imageArray[j])
+
+    if (duplicates.length > 1) {
+      duplicates.sort(function (a, b) {
+        const aR = getIndexOf(prioritizeOrder, getExtension(a.name).toLowerCase())
+        const bR = getIndexOf(prioritizeOrder, getExtension(b.name).toLowerCase())
+        if (aR == -1) return 1
+        if (bR == -1) return -1
+        return aR - bR
+      })
+    }
+
+    for (j = 1; j < duplicates.length; j++) {
+      var index = getIndexOf(imageArray, duplicates[j])
+      var removed = imageArray.splice(index, 1)
+      //alert("removing " + removed[0].name)
+    }
+  }
+
   imageArray.sort()
+
   return imageArray
 }
 

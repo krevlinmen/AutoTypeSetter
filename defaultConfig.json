@@ -2,6 +2,7 @@
   "identifierStart": "[",
   "identifierEnd": "]",
   "ignorePageNumber": false,
+  "prioritizePSD": false,
   "selectAllFiles": false,
   "groupLayer": {
     "groupName": "Types",
