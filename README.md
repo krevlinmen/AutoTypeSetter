@@ -18,8 +18,14 @@
     // "01.png", "2.psd", "30.jpeg" to insert this text into
   
   
+  "prioritizePSD": false, // Prioritize '.psd' and '.psb' over the other files
+  // If have ambiguous files selected like "01.png" and "1.psd"
+  // There is a order of priorities, that is:
+  // '.psd', '.psb', '.png',  '.jpg', '.jpeg'  OR
+  // '.png', '.jpg', '.jpeg', '.psd', '.psb'
   
-  selectAllFiles: false, // With this, you select every file manually, rather than a folder
+  
+  selectAllFiles: false,  // With this, you select every file manually, rather than a folder
   
   groupLayer: {
     groupName: "Types",       // Folder name
