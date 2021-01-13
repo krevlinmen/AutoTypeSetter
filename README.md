@@ -20,7 +20,7 @@ Can only be used in `defaultTextFormat` and `customTextFormats` from the configu
 | identifierStart | string | Can only be used in `customTextFormats` and is **Obrigatory**. Identifies the type of formatting to use in a line of text. Will be ignored if `ignoreCustomWith` identifier was found before this. |
 | size | integer | Font size. |
 | font | string |  Font name. |
-| justification | string |  Text justification. See *Documentation* for options. |
+| justification | string |  Text justification. See [Documentation](#Documentation) for options. |
 | language | string |  Text language, useful for auto-wrapping. See [Documentation](#Documentation) for options. |
 | boxText | boolean |  If true, a TextBox will be used instead of a PointText. |
 
