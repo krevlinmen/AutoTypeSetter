@@ -1,7 +1,3 @@
-
-[TOC]
-
-
 # Layer Format Object
 This can be used in `defaultTextFormat`, `customTextFormats`, `starterLayerFormats` and `groupLayer` properties from the configuration file.
 
@@ -25,7 +21,7 @@ Can only be used in `defaultTextFormat` and `customTextFormats` from the configu
 | size | integer | Font size. |
 | font | string |  Font name. |
 | justification | string |  Text justification. See *Documentation* for options. |
-| language | string |  Text language, useful for auto-wrapping. See *Documentation* for options. |
+| language | string |  Text language, useful for auto-wrapping. See [Documentation](#Documentation) for options. |
 | boxText | boolean |  If true, a TextBox will be used instead of a PointText. |
 
 
