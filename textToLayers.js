@@ -8,6 +8,7 @@
 
 #target 'photoshop'
 
+
 /* -------------------------------------------------------------------------- */
 /*                                Documentation                               */
 /*            https://www.adobe.com/devnet/photoshop/scripting.html           */
@@ -173,8 +174,7 @@ function removeExtension(str) {
 }
 
 function saveAndClosefile(file) {
-  if (isNotUndef(config.groupLayer.visible))
-    getTypeFolder().visible = config.groupLayer.visible
+  formatLayer(getTypeFolder(), config.groupLayer)
 
   const saveFile = File(removeExtension(file.fullName) + '.psd')
   activeDocument.saveAs(saveFile)
@@ -189,7 +189,7 @@ function applyStarterLayerFormats() {
   for (i in config.starterLayerFormats) {
     var format = config.starterLayerFormats[i]
 
-    if (isNotUndef(format.duplicate) && format.duplicate)
+    if (i > 0 && isNotUndef(format.duplicate) && format.duplicate)
       currentLayer = currentLayer.duplicate()
     else if (i > 0) {
       var newL = activeDocument.artLayers.add()
@@ -329,9 +329,9 @@ function getFont(fontName) {
 }
 
 function getTypeFolder() {
-  const groupName = config.groupLayer.groupName
+  const groupName = config.groupLayer.name
 
-  if (config.groupLayer.alwaysCreateGroup && !alreadyCreatedTextFolder) {
+  if (config.alwaysCreateGroup && !alreadyCreatedTextFolder) {
     alreadyCreatedTextFolder = true
     return createGroupFolder(groupName)
   }
@@ -396,13 +396,21 @@ function getConfig() {
     identifierStart: undefined,
     identifierEnd: undefined,
     ignorePageNumber: undefined,
+    alwaysCreateGroup: undefined,
     groupLayer: {
-      groupName: undefined,
-      alwaysCreateGroup: undefined
+      name: undefined
     }
   }
 
   assertIntegrity(necessaryConfigs)
+
+  if (!Array.isArray(config.customTextFormats))
+    config.customTextFormats = []
+
+  config.groupLayer.isBackgroundLayer = undefined
+  config.defaultTextFormat.isBackgroundLayer = undefined
+  for (i in config.customTextFormats)
+    config.customTextFormats[i].isBackgroundLayer = undefined
 
   return { defaultConfig: defaultConfig, savedConfig: savedConfig }
 }
@@ -538,11 +546,21 @@ function formatLayer(layer, format) {
   if (isNotUndef(format.name)) layer.name = format.name
 
 
-  //* Locking - allLocked should always be first
-  if (isNotUndef(format.allLocked)) layer.allLocked = format.allLocked
+  //* Locking
   if (isNotUndef(format.transparentPixelsLocked)) layer.transparentPixelsLocked = format.transparentPixelsLocked
   if (isNotUndef(format.pixelsLocked)) layer.pixelsLocked = format.pixelsLocked
   if (isNotUndef(format.positionLocked)) layer.positionLocked = format.positionLocked
+
+  if (isNotUndef(format.allLocked)) {
+    layer.allLocked = format.allLocked
+    if (layer.allLocked) {
+      layer.transparentPixelsLocked = false
+      layer.pixelsLocked = false
+      layer.positionLocked = false
+    }
+  } else if (layer.transparentPixelsLocked || layer.pixelsLocked || layer.positionLocked)
+    layer.allLocked = false
+
 
 
   //* Text Features
@@ -921,9 +939,9 @@ function formatUserInterface(UI) {
       if (isNotUndef(config.identifierEnd)) UI.identifierEndBox.text = config.identifierEnd
       if (isNotUndef(config.ignorePageNumber)) UI.ignorePageNumberCB.value = config.ignorePageNumber
       if (isNotUndef(config.selectAllFiles)) UI.selectAllFilesCB.value = config.selectAllFiles
+      if (isNotUndef(config.alwaysCreateGroup)) UI.alwaysCreateGroupCB.value = config.alwaysCreateGroup
       if (isNotUndef(config.groupLayer)) {
-        if (isNotUndef(config.groupLayer.groupName)) UI.groupNameBox.text = config.groupLayer.groupName
-        if (isNotUndef(config.groupLayer.alwaysCreateGroup)) UI.alwaysCreateGroupCB.value = config.groupLayer.alwaysCreateGroup
+        if (isNotUndef(config.groupLayer.name)) UI.groupNameBox.text = config.groupLayer.name
         if (isNotUndef(config.groupLayer.visible)) UI.visibleGroupCB.value = config.groupLayer.visible
       }
     } catch (error) {
@@ -937,8 +955,8 @@ function formatUserInterface(UI) {
     config.identifierEnd = UI.identifierEndBox.text
     config.ignorePageNumber = UI.ignorePageNumberCB.value
     config.selectAllFiles = UI.selectAllFilesCB.value
-    config.groupLayer.groupName = UI.groupNameBox.text
-    config.groupLayer.alwaysCreateGroup = UI.alwaysCreateGroupCB.value
+    config.alwaysCreateGroup = UI.alwaysCreateGroupCB.value
+    config.groupLayer.name = UI.groupNameBox.text
     config.groupLayer.visible = UI.visibleGroupCB.value
   }
 

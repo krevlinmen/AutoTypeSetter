@@ -4,10 +4,10 @@
   "ignorePageNumber": false,
   "prioritizePSD": false,
   "selectAllFiles": false,
+  "alwaysCreateGroup": false,
   "groupLayer": {
-    "groupName": "Types",
-    "visible": false,
-    "alwaysCreateGroup": false
+    "name": "Types",
+    "visible": false
   },
   "defaultTextFormat": {
     "size": 16,
