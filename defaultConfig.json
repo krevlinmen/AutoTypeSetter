@@ -7,26 +7,43 @@
   "groupLayer": {
     "groupName": "Types",
     "visible": false,
-    "alwaysCreateGroup": false,
-    "layerColor": null
+    "alwaysCreateGroup": false
   },
   "defaultTextFormat": {
     "size": 16,
     "font": "CCWildWordsInt Regular",
+    "visible": true,
     "boxText": true,
     "justification": "CENTER",
-    "visible": true,
-    "language": "BRAZILLIANPORTUGUESE",
-    "layerColor": null
+    "language": "BRAZILLIANPORTUGUESE"
   },
   "ignoreCustomWith": ".",
   "customTextFormats": [
     {
-      "identifier_Start": "#",
+      "identifierStart": "#",
       "size": 12,
       "font": "Chinacat",
       "boxText": false,
       "border": "#FFFFFF-3-outer-false"
+    }
+  ],
+  "starterLayerFormats": [
+    {
+      "name": "Raw",
+      "isBackgroundLayer": false,
+      "allLocked": true
+    },
+    {
+      "name": "Redraw",
+      "duplicate": true,
+      "visible": false,
+      "allLocked": false,
+      "transparentPixelsLocked": true,
+      "positionLocked": true
+    },
+    {
+      "name": "Balões",
+      "positionLocked": true
     }
   ]
 }

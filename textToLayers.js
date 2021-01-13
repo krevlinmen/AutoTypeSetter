@@ -6,7 +6,7 @@
 </javascriptresource>
 */
 
-//#target 'photoshop'
+#target 'photoshop'
 
 /* -------------------------------------------------------------------------- */
 /*                                Documentation                               */
@@ -21,6 +21,7 @@
 
 var textFile;
 var duplicatedLayer;
+var alreadyCreatedTextFolder = false;
 var config = {};
 
 /* -------------------------------------------------------------------------- */
@@ -33,6 +34,11 @@ function main() {
   const savedDialogMode = app.displayDialogs
   //? Change Configurations
   app.displayDialogs = DialogModes.ERROR //change to NO by the End
+
+  //! TESTING
+  //* insertPageTexts() inside processText()
+  //* applyStarterLayerFormats()
+  //* formatLayer()
 
 
   const UI = formatUserInterface()
@@ -50,7 +56,7 @@ function main() {
 
 function processText(arrayFiles) {
 
-  
+
   var multipleArchives = false
 
   if (arrayFiles.length === 0)
@@ -67,14 +73,31 @@ function processText(arrayFiles) {
 
   function insertPageTexts(page) {
     const positionArray = calculatePositions(page)
-    for (i in page)
-      writeTextLayer(page[i], i < page.length - 1, positionArray[i])
+
+    for (i in page) {
+      var line = page[i]
+      var format;
+
+      if (isNotUndef(config.ignoreCustomWith) && line.startsWith(config.ignoreCustomWith))
+        line = line.slice(config.ignoreCustomWith.length)
+
+      else if (isNotUndef(config.customTextFormats))
+        for (j in config.customTextFormats)
+          if (line.startsWith(config.customTextFormats[j].identifierStart)) {
+            line = line.slice(config.customTextFormats[j].identifierStart.length)
+            format = config.customTextFormats[j]
+            break;
+          }
+
+      writeTextLayer(line, i < page.length - 1, positionArray[i], format)
+    }
+
   }
 
   if (multipleArchives) {
     progressBarObj = new createProgressBarObj(filteredFiles[1])
     progressBarObj.win.show()
-    
+
     for (key in content) { //File editing loop
       var keyNum = parseInt(key)
       if (config.ignorePageNumber && (keyNum - 1) >= imageArrayDir.length) break;
@@ -83,9 +106,9 @@ function processText(arrayFiles) {
       if (found === undefined) continue;
 
       open(found)
-      cleanFile()
+      applyStarterLayerFormats()
       insertPageTexts(content[key]) //Page text Writing Loop
-      progressBarObj.progressBar.value += 1/imageArrayDir.length
+      progressBarObj.progressBar.value += 1 / imageArrayDir.length
       saveAndClosefile(found)
     }
   } else {
@@ -97,7 +120,7 @@ function processText(arrayFiles) {
       throwError("No document open.")
     }
 
-    cleanFile()
+    applyStarterLayerFormats()
     //? Getting the first valid key of 'content'
     insertPageTexts(content[content.keys()[0]])
   }
@@ -149,10 +172,6 @@ function removeExtension(str) {
   return str.slice(0, str.lastIndexOf("."))
 }
 
-function getFileFromScriptPath(filename) {
-  return new File((new File($.fileName)).path + "/" + encodeURI(filename))
-}
-
 function saveAndClosefile(file) {
   if (isNotUndef(config.groupLayer.visible))
     getTypeFolder().visible = config.groupLayer.visible
@@ -160,19 +179,27 @@ function saveAndClosefile(file) {
   const saveFile = File(removeExtension(file.fullName) + '.psd')
   activeDocument.saveAs(saveFile)
   activeDocument.close()
+  alreadyCreatedTextFolder = false;
 }
 
-function cleanFile() {
-  try {
-    var editL = activeDocument.backgroundLayer.duplicate()
-    editL.name = "Camada para Edicao"
-    activeDocument.backgroundLayer.name = "Camada Raw"
-  } catch (error) {
-    return
+function applyStarterLayerFormats() {
+
+  var currentLayer = activeDocument.layers[activeDocument.layers.length - 1]
+
+  for (i in config.starterLayerFormats) {
+    var format = config.starterLayerFormats[i]
+
+    if (isNotUndef(format.duplicate) && format.duplicate)
+      currentLayer = currentLayer.duplicate()
+    else if (i > 0) {
+      var newL = activeDocument.artLayers.add()
+      newL.move(currentLayer, ElementPlacement.PLACEBEFORE)
+      currentLayer = newL
+    }
+
+    formatLayer(currentLayer, format)
   }
-  //createGroupFolder("Layers")
-  createEmptyLayer('Baloes')
-  createEmptyLayer('Redraw')
+
 }
 
 
@@ -265,7 +292,9 @@ function isEqualObjects(obj, sec) {
 
 
 
-
+function getFileFromScriptPath(filename) {
+  return new File((new File($.fileName)).path + "/" + encodeURI(filename))
+}
 
 function getPageNumber(str) {
   return parseInt(str.slice(config.identifierStart.length, str.length - config.identifierEnd.length))
@@ -302,8 +331,11 @@ function getFont(fontName) {
 function getTypeFolder() {
   const groupName = config.groupLayer.groupName
 
-  if (config.groupLayer.alwaysCreateGroup)
+  if (config.groupLayer.alwaysCreateGroup && !alreadyCreatedTextFolder) {
+    alreadyCreatedTextFolder = true
     return createGroupFolder(groupName)
+  }
+
 
   var textFolder;
   try {
@@ -401,10 +433,10 @@ function createImageArray(arrayFiles) {
       textFile = file
     else
       imageArray.push(file)
-      fileNames.push(file.name)
-      
+    fileNames.push(file.name)
+
   }
-  
+
   return [imageArray.sort(), fileNames.sort()]
 }
 
@@ -491,21 +523,46 @@ function createGroupFolder(groupName, folderFormat) {
 
 
 
+function formatLayer(layer, format) {
+  if (format === undefined || layer === undefined) return;
+
+  //* Is Background - This property can break many of the other ones
+  //! it breaks 'Naming', 'Locking' and Text Features(probably)
+  if (isNotUndef(format.isBackgroundLayer)) layer.isBackgroundLayer = format.isBackgroundLayer
+  if (layer.isBackgroundLayer) {
+    if (isNotUndef(format.visible)) layer.visible = format.visible
+    return;
+  }
+
+  //* Naming
+  if (isNotUndef(format.name)) layer.name = format.name
 
 
+  //* Locking - allLocked should always be first
+  if (isNotUndef(format.allLocked)) layer.allLocked = format.allLocked
+  if (isNotUndef(format.transparentPixelsLocked)) layer.transparentPixelsLocked = format.transparentPixelsLocked
+  if (isNotUndef(format.pixelsLocked)) layer.pixelsLocked = format.pixelsLocked
+  if (isNotUndef(format.positionLocked)) layer.positionLocked = format.positionLocked
 
-function formatTextLayer(TextLayer, format) {
-  if (format === undefined) return;
 
-  const txt = TextLayer.textItem
+  //* Text Features
+  if (layer.kind === LayerKind.TEXT) {
 
-  if (isNotUndef(format.visible)) TextLayer.visible = format.visible
-  if (isNotUndef(format.font)) txt.font = getFont(format.font).postScriptName
-  if (isNotUndef(format.size)) txt.size = format.size
-  if (isNotUndef(format.boxText)) txt.kind = format.boxText ? TextType.PARAGRAPHTEXT : TextType.POINTTEXT
-  if (isNotUndef(format.justification)) txt.justification = Justification[format.justification]
-  if (isNotUndef(format.language)) txt.language = Language[format.language]
+    const txt = layer.textItem
+
+    if (isNotUndef(format.font)) txt.font = getFont(format.font).postScriptName
+    if (isNotUndef(format.size)) txt.size = format.size
+    if (isNotUndef(format.boxText)) txt.kind = format.boxText ? TextType.PARAGRAPHTEXT : TextType.POINTTEXT
+    if (isNotUndef(format.justification)) txt.justification = Justification[format.justification]
+    if (isNotUndef(format.language)) txt.language = Language[format.language]
+
+  }
+
+  //* Visibility - always last
+  if (isNotUndef(format.visible)) layer.visible = format.visible
+
 }
+
 
 function writeTextLayer(text, activateDuplication, positionArray, format) {
 
@@ -517,7 +574,7 @@ function writeTextLayer(text, activateDuplication, positionArray, format) {
 
     //* Default Formatting
     if (isNotUndef(config.defaultTextFormat))
-      formatTextLayer(txtLayer, config.defaultTextFormat)
+      formatLayer(txtLayer, config.defaultTextFormat)
     return txtLayer;
   }
 
@@ -531,7 +588,7 @@ function writeTextLayer(text, activateDuplication, positionArray, format) {
   txtLayer.textItem.contents = text
   txtLayer.name = text
 
-  if (format) formatTextLayer(txtLayer, format)
+  if (format) formatLayer(txtLayer, format)
 
   //? Positioning
   txtLayer.textItem.position = [positionArray.xPosition, positionArray.yPosition]
@@ -596,39 +653,39 @@ function calculatePositions(textArray) {
 // }
 
 
-function createProgressBarObj(imgArrayDir){
-  
-/*
-Code for Import https://scriptui.joon as.me — (Triple click to select): 
-{"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"Processing files","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"Progressbar","parentId":0,"style":{"enabled":true,"varName":"","preferredSize":[50,4],"alignment":"fill","helpTip":null}},"item-2":{"id":2,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":null}},"item-3":{"id":3,"type":"Button","parentId":0,"style":{"enabled":true,"varName":"cancelButton","text":"Cancel","justify":"center","preferredSize":[0,0],"alignment":"right","helpTip":null}}},"order":[0,1,2,3],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
-*/ 
+function createProgressBarObj(imgArrayDir) {
 
-// WIN
-// ===
-this.win = new Window("window"); 
-this.win.text = "Processing files"; 
-this.win.orientation = "column"; 
-this.win.alignChildren = ["center","top"]; 
-this.win.spacing = 10; 
-this.win.margins = 16; 
+  /*
+  Code for Import https://scriptui.joon as.me — (Triple click to select): 
+  {"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"Processing files","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"Progressbar","parentId":0,"style":{"enabled":true,"varName":"","preferredSize":[50,4],"alignment":"fill","helpTip":null}},"item-2":{"id":2,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":null}},"item-3":{"id":3,"type":"Button","parentId":0,"style":{"enabled":true,"varName":"cancelButton","text":"Cancel","justify":"center","preferredSize":[0,0],"alignment":"right","helpTip":null}}},"order":[0,1,2,3],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
+  */
 
-this.progressBar = this.win.add("progressbar", undefined, undefined, {name: "progressBar"}); 
-this.progressBar.maxvalue = 1; 
-this.progressBar.value = 0; 
-this.progressBar.preferredSize.width = 200; 
-this.progressBar.preferredSize.height = 15; 
-this.progressBar.alignment = ["fill","top"]; 
+  // WIN
+  // ===
+  this.win = new Window("window");
+  this.win.text = "Processing files";
+  this.win.orientation = "column";
+  this.win.alignChildren = ["center", "top"];
+  this.win.spacing = 10;
+  this.win.margins = 16;
 
-
-this.listBox = this.win.add("listbox", undefined, undefined, {name: "listbox1", items: imgArrayDir});
+  this.progressBar = this.win.add("progressbar", undefined, undefined, { name: "progressBar" });
+  this.progressBar.maxvalue = 1;
+  this.progressBar.value = 0;
+  this.progressBar.preferredSize.width = 200;
+  this.progressBar.preferredSize.height = 15;
+  this.progressBar.alignment = ["fill", "top"];
 
 
-var divider1 = this.win.add("panel", undefined, undefined, {name: "divider1"}); 
-divider1.alignment = "fill"; 
+  this.listBox = this.win.add("listbox", undefined, undefined, { name: "listbox1", items: imgArrayDir });
 
-var cancelButton = this.win.add("button", undefined, undefined, {name: "cancelButton"}); 
-cancelButton.text = "Cancel"; 
-cancelButton.alignment = ["right","top"]; 
+
+  var divider1 = this.win.add("panel", undefined, undefined, { name: "divider1" });
+  divider1.alignment = "fill";
+
+  var cancelButton = this.win.add("button", undefined, undefined, { name: "cancelButton" });
+  cancelButton.text = "Cancel";
+  cancelButton.alignment = ["right", "top"];
 
 
 }
