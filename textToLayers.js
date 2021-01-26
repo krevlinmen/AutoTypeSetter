@@ -6,7 +6,7 @@
 </javascriptresource>
 */
 
-#target 'photoshop'
+//#target 'photoshop'
 
 
 /* -------------------------------------------------------------------------- */
@@ -43,11 +43,31 @@ function main() {
 
 
   const UI = formatUserInterface()
-
+  progressBarObj = new createProgressBarObj()
   UI.Executing = function () {
-    //alert("Executado!")
-    processText(UI.arrayFiles)
+
+    try {
+      //alert("Executado!")
+      
+      processText(UI.arrayFiles)
+
+
+
+
+    } catch (error) { //? Closes the windows if an error occurs, else Photoshop crashes
+      try {
+        UI.win.close()
+      } catch (error) {
+        try {
+          progressBarObj.win.close()
+        } catch (error) {
+          throwError("Something really bad happened")
+        }
+      }
+
+    }
   }
+
 
   $.writeln(UI.win.show());
 
@@ -56,7 +76,7 @@ function main() {
 }
 
 function processText(arrayFiles) {
-
+  
 
   var multipleArchives = false
 
@@ -71,10 +91,9 @@ function processText(arrayFiles) {
   const content = createContentObj()
 
   delete content[0] //Deletes text before the first identifier
-
+  
   function insertPageTexts(page) {
     const positionArray = calculatePositions(page)
-
     for (i in page) {
       var line = page[i]
       var format;
@@ -94,24 +113,27 @@ function processText(arrayFiles) {
     }
 
   }
-
+  
   if (multipleArchives) {
-    progressBarObj = new createProgressBarObj(filteredFiles[1])
-    progressBarObj.win.show()
-
+    
+    formatProgressBarObj(progressBarObj,filteredFiles[1])
+    
+    var pageNumber = 0 //! Cant use 'key' because it also contains the functions
     for (key in content) { //File editing loop
+
       var keyNum = parseInt(key)
       if (config.ignorePageNumber && (keyNum - 1) >= imageArrayDir.length) break;
-
       var found = config.ignorePageNumber ? imageArrayDir[keyNum - 1] : getSpecificImage(imageArrayDir, keyNum)
+      
       if (found === undefined) continue;
-
+      
       open(found)
       applyStarterLayerFormats()
       insertPageTexts(content[key]) //Page text Writing Loop
-      progressBarObj.progressBar.value += 1 / imageArrayDir.length
-      saveAndClosefile(found)
+      saveAndClosefile(found,imageArrayDir)
+      
     }
+    progressBarObj.win.close()
   } else {
 
     try {
@@ -158,6 +180,16 @@ function processText(arrayFiles) {
 function throwError(message, extra) {
   if (app.displayDialogs === DialogModes.NO) alert(message)
   else if (isNotUndef(extra)) alert(extra)
+  
+  try {//?Closes the tabs, else Crash
+    UI.win.close()
+  } catch (error) {
+    try {
+      progressBarObj.win.close()
+    } catch (error) {
+      throw new Error(message)
+    }
+  }
   throw new Error(message)
 }
 
@@ -173,13 +205,20 @@ function removeExtension(str) {
   return str.slice(0, str.lastIndexOf("."))
 }
 
-function saveAndClosefile(file) {
+function saveAndClosefile(file,imageArrayDir) {
   formatLayer(getTypeFolder(), config.groupLayer)
 
   const saveFile = File(removeExtension(file.fullName) + '.psd')
   activeDocument.saveAs(saveFile)
   activeDocument.close()
   alreadyCreatedTextFolder = false;
+
+  //? Update progressBar
+  progressBarObj.progressBar.value += 1 / imageArrayDir.length
+  progressBarObj.listBox.remove(0)
+  pageNumber += 1
+
+
 }
 
 function applyStarterLayerFormats() {
@@ -232,7 +271,7 @@ function isNewPage(line) {
 function isEqualObjects(obj, sec) {
 
   if ((obj === null || sec === null ||
-    typeof (obj) != 'object' || typeof (sec) != 'object'))
+      typeof (obj) != 'object' || typeof (sec) != 'object'))
     throwError("\nTypeError: equalObjects received non-objects")
 
   const objKeys = obj.keys()
@@ -276,8 +315,7 @@ function isEqualObjects(obj, sec) {
     if (o != null && typeof (o) === 'object') {
       if (!isEqualObjects(o, s))
         return false
-    }
-    else if (o != s)
+    } else if (o != s)
       return false
   }
 
@@ -297,7 +335,9 @@ function getFileFromScriptPath(filename) {
 }
 
 function getPageNumber(str) {
-  return parseInt(str.slice(config.identifierStart.length, str.length - config.identifierEnd.length))
+  var res = str.slice(config.identifierStart.length, str.length - config.identifierEnd.length) //? Removes the identifier
+  var str = res.replace(/\D/g, ""); //? Cleans the line, removing NaN text such as "Page" from the identifier
+  return parseInt(str)
 }
 
 function getSpecificImage(arr, num) {
@@ -361,8 +401,7 @@ function getConfig() {
   //* Setting 'config'
   if (defaultConfig === undefined) {
     throwError("Default Configuration Missing.\nYou can get another one for free on https://github.com/krevlinmen/PhotoshopScanlatingScripts")
-  }
-  else {
+  } else {
     config = (savedConfig === undefined ? defaultConfig : savedConfig).copy()
   }
 
@@ -412,7 +451,10 @@ function getConfig() {
   for (i in config.customTextFormats)
     config.customTextFormats[i].isBackgroundLayer = undefined
 
-  return { defaultConfig: defaultConfig, savedConfig: savedConfig }
+  return {
+    defaultConfig: defaultConfig,
+    savedConfig: savedConfig
+  }
 }
 
 
@@ -442,7 +484,6 @@ function createImageArray(arrayFiles) {
     else
       imageArray.push(file)
     fileNames.push(file.name)
-
   }
 
   return [imageArray.sort(), fileNames.sort()]
@@ -462,7 +503,6 @@ function createContentObj() {
     0: []
   }
   var current = 0
-
   for (t in textArray) {
     var line = textArray[t].trim()
 
@@ -470,6 +510,7 @@ function createContentObj() {
       current = config.ignorePageNumber ? current + 1 : getPageNumber(line)
       content[current] = []
     } else if (current && line.length) {
+      
       content[current].push(line)
     }
   }
@@ -671,7 +712,7 @@ function calculatePositions(textArray) {
 // }
 
 
-function createProgressBarObj(imgArrayDir) {
+function createProgressBarObj() {
 
   /*
   Code for Import https://scriptui.joon as.me — (Triple click to select): 
@@ -687,27 +728,53 @@ function createProgressBarObj(imgArrayDir) {
   this.win.spacing = 10;
   this.win.margins = 16;
 
-  this.progressBar = this.win.add("progressbar", undefined, undefined, { name: "progressBar" });
+
+
+
+  this.progressBar = this.win.add("progressbar", undefined, undefined, {
+    name: "progressBar"
+  });
   this.progressBar.maxvalue = 1;
   this.progressBar.value = 0;
   this.progressBar.preferredSize.width = 200;
   this.progressBar.preferredSize.height = 15;
   this.progressBar.alignment = ["fill", "top"];
 
+  
+  this.listBox = this.win.add("listbox", undefined, undefined, {
+    name: "listbox1"
+  });
 
-  this.listBox = this.win.add("listbox", undefined, undefined, { name: "listbox1", items: imgArrayDir });
-
-
-  var divider1 = this.win.add("panel", undefined, undefined, { name: "divider1" });
+  var divider1 = this.win.add("panel", undefined, undefined, {
+    name: "divider1"
+  });
   divider1.alignment = "fill";
 
-  var cancelButton = this.win.add("button", undefined, undefined, { name: "cancelButton" });
+  var cancelButton = this.win.add("button", undefined, undefined, {
+    name: "cancelButton"
+  });
   cancelButton.text = "Cancel";
   cancelButton.alignment = ["right", "top"];
-
-
 }
 
+function formatProgressBarObj(progressBar,imgDir){
+
+  for (i in imgDir) { //Removes the txt file | Weird code that works up ahead
+    if (imgDir[i].endsWith(".txt")) {
+      imgDir[i] = imgDir[imgDir.length - 1];
+      imgDir.pop();
+      break
+    }
+  }
+
+  imgDir = imgDir.sort()
+  imgDir[0]+= " | Processing......" //Makes the listBox full length
+  for (i in imgDir){
+  progressBar.listBox.add("item",imgDir[i])
+}
+  progressBar.listBox.items[0].text = progressBar.listBox.items[0].text.replace(" | Processing......", "")
+ progressBar.win.show()
+}
 
 function createUserInterface() {
   /*
@@ -726,7 +793,9 @@ function createUserInterface() {
 
   // GROUP1
   // ======
-  var group1 = this.win.add("group", undefined, { name: "group1" });
+  var group1 = this.win.add("group", undefined, {
+    name: "group1"
+  });
   group1.orientation = "column";
   group1.alignChildren = ["fill", "top"];
   group1.spacing = 10;
@@ -734,7 +803,9 @@ function createUserInterface() {
 
   // PANEL1
   // ======
-  var panel1 = group1.add("panel", undefined, undefined, { name: "panel1" });
+  var panel1 = group1.add("panel", undefined, undefined, {
+    name: "panel1"
+  });
   panel1.text = "Page Indentifiers";
   panel1.orientation = "column";
   panel1.alignChildren = ["left", "top"];
@@ -743,14 +814,18 @@ function createUserInterface() {
 
   // GROUP2
   // ======
-  var group2 = panel1.add("group", undefined, { name: "group2" });
+  var group2 = panel1.add("group", undefined, {
+    name: "group2"
+  });
   group2.orientation = "row";
   group2.alignChildren = ["right", "center"];
   group2.spacing = 10;
   group2.margins = 0;
   group2.alignment = ["center", "top"];
 
-  var statictext1 = group2.add("statictext", undefined, undefined, { name: "statictext1" });
+  var statictext1 = group2.add("statictext", undefined, undefined, {
+    name: "statictext1"
+  });
   statictext1.text = "Start";
 
   this.identifierStartBox = group2.add('edittext {properties: {name: "identifierStartBox"}}');
@@ -759,14 +834,18 @@ function createUserInterface() {
 
   // GROUP3
   // ======
-  var group3 = panel1.add("group", undefined, { name: "group3" });
+  var group3 = panel1.add("group", undefined, {
+    name: "group3"
+  });
   group3.orientation = "row";
   group3.alignChildren = ["right", "center"];
   group3.spacing = 10;
   group3.margins = 0;
   group3.alignment = ["center", "top"];
 
-  var statictext2 = group3.add("statictext", undefined, undefined, { name: "statictext2" });
+  var statictext2 = group3.add("statictext", undefined, undefined, {
+    name: "statictext2"
+  });
   statictext2.text = "End";
 
   this.identifierEndBox = group3.add('edittext {properties: {name: "identifierEndBox"}}');
@@ -775,13 +854,17 @@ function createUserInterface() {
 
   // PANEL1
   // ======
-  this.ignorePageNumberCB = panel1.add("checkbox", undefined, undefined, { name: "ignorePageNumberCB" });
+  this.ignorePageNumberCB = panel1.add("checkbox", undefined, undefined, {
+    name: "ignorePageNumberCB"
+  });
   this.ignorePageNumberCB.helpTip = "This will ignore or not numbers between both identifiers";
   this.ignorePageNumberCB.text = "Ignore Page Number";
 
   // PANEL2
   // ======
-  var panel2 = group1.add("panel", undefined, undefined, { name: "panel2" });
+  var panel2 = group1.add("panel", undefined, undefined, {
+    name: "panel2"
+  });
   panel2.text = "Text Group";
   panel2.orientation = "column";
   panel2.alignChildren = ["left", "top"];
@@ -790,14 +873,18 @@ function createUserInterface() {
 
   // GROUP4
   // ======
-  var group4 = panel2.add("group", undefined, { name: "group4" });
+  var group4 = panel2.add("group", undefined, {
+    name: "group4"
+  });
   group4.orientation = "row";
   group4.alignChildren = ["right", "center"];
   group4.spacing = 10;
   group4.margins = 0;
   group4.alignment = ["fill", "top"];
 
-  var statictext3 = group4.add("statictext", undefined, undefined, { name: "statictext3" });
+  var statictext3 = group4.add("statictext", undefined, undefined, {
+    name: "statictext3"
+  });
   statictext3.text = "Name";
 
   this.groupNameBox = group4.add('edittext {properties: {name: "groupNameBox"}}');
@@ -806,45 +893,61 @@ function createUserInterface() {
 
   // PANEL2
   // ======
-  this.visibleGroupCB = panel2.add("checkbox", undefined, undefined, { name: "visibleGroupCB" });
+  this.visibleGroupCB = panel2.add("checkbox", undefined, undefined, {
+    name: "visibleGroupCB"
+  });
   this.visibleGroupCB.helpTip = "Set Layer to Visible";
   this.visibleGroupCB.text = "Visible";
 
-  this.alwaysCreateGroupCB = panel2.add("checkbox", undefined, undefined, { name: "alwaysCreateGroupCB" });
+  this.alwaysCreateGroupCB = panel2.add("checkbox", undefined, undefined, {
+    name: "alwaysCreateGroupCB"
+  });
   this.alwaysCreateGroupCB.helpTip = "Always create a new group, otherwise add text layers to an existing group";
   this.alwaysCreateGroupCB.text = "Always Create Group";
 
   // PANEL3
   // ======
-  var panel3 = group1.add("panel", undefined, undefined, { name: "panel3" });
+  var panel3 = group1.add("panel", undefined, undefined, {
+    name: "panel3"
+  });
   panel3.text = "Configuration";
   panel3.orientation = "column";
   panel3.alignChildren = ["left", "top"];
   panel3.spacing = 10;
   panel3.margins = 10;
 
-  this.saveConfigBtn = panel3.add("button", undefined, undefined, { name: "saveConfigBtn" });
+  this.saveConfigBtn = panel3.add("button", undefined, undefined, {
+    name: "saveConfigBtn"
+  });
   this.saveConfigBtn.helpTip = "Quick Save Current Configuration";
   this.saveConfigBtn.text = "Save Config.";
   this.saveConfigBtn.alignment = ["fill", "top"];
 
-  this.registerConfigBtn = panel3.add("button", undefined, undefined, { name: "registerConfigBtn" });
+  this.registerConfigBtn = panel3.add("button", undefined, undefined, {
+    name: "registerConfigBtn"
+  });
   this.registerConfigBtn.helpTip = "Select a JSON with your custom configuration to use!  :D";
   this.registerConfigBtn.text = "Register Config.";
   this.registerConfigBtn.alignment = ["fill", "top"];
 
-  this.openFolderBtn = panel3.add("button", undefined, undefined, { name: "openFolderBtn" });
+  this.openFolderBtn = panel3.add("button", undefined, undefined, {
+    name: "openFolderBtn"
+  });
   this.openFolderBtn.text = "Open Folder";
   this.openFolderBtn.alignment = ["fill", "top"];
 
-  this.resetConfigBtn = panel3.add("button", undefined, undefined, { name: "resetConfigBtn" });
+  this.resetConfigBtn = panel3.add("button", undefined, undefined, {
+    name: "resetConfigBtn"
+  });
   this.resetConfigBtn.helpTip = "This will delete the JSON you registered";
   this.resetConfigBtn.text = "Reset Config.";
   this.resetConfigBtn.alignment = ["fill", "top"];
 
   // GROUP5
   // ======
-  var group5 = this.win.add("group", undefined, { name: "group5" });
+  var group5 = this.win.add("group", undefined, {
+    name: "group5"
+  });
   group5.orientation = "column";
   group5.alignChildren = ["fill", "top"];
   group5.spacing = 10;
@@ -852,7 +955,9 @@ function createUserInterface() {
 
   // PANEL4
   // ======
-  var panel4 = group5.add("panel", undefined, undefined, { name: "panel4" });
+  var panel4 = group5.add("panel", undefined, undefined, {
+    name: "panel4"
+  });
   panel4.text = "Files";
   panel4.orientation = "column";
   panel4.alignChildren = ["fill", "top"];
@@ -864,24 +969,44 @@ function createUserInterface() {
   statictext4.alignChildren = ["left", "center"];
   statictext4.spacing = 0;
 
-  statictext4.add("statictext", undefined, "Select a Folder including:", { name: "statictext4" });
-  statictext4.add("statictext", undefined, "- A '.txt' file containing the text", { name: "statictext4" });
-  statictext4.add("statictext", undefined, "- Image Files ('1.png', '2.jpg') ", { name: "statictext4" });
-  statictext4.add("statictext", undefined, "", { name: "statictext4" });
-  statictext4.add("statictext", undefined, "(if you don't select images, ", { name: "statictext4" });
-  statictext4.add("statictext", undefined, "the script will run on a open", { name: "statictext4" });
-  statictext4.add("statictext", undefined, "document)", { name: "statictext4" });
+  statictext4.add("statictext", undefined, "Select a Folder including:", {
+    name: "statictext4"
+  });
+  statictext4.add("statictext", undefined, "- A '.txt' file containing the text", {
+    name: "statictext4"
+  });
+  statictext4.add("statictext", undefined, "- Image Files ('1.png', '2.jpg') ", {
+    name: "statictext4"
+  });
+  statictext4.add("statictext", undefined, "", {
+    name: "statictext4"
+  });
+  statictext4.add("statictext", undefined, "(if you don't select images, ", {
+    name: "statictext4"
+  });
+  statictext4.add("statictext", undefined, "the script will run on a open", {
+    name: "statictext4"
+  });
+  statictext4.add("statictext", undefined, "document)", {
+    name: "statictext4"
+  });
 
-  var statictext5 = panel4.add("statictext", undefined, undefined, { name: "statictext5" });
+  var statictext5 = panel4.add("statictext", undefined, undefined, {
+    name: "statictext5"
+  });
   statictext5.helpTip = "'.png', '.jpeg', '.jpg', '.psd', '.psb'";
   statictext5.text = "Formats Supported";
   statictext5.justify = "center";
 
-  this.selectAllFilesCB = panel4.add("checkbox", undefined, undefined, { name: "selectAllFilesCB" });
+  this.selectAllFilesCB = panel4.add("checkbox", undefined, undefined, {
+    name: "selectAllFilesCB"
+  });
   this.selectAllFilesCB.helpTip = "You need to select all files, not a folder containing these files";
   this.selectAllFilesCB.text = "Select All Files Instead";
 
-  this.selectFilesBtn = panel4.add("button", undefined, undefined, { name: "selectFilesBtn" });
+  this.selectFilesBtn = panel4.add("button", undefined, undefined, {
+    name: "selectFilesBtn"
+  });
   this.selectFilesBtn.text = "Select";
   this.selectFilesBtn.alignment = ["center", "top"];
 
@@ -892,22 +1017,32 @@ function createUserInterface() {
   statictext6.alignChildren = ["left", "center"];
   statictext6.spacing = 0;
 
-  statictext6.add("statictext", undefined, "Created By ", { name: "statictext6" });
-  statictext6.add("statictext", undefined, "KrevlinMen and ImSamuka", { name: "statictext6" });
+  statictext6.add("statictext", undefined, "Created By ", {
+    name: "statictext6"
+  });
+  statictext6.add("statictext", undefined, "KrevlinMen and ImSamuka", {
+    name: "statictext6"
+  });
 
   // GROUP6
   // ======
-  var group6 = this.win.add("group", undefined, { name: "group6" });
+  var group6 = this.win.add("group", undefined, {
+    name: "group6"
+  });
   group6.orientation = "column";
   group6.alignChildren = ["fill", "top"];
   group6.spacing = 10;
   group6.margins = 0;
 
-  this.confirmBtn = group6.add("button", undefined, undefined, { name: "confirmBtn" });
+  this.confirmBtn = group6.add("button", undefined, undefined, {
+    name: "confirmBtn"
+  });
   this.confirmBtn.enabled = false;
   this.confirmBtn.text = "OK";
 
-  this.cancelBtn = group6.add("button", undefined, undefined, { name: "cancelBtn" });
+  this.cancelBtn = group6.add("button", undefined, undefined, {
+    name: "cancelBtn"
+  });
   this.cancelBtn.text = "Cancel";
 
 }
@@ -920,7 +1055,7 @@ function formatUserInterface(UI) {
   //* Set New Variables
   UI.configs = getConfig()
   UI.arrayFiles = []
-  UI.Executing = function () { }
+  UI.Executing = function () {}
 
   //* Set New Properties
   UI.win.defaultElement = UI.confirmBtn;
