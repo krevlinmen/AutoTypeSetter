@@ -890,7 +890,7 @@ function createUserInterface() {
   var statictext1 = group2.add("statictext", undefined, undefined, {
     name: "statictext1"
   });
-  statictext1.text = "Start";
+  statictext1.text = "Prefix";
 
   this.identifierStartBox = group2.add('edittext {properties: {name: "identifierStartBox"}}');
   this.identifierStartBox.text = "[";
@@ -910,7 +910,7 @@ function createUserInterface() {
   var statictext2 = group3.add("statictext", undefined, undefined, {
     name: "statictext2"
   });
-  statictext2.text = "End";
+  statictext2.text = "Suffix";
 
   this.identifierEndBox = group3.add('edittext {properties: {name: "identifierEndBox"}}');
   this.identifierEndBox.text = "]";
@@ -984,27 +984,27 @@ function createUserInterface() {
     name: "saveConfigBtn"
   });
   this.saveConfigBtn.helpTip = "Quick Save Current Configuration";
-  this.saveConfigBtn.text = "Save Config.";
+  this.saveConfigBtn.text = "Save Config";
   this.saveConfigBtn.alignment = ["fill", "top"];
 
   this.registerConfigBtn = panel3.add("button", undefined, undefined, {
     name: "registerConfigBtn"
   });
-  this.registerConfigBtn.helpTip = "Select a JSON with your custom configuration to use!  :D";
-  this.registerConfigBtn.text = "Register Config.";
+  this.registerConfigBtn.helpTip = "Select a JSON with your custom configuration to use!";
+  this.registerConfigBtn.text = "Open Config";
   this.registerConfigBtn.alignment = ["fill", "top"];
 
   this.openFolderBtn = panel3.add("button", undefined, undefined, {
     name: "openFolderBtn"
   });
-  this.openFolderBtn.text = "Open Folder";
+  this.openFolderBtn.text = "Open Script Folder";
   this.openFolderBtn.alignment = ["fill", "top"];
 
   this.resetConfigBtn = panel3.add("button", undefined, undefined, {
     name: "resetConfigBtn"
   });
   this.resetConfigBtn.helpTip = "This will delete the JSON you registered";
-  this.resetConfigBtn.text = "Reset Config.";
+  this.resetConfigBtn.text = "Reset";
   this.resetConfigBtn.alignment = ["fill", "top"];
 
   // GROUP5

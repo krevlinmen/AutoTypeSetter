@@ -1,6 +1,6 @@
 {
-  "identifierStart": "[",
-  "identifierEnd": "]",
+  "identifierStart": ">>",
+  "identifierEnd": "",
   "ignorePageNumber": false,
   "prioritizePSD": false,
   "selectAllFiles": false,
@@ -36,13 +36,13 @@
     {
       "name": "Redraw",
       "duplicate": true,
-      "visible": false,
+      "visible": true,
       "allLocked": false,
       "transparentPixelsLocked": true,
       "positionLocked": true
     },
     {
-      "name": "Balões",
+      "name": "Ballons",
       "positionLocked": true
     }
   ]
