@@ -16,6 +16,9 @@ AutoTypeSetter is a script that automatically creates .psd files containing both
 All scripts were made using [Adobe Photoshop 2020 JavaScript Scripting](https://www.adobe.com/devnet/photoshop/scripting.html).
 
 
+Documentation can be found on our [Documentation](https://github.com/krevlinmen/PhotoshopScanlatingScripts/wiki/Documentation)
+
+
 # Credits
 
 User Interface Created With https://scriptui.joonas.me/
