@@ -1,6 +1,6 @@
 /*
 <javascriptresource>
-  <name>AutoTypeSetting</name>
+  <name>AutoTypeSetter</name>
   <about>A program that automatically inputs text from files</about>
   <category>PhotoshopScanlatingScripts</category>
 </javascriptresource>
