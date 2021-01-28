@@ -492,10 +492,65 @@ function createImageArray(arrayFiles) {
       textFile = file
     else
       imageArray.push(file)
-    fileNames.push(file.name)
+    
   }
 
-  return [imageArray.sort(), fileNames.sort()]
+
+
+
+
+  //* Prioritize Order
+
+  const prioritizeOrder = ['.psd', '.psb', '.png', '.jpg', '.jpeg']
+
+  if (!config.prioritizePSD) {
+    prioritizeOrder.push(prioritizeOrder.shift())
+    prioritizeOrder.push(prioritizeOrder.shift())
+  }
+
+  //* Eliminate Duplicates
+
+  const getExtension = function (str) {
+    return str.slice(str.lastIndexOf("."))
+  }
+
+  const nValue = function (str) { //???
+    return config.ignorePageNumber ? removeExtension(str) : parseInt(removeExtension(str))
+  }
+
+
+  for (i = 0; i < imageArray.length; i++) {
+
+    var n = nValue(imageArray[i].name)
+    var duplicates = []
+
+    for (j in imageArray)
+      if (n == nValue(imageArray[j].name))
+        duplicates.push(imageArray[j])
+
+    if (duplicates.length > 1) {
+      duplicates.sort(function (a, b) {
+        const aR = getIndexOf(prioritizeOrder, getExtension(a.name).toLowerCase())//???
+        const bR = getIndexOf(prioritizeOrder, getExtension(b.name).toLowerCase())
+        if (aR == -1) return 1
+        if (bR == -1) return -1
+        return aR - bR
+      })
+    }
+
+    for (j = 1; j < duplicates.length; j++) {
+      var index = getIndexOf(imageArray, duplicates[j])
+      var removed = imageArray.splice(index, 1)
+      //alert("removing " + removed[0].name)
+    }
+  }
+  imageArray = imageArray.sort()
+  for (i in imageArray){
+    fileNames.push(imageArray[i].name)
+  }
+
+
+  return [imageArray, fileNames]
 }
 
 function createContentObj() {
