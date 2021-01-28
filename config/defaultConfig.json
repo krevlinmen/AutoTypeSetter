@@ -5,6 +5,8 @@
   "prioritizePSD": false,
   "selectAllFiles": false,
   "alwaysCreateGroup": false,
+  "disableStarterLayer":false,
+  "columnGroup":true,
   "groupLayer": {
     "name": "Types",
     "visible": false
@@ -23,8 +25,7 @@
       "identifierStart": "#",
       "size": 12,
       "font": "Chinacat",
-      "boxText": false,
-      "border": "#FFFFFF-3-outer-false"
+      "boxText": false
     }
   ],
   "starterLayerFormats": [
