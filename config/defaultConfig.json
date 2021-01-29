@@ -5,8 +5,9 @@
   "prioritizePSD": false,
   "selectAllFiles": false,
   "alwaysCreateGroup": false,
-  "disableStarterLayer":false,
-  "columnGroup":true,
+  "disableStarterLayer": false,
+  "disableCustomFormatting": false,
+  "columnGroup": true,
   "groupLayer": {
     "name": "Types",
     "visible": false

@@ -54,7 +54,36 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
 /* -------------------------------------------------------------------------- */
 
 
-const justificationObj = {
+/* ---------------------------- Global Constants ---------------------------- */
+
+
+const absoluteDefaultConfig = {
+  identifierStart: ">>",
+  identifierEnd: "",
+  ignorePageNumber: true,
+  prioritizePSD: false,
+  selectAllFiles: false,
+  alwaysCreateGroup: false,
+  disableStarterLayer: false,
+  columnGroup: false,
+  ignoreCustomWith: ".",
+
+  LayerFormatObject: {
+    name: "Default Name",
+    visible: true,
+    opacity: 100,
+    grouped: false,
+    allLocked: false,
+    transparentPixelsLocked: false,
+    pixelsLocked: false,
+    positionLocked: false,
+    isBackgroundLayer: false,
+    duplicate: false
+  }
+}
+
+
+const justificationOpt = {
   "Center": "CENTER",
   "Center Justified": "CENTERJUSTIFIED",
   "Fully Justified": "FULLYJUSTIFIED",
@@ -94,7 +123,7 @@ const blendModeOpt ={
 
 
 
-const languageObj = {
+const languageOpt = {
   "Brazilian Portuguese": "BRAZILLIANPORTUGUESE",
   "Canadian French": "CANADIANFRENCH",
   "Danish": "DANISH",
@@ -509,7 +538,58 @@ function getTypeFolder(groupIndex) {
   return textFolder;
 }
 
-function getConfig() {
+
+
+
+
+
+
+
+function getDefaultConfigValue(arrayPropertyPath) {
+  //? Function used to get the value of a
+  //? 'absoluteDefault' property, using a array
+
+  const props = Array.isArray(arrayPropertyPath) ? arrayPropertyPath : Array.prototype.slice.call(arguments, 0, arguments.length)
+
+  var item = absoluteDefaultConfig[props[0]];
+
+  for (var i = 1, l = props.length; i < l; i++)
+    if ( isNotUndef(item) )
+      item = item[props[i]]
+
+  return item
+}
+
+
+
+function setValidConfigValue(newValue, propertyParent, arrayPropertyPath){
+  //? Function used to set a valid config value
+  //? Examples:
+  // setValidConfigValue("<>", config, "identifierStart")
+  // setValidConfigValue(80, condig.groupLayer, ["LayerFormatObject", "opacity"])
+  // setValidConfigValue(null, condig.groupLayer, "LayerFormatObject", "opacity")
+
+  if (arguments.length < 3) return //? Not enought arguments
+
+  //? No item is null or NaN
+  if (isNaN(newValue) || null === newValue) return
+
+
+  const props = Array.isArray(arrayPropertyPath) ? arrayPropertyPath : Array.prototype.slice.call(arguments, 2, arguments.length)
+  const defaultValue = getDefaultConfigValue(props)
+
+  if (isNotUndef(defaultValue)){
+    if (undefined === newValue) return
+
+    //? Diferent types will not be tolerated
+    if (typeof(defaultValue) != typeof(newValue)) return
+  }
+
+  propertyParent[ props[props.length-1] ] = newValue
+}
+
+
+function readConfig() {
 
   //* Reading Files
   var defaultConfig = getFileFromScriptPath("config/defaultConfig.json")
@@ -521,7 +601,7 @@ function getConfig() {
 
   //* Setting 'config'
   if (defaultConfig === undefined) {
-    throwError("Default Configuration Missing.\nYou can get another one for free on https://github.com/krevlinmen/PhotoshopScanlatingScripts")
+    throwError("Default Configuration Missing.\nYou can get another one for free on github.com/krevlinmen/AutoTypeSetter")
 
   }
   else {
@@ -529,42 +609,6 @@ function getConfig() {
   }
 
   //* Asserting Integrity
-
-  //! This Function can cause a softlock
-  function assertIntegrity(necConfigs, arrayI) {
-
-    var configBuffer = config
-    if (arrayI === undefined)
-      arrayI = []
-    else
-      for (j in arrayI)
-        configBuffer = configBuffer[arrayI[j]]
-
-    for (i in necConfigs) {
-      if (!necConfigs.hasOwnProperty(i)) continue;
-
-      if (configBuffer[i] === undefined)
-        throwError("Necessary configuration missing: " + i)
-      if (isNotUndef(necConfigs[i])) {
-        var newArrayI = getCopy(arrayI)
-        newArrayI.push(i)
-        assertIntegrity(necConfigs[i], newArrayI)
-      }
-
-    }
-  }
-
-  const necessaryConfigs = {
-    identifierStart: undefined,
-    identifierEnd: undefined,
-    ignorePageNumber: undefined,
-    alwaysCreateGroup: undefined,
-    groupLayer: {
-      name: undefined
-    }
-  }
-
-  assertIntegrity(necessaryConfigs)
 
   if (!Array.isArray(config.customTextFormats))
     config.customTextFormats = []
@@ -574,11 +618,8 @@ function getConfig() {
   for (i in config.customTextFormats)
     config.customTextFormats[i].isBackgroundLayer = undefined
 
-  return {
-    defaultConfig: defaultConfig,
-    savedConfig: savedConfig
-  }
 }
+
 
 
 
@@ -993,8 +1034,8 @@ function formatProgressBarObj(progressBar,imgDir){
 
 function createUserInterface() {
 
-var justificationDropdown_array = getKeys(justificationObj)
-var languageDropdown_array = getKeys(languageObj)
+var justificationDropdown_array = getKeys(justificationOpt)
+var languageDropdown_array = getKeys(languageOpt)
 
 //NEW UI
 //NEW UI
@@ -1307,15 +1348,16 @@ function formatUserInterface(UI) {
     UI = new createUserInterface()
 
   //* Set New Variables
-  UI.configs = getConfig()
+  readConfig()
   UI.arrayFiles = []
   UI.Executing = function () {}
 
   //* Set New Properties
   UI.win.defaultElement = UI.confirmBtn;
   UI.win.cancelElement = UI.cancelBtn;
-  if (UI.configs.savedConfig === undefined)
-    UI.resetConfigBtn.enabled = false;
+  UI.resetConfigBtn.enabled = getFileFromScriptPath("config/savedConfig.json").exists
+
+
 
   setUIConfigs()
 
@@ -1334,7 +1376,7 @@ function formatUserInterface(UI) {
         if (isNotUndef(config.groupLayer.visible)) UI.visibleGroupCB.value = config.groupLayer.visible
       }
     } catch (error) {
-      throwError("A configuration is corrupted: " + error)
+      throwError("A configuration is corrupted: " + error, error)
     }
     app.refresh();
   }
@@ -1360,8 +1402,8 @@ function formatUserInterface(UI) {
 
     config.defaultTextFormat.font = UI.fontList.selection
     config.defaultTextFormat.boxText = UI.boxTextCB.value
-    config.defaultTextFormat.justification = justificationObj[UI.justificationDropdown.selection] //! Convert to proper stuff
-    config.defaultTextFormat.language = languageObj[UI.languageDropdown.selection] //! Convert to proper stuff
+    config.defaultTextFormat.justification = justificationOpt[UI.justificationDropdown.selection]
+    config.defaultTextFormat.language = languageOpt[UI.languageDropdown.selection]
 
 
   }
@@ -1387,7 +1429,7 @@ function formatUserInterface(UI) {
     }
 
     UI.resetConfigBtn.enabled = true;
-    UI.configs = getConfig()
+    readConfig()
     setUIConfigs()
   }
 
@@ -1429,7 +1471,7 @@ function formatUserInterface(UI) {
     }
 
     UI.resetConfigBtn.enabled = false;
-    UI.configs = getConfig()
+    UI.configs = readConfig()
     setUIConfigs()
 
   }
@@ -1500,6 +1542,23 @@ function formatUserInterface(UI) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
 
   /*
@@ -1508,13 +1567,12 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
   */
 
 
-  const tab = tabPanel_innerwrap.add("group", undefined, {name: ("tab" + (index + 1))});
+  const tab = tabPanel_innerwrap.add("group", undefined, {name: "Layer " + (index + 1)});
   tab.text = "Layer " + (index + 1);
   tab.orientation = "column";
   tab.alignChildren = ["fill","top"];
   tab.spacing = 10;
   tab.margins = 0;
-
 
 
 
@@ -1603,37 +1661,73 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
 
   //* -------------------------------------------------------------
 
-  function changeAll(array, enabled, value){
-    for (var i = 0, l = array.length; i < l; i++){
+  //? --------- Fallbacks ---------
 
-      var element = array[i]
-      element.enabled = enabled
+  var duplicateCB = { value:false }
+  var isBackgroundLayerCB = { value:false }
 
-      if (isNotUndef(value)){
+  //? --------- Conditional Object Creation ---------
 
-        if (element.type == "checkbox"){
-          element.value = value
 
-        } else if (element.type == "slider" && !value){
-          element.value = 100
-          element.onChange()
-        }
 
+  if (index){
+    //? Index is more than 1
+
+    duplicateCB = panel2.add("checkbox", undefined, undefined, {name: "duplicateCB"});
+      duplicateCB.helpTip = "This will duplicate the layer below/before";
+      duplicateCB.text = "Duplicate";
+
+    var deleteBtn = panel1.add("button", undefined, undefined, {name: "deleteBtn"});
+      deleteBtn.helpTip = "Delete this Layer";
+      deleteBtn.text = "Delete";
+      deleteBtn.alignment = ["fill","top"];
+
+  } else {
+    //? Index is 0
+
+    isBackgroundLayerCB = panel2.add("checkbox", undefined, undefined, {name: "isBackgroundLayerCB"});
+      isBackgroundLayerCB.helpTip = "Check this to make the layer, the background layer";
+      isBackgroundLayerCB.text = "Is Background Layer";
+
+  }
+
+
+
+  //? --------- Functions ---------
+
+
+  function changeOne(element, enabled, value){
+    element.enabled = enabled
+
+    if (isNotUndef(value)){
+
+      if (element.type == "checkbox"){
+        element.value = value
+
+      } else if (element.type == "slider" && !value){
+        element.value = 100
+        element.onChange()
       }
 
     }
   }
 
+  function changeAll(array, enabled, value){
+    for (var i = 0, l = array.length; i < l; i++)
+      changeOne(array[i], enabled, value)
+  }
 
 
-  //* Necessary
+
+  //? --------- Set Properties ---------
+
   tab.alignment = ["fill","fill"];
   tab.visible = false;
 
   opacitySlider.onChange = function () {
     opacitySlider.helpTip = opacitySlider.value
   }
-  opacitySlider.onChanging = opacitySlider.onChange
+  opacitySlider.onChanging = opacitySlider.onChange //? Fallback
 
   allLockedCB.onClick = function () {
     if (allLockedCB.value)
@@ -1644,73 +1738,47 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
 
 
 
-
-
-
-
-
   if (index){
-      //? Index is more than 1
+    //? Index is more than 1
 
-      var duplicateCB = panel2.add("checkbox", undefined, undefined, {name: "duplicateCB"});
-      duplicateCB.helpTip = "This will duplicate the layer below/before";
-      duplicateCB.text = "Duplicate";
-
-      var deleteBtn = panel1.add("button", undefined, undefined, {name: "deleteBtn"});
-      deleteBtn.helpTip = "Delete this Layer";
-      deleteBtn.text = "Delete";
-      deleteBtn.alignment = ["fill","top"];
-
-
-      //* ----------------------------------
-
-      duplicateCB.value = isNotUndef(layerFormat.duplicate) ? layerFormat.duplicate : false
-
-      deleteBtn.onClick = function () {
-        tabPanel_innerwrap.deleteIndex(index)
-      }
+    duplicateCB.value = isNotUndef(layerFormat.duplicate) ? layerFormat.duplicate : getDefaultConfigValue("LayerFormatObject", "duplicate")
+    deleteBtn.onClick = function () {
+        tabPanel_innerwrap.deleteLayer(index)
+    }
 
   } else {
     //? Index is 0
 
-    var isBackgroundLayerCB = panel2.add("checkbox", undefined, undefined, {name: "isBackgroundLayerCB"});
-    isBackgroundLayerCB.helpTip = "Check this to make the layer, the background layer";
-    isBackgroundLayerCB.text = "Is Background Layer";
-
-
-    //* ----------------------------------
-
     isBackgroundLayerCB.onClick = function () {
-      if (isBackgroundLayerCB.value)
+      if (isBackgroundLayerCB.value){
+        changeOne(visibleCB, false, true)
         changeAll([nameBox,opacitySlider,allLockedCB,transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], false, false)
-      else
+      } else {
+        changeOne(visibleCB, true)
         changeAll([nameBox,opacitySlider,allLockedCB,transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], true)
+      }
     }
 
-    isBackgroundLayerCB.value = isNotUndef(layerFormat.isBackgroundLayer) ? layerFormat.isBackgroundLayer : false
+    isBackgroundLayerCB.value = isNotUndef(layerFormat.isBackgroundLayer) ? layerFormat.isBackgroundLayer : getDefaultConfigValue("LayerFormatObject", "isBackgroundLayer")
     isBackgroundLayerCB.onClick()
 
     groupedCB.enabled = false
-
   }
 
-  nameBox.text = isNotUndef(layerFormat.name) ? layerFormat.name : "New Layer";
-  opacitySlider.value = isNotUndef(layerFormat.opacity) ? layerFormat.opacity : 100;
 
-
-  visibleCB.value = isNotUndef(layerFormat.visible) ? layerFormat.visible : true
-  //groupedCB.value = isNotUndef(layerFormat.grouped) ? layerFormat.grouped : false
-
-  allLockedCB.value = isNotUndef(layerFormat.allLocked) ? layerFormat.allLocked : false
-  transparentPixelsLockedCB.value = isNotUndef(layerFormat.transparentPixelsLocked) ? layerFormat.transparentPixelsLocked : false
-  pixelsLockedCB.value = isNotUndef(layerFormat.pixelsLocked) ? layerFormat.pixelsLocked : false
-  positionLockedCB.value = isNotUndef(layerFormat.positionLocked) ? layerFormat.positionLocked : false
-
-
+  nameBox.text = isNotUndef(layerFormat.name) ? layerFormat.name : getDefaultConfigValue("LayerFormatObject", "name")
+  opacitySlider.value = isNotUndef(layerFormat.opacity) ? layerFormat.opacity : getDefaultConfigValue("LayerFormatObject", "opacity")
+  visibleCB.value = isNotUndef(layerFormat.visible) ? layerFormat.visible : getDefaultConfigValue("LayerFormatObject", "visible")
+  groupedCB.value = isNotUndef(layerFormat.grouped) ? layerFormat.grouped : getDefaultConfigValue("LayerFormatObject", "grouped")
+  allLockedCB.value = isNotUndef(layerFormat.allLocked) ? layerFormat.allLocked : getDefaultConfigValue("LayerFormatObject", "allLocked")
+  transparentPixelsLockedCB.value = isNotUndef(layerFormat.transparentPixelsLocked) ? layerFormat.transparentPixelsLocked : getDefaultConfigValue("LayerFormatObject", "transparentPixelsLocked")
+  pixelsLockedCB.value = isNotUndef(layerFormat.pixelsLocked) ? layerFormat.pixelsLocked : getDefaultConfigValue("LayerFormatObject", "pixelsLocked")
+  positionLockedCB.value = isNotUndef(layerFormat.positionLocked) ? layerFormat.positionLocked : getDefaultConfigValue("LayerFormatObject", "positionLocked")
 
 
   allLockedCB.onClick()
   opacitySlider.onChange()
+
 
   tab.items = {
     tab: tab, // dialog
@@ -1732,7 +1800,7 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
 
 
 
-  function createStarterLayerUI(){
+  function createStarterLayerUI(repeatIndex){
 
   /*
   JSON Starter Layers:
@@ -1747,6 +1815,8 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
       win.alignChildren = ["left","top"];
       win.spacing = 10;
       win.margins = 16;
+
+
 
   // GROUP1
   // ======
@@ -1768,75 +1838,84 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
   var closeBtn = group1.add("button", undefined, undefined, {name: "closeBtn"});
       closeBtn.text = "Close";
 
+
+
   // TABPANEL
   // ========
   var tabPanel = win.add("group", undefined, undefined, {name: "tabPanel"});
       tabPanel.alignChildren = ["left","fill"];
-  var tabPanel_nav = tabPanel.add ("listbox", undefined, createLayerList());
+  var tabPanel_nav = tabPanel.add ("listbox", undefined, [], { columnWidths: [60]});
   var tabPanel_innerwrap = tabPanel.add("group")
       tabPanel_innerwrap.alignment = ["fill","fill"];
       tabPanel_innerwrap.orientation = ["stack"];
 
 
 
-  // TABPANEL
-  // ========
 
   // * -------------------------------------------------------------------
 
 
-  function createLayerList() {
-    const layerList = []
-    for (var i = 1; i <= config.starterLayerFormats.length; i++)
-      layerList.push("Layer " + i)
-    return layerList
-  }
-
-  function resetWindow(){
-    win.items.repeat = true
-    win.close()
-  }
-
-  function deleteIndex(index){
-    config.starterLayerFormats.splice(index,1)
-    tabPanel_tabs.splice(index,1)
-    resetWindow()
-  }
-
-  tabPanel_innerwrap.deleteIndex = deleteIndex
-
-  addLayerBtn.onClick = function (){
-    config.starterLayerFormats.push({})
-    resetWindow()
-  }
-
-
   const tabPanel_tabs = [];
 
-  for (var i = 0; i < config.starterLayerFormats.length; i++)
-    tabPanel_tabs.push(createStarterLayerTab(i, config.starterLayerFormats[i], tabPanel_innerwrap))
 
+  //? --------- Functions ---------
+
+  function deleteLayer(index){
+    config.starterLayerFormats.splice(index,1)
+    tabPanel_tabs.splice(index,1)
+    tabPanel_nav.remove(index)
+    tabPanel_innerwrap.remove(index)
+    tabPanel_nav.selection = index - 1;
+  }
+
+  function addLayer(index){
+
+    if (index === undefined || index >= config.starterLayerFormats.length){
+      index = config.starterLayerFormats.length
+      config.starterLayerFormats.push({})
+    }
+
+    tabPanel_tabs.push(createStarterLayerTab(index, config.starterLayerFormats[index], tabPanel_innerwrap))
+    tabPanel_nav.add ("item", "Layer " + (index + 1))
+    tabPanel_nav.selection = index
+
+
+    if (win.visible){
+      win.repeat = index
+      win.close()
+    }
+  }
 
   function showTab_tabPanel() {
     if ( tabPanel_nav.selection !== null ) {
       for (var i = tabPanel_tabs.length-1; i >= 0; i--)
         tabPanel_tabs[i].visible = false;
-
       tabPanel_tabs[tabPanel_nav.selection.index].visible = true;
     }
   }
 
-  tabPanel_nav.onChange = showTab_tabPanel;
-  tabPanel_nav.selection = 0;
-  showTab_tabPanel()
+  //? --------- Set Properties ---------
 
   win.cancelElement = closeBtn
   win.defaultElement = addLayerBtn
 
+  tabPanel_nav.onChange = showTab_tabPanel;
+  tabPanel_innerwrap.deleteLayer = deleteLayer
+  addLayerBtn.onClick = addLayer
+
+  disableStarterLayerCB.value = config.disableStarterLayer
+  disableStarterLayerCB.onClick = function () {
+    config.disableStarterLayer = disableStarterLayerCB.value
+  }
 
 
-  // * -------------------------------------------------------------------
+  //? Add all Layers
+  for (var i = 0; i < config.starterLayerFormats.length; i++)
+    addLayer(i)
 
+  //? Show the first one by default
+  tabPanel_nav.selection = repeatIndex ? repeatIndex : 0;
+  showTab_tabPanel() //? Fallback of line above
 
 
   win.items = {
@@ -1846,8 +1925,6 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
     addLayerBtn: addLayerBtn, // button
     closeBtn: closeBtn, // button
   };
-
-  win.items.repeat = false;
 
   win.show()
 
@@ -1859,67 +1936,39 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap){
 
 
 
+
   function showStarterLayerUI(){
 
     function getUIConfigs(items){
 
       for (var i = 0, len = items.tabPanel_tabs.length; i < len; i++){
-
         var it = items.tabPanel_tabs[i].items
         var layerFormat = config.starterLayerFormats[i]
 
-        if (isNotUndef(it.duplicateCB)) layerFormat.duplicate = it.duplicateCB.value
-        if (isNotUndef(it.isBackgroundLayerCB)) layerFormat.isBackgroundLayer = it.isBackgroundLayerCB.value
-
-        if (isNotUndef(it.nameBox)) layerFormat.name = it.nameBox.text
-        if (isNotUndef(it.opacitySlider)) layerFormat.opacity = it.opacitySlider.value
-        if (isNotUndef(it.visibleCB)) layerFormat.visible = it.visibleCB.value
-        if (isNotUndef(it.groupedCB)) layerFormat.grouped = it.groupedCB.value
-        if (isNotUndef(it.allLockedCB)) layerFormat.allLocked = it.allLockedCB.value
-        if (isNotUndef(it.transparentPixelsLockedCB)) layerFormat.transparentPixelsLocked = it.transparentPixelsLockedCB.value
-        if (isNotUndef(it.pixelsLockedCB)) layerFormat.pixelsLocked = it.pixelsLockedCB.value
-        if (isNotUndef(it.positionLockedCB)) layerFormat.positionLocked = it.positionLockedCB.value
+        setValidConfigValue(it.nameBox.text, layerFormat, ["LayerFormatObject", "name"] )
+        setValidConfigValue(it.duplicateCB.value, layerFormat, ["LayerFormatObject", "duplicate"] )
+        setValidConfigValue(it.isBackgroundLayerCB.value, layerFormat, ["LayerFormatObject", "isBackgroundLayer"] )
+        setValidConfigValue(it.opacitySlider.value, layerFormat, ["LayerFormatObject", "opacity"] )
+        setValidConfigValue(it.visibleCB.value, layerFormat, ["LayerFormatObject", "visible"] )
+        setValidConfigValue(it.groupedCB.value, layerFormat, ["LayerFormatObject", "grouped"] )
+        setValidConfigValue(it.allLockedCB.value, layerFormat, ["LayerFormatObject", "allLocked"] )
+        setValidConfigValue(it.transparentPixelsLockedCB.value, layerFormat, ["LayerFormatObject", "transparentPixelsLocked"] )
+        setValidConfigValue(it.pixelsLockedCB.value, layerFormat, ["LayerFormatObject", "pixelsLocked"] )
+        setValidConfigValue(it.positionLockedCB.value, layerFormat, ["LayerFormatObject", "positionLocked"] )
       }
-
     }
 
     var repeat = true
 
     while (repeat){
-
-      var win = createStarterLayerUI()
-      repeat = win.items.repeat
+      repeat = undefined
+      var win = createStarterLayerUI(repeat)
+      repeat = win.repeat
 
       getUIConfigs(win.items)
     }
 
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
