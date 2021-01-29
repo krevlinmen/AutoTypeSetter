@@ -1,0 +1,5 @@
+# Markdown
+*.md
+
+# Saved Configuration
+config/savedConfig.json
