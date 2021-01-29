@@ -1,0 +1,8 @@
+# Markdown
+*.md
+
+# Folders
+images
+config/*
+
+config/!defaultConfig.json
