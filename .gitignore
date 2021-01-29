@@ -3,6 +3,6 @@
 
 # Folders
 images/
-config/*
+config/
 
 config/!defaultConfig.json
