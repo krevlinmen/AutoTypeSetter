@@ -2,7 +2,7 @@
 *.md
 
 # Folders
-images
+images/
 config/*
 
 config/!defaultConfig.json
