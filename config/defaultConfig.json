@@ -1,13 +1,17 @@
 {
-  "identifierStart": ">>",
-  "identifierEnd": "",
+  "pageIdentifierPrefix": ">>",
+  "pageIdentifierSuffix": "",
   "ignorePageNumber": false,
   "prioritizePSD": false,
   "selectAllFiles": false,
   "alwaysCreateGroup": false,
+  "columnGroup": true,
+
+  "ignoreCustomWith": ".",
+
   "disableStarterLayer": false,
   "disableCustomFormatting": false,
-  "columnGroup": true,
+
   "groupLayer": {
     "name": "Types",
     "visible": false
@@ -20,10 +24,9 @@
     "justification": "CENTER",
     "language": "BRAZILLIANPORTUGUESE"
   },
-  "ignoreCustomWith": ".",
   "customTextFormats": [
     {
-      "identifierStart": "#",
+      "lineIdentifierPrefix": "#",
       "size": 12,
       "font": "Chinacat",
       "boxText": false
