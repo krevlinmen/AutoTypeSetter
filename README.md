@@ -12,6 +12,7 @@ AutoTypeSetter is a photoshop plugin, meaning that all you have to do is drag an
 This folder generally is located at: (Program files)\Adobe\Adobe Photoshop 2021\Presets\Scripts
 
 3. Open Photoshop (or restart it, if it was already open), and go to File>Scripts to find your newly installed AutoTypeSetter.
+
 ![Scripts Location](images/script_location.png)
 
 
