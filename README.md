@@ -20,7 +20,7 @@ This folder generally is located at: (Program files)\Adobe\Adobe Photoshop 2021\
 
 This script was made using [Adobe Photoshop 2020 JavaScript Scripting](https://www.adobe.com/devnet/photoshop/scripting.html).
 
-Documentation can be found on [here](https://github.com/krevlinmen/PhotoshopScanlatingScripts/wiki/Documentation)
+Documentation can be found on [here](https://github.com/krevlinmen/PhotoshopScanlatingScripts/wiki/Home)
 
 
 # Credits
