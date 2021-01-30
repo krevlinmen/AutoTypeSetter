@@ -22,6 +22,7 @@ This script was made using [Adobe Photoshop 2020 JavaScript Scripting](https://w
 
 Documentation can be found on [here](https://github.com/krevlinmen/PhotoshopScanlatingScripts/wiki/Home)
 
+[Test](/wiki)
 
 # Credits
 
