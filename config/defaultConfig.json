@@ -1,14 +1,14 @@
 {
   "pageIdentifierPrefix": ">>",
   "pageIdentifierSuffix": "",
-  "ignorePageNumber": false,
+  "ignorePageNumber": true,
+
   "prioritizePSD": false,
   "selectAllFiles": false,
   "alwaysCreateGroup": false,
-  "columnGroup": true,
+  "ignoreCustomWith": "",
 
-  "ignoreCustomWith": ".",
-
+  "columnGroup": false,
   "disableStarterLayer": false,
   "disableCustomFormatting": false,
 
@@ -47,7 +47,7 @@
       "positionLocked": true
     },
     {
-      "name": "Ballons",
+      "name": "Balloons",
       "positionLocked": true
     }
   ]
