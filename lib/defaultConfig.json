@@ -1,0 +1,41 @@
+{
+  "pageIdentifierPrefix": ">>",
+  "pageIdentifierSuffix": "",
+  "ignorePageNumber": true,
+
+  "prioritizePSD": false,
+  "selectAllFiles": false,
+  "alwaysCreateGroup": false,
+  "ignoreCustomWith": "",
+
+  "columnGroup": false,
+  "disableStarterLayer": true,
+  "disableCustomFormatting": true,
+
+  "groupLayer": { "name": "Types" },
+  "defaultTextFormat": {},
+  "customTextFormats": [],
+  "starterLayerFormats": [],
+
+  "LayerFormatObject": {
+    "name": "Default Name",
+    "visible": true,
+    "opacity": 100,
+    "grouped": false,
+    "blendMode": "",
+    "allLocked": false,
+    "transparentPixelsLocked": false,
+    "pixelsLocked": false,
+    "positionLocked": false,
+
+    "lineIdentifierPrefix": "",
+    "size": 0,
+    "font": "",
+    "justification": "",
+    "language": "",
+    "boxText": false,
+
+    "isBackgroundLayer": false,
+    "duplicate": false
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "pageIdentifierPrefix": "Page",
+  "pageIdentifierSuffix": "",
+  "ignorePageNumber": false,
+  "prioritizePSD": false,
+  "selectAllFiles": false,
+  "alwaysCreateGroup": false,
+  "ignoreCustomWith": "",
+  "columnGroup": false,
+  "disableStarterLayer": true,
+  "disableCustomFormatting": false,
+  "groupLayer": { "name": "Types", "visible": false },
+  "defaultTextFormat": {
+    "size": 16,
+    "boxText": true,
+    "font": "CCWildWords",
+    "justification": "CENTER",
+    "language": "BRAZILLIANPORTUGUESE"
+  },
+  "customTextFormats": [
+    {
+      "lineIdentifierPrefix": "#",
+      "size": 12,
+      "font": "Chinacat",
+      "boxText": false
+    }
+  ],
+  "starterLayerFormats": [
+    {
+      "name": "Raw",
+      "duplicate": false,
+      "isBackgroundLayer": false,
+      "opacity": 100,
+      "visible": true,
+      "grouped": false,
+      "allLocked": true,
+      "transparentPixelsLocked": false,
+      "pixelsLocked": false,
+      "positionLocked": false,
+      "blendMode": ""
+    },
+    {
+      "name": "Redraw",
+      "duplicate": true,
+      "isBackgroundLayer": false,
+      "opacity": 100,
+      "visible": true,
+      "grouped": false,
+      "allLocked": false,
+      "transparentPixelsLocked": true,
+      "pixelsLocked": false,
+      "positionLocked": true,
+      "blendMode": ""
+    },
+    {
+      "name": "Clean",
+      "duplicate": false,
+      "isBackgroundLayer": false,
+      "opacity": 100,
+      "visible": true,
+      "grouped": false,
+      "allLocked": false,
+      "transparentPixelsLocked": false,
+      "pixelsLocked": false,
+      "positionLocked": true,
+      "blendMode": ""
+    }
+  ]
+}
