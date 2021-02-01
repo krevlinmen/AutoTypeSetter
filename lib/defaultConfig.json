@@ -15,29 +15,7 @@
   "groupLayer": { "name": "Types" },
   "defaultTextFormat": {},
   "customTextFormats": [],
-  "starterLayerFormats": [{
-    "name": "Raw",
-    "duplicate": false,
-    "isBackgroundLayer": false,
-    "opacity": 100,
-    "visible": true,
-    "allLocked": false,
-    "transparentPixelsLocked": false,
-    "pixelsLocked": false,
-    "positionLocked": false,
-    "blendMode": ""
-  }, {
-    "name": "Redraw",
-    "duplicate": false,
-    "isBackgroundLayer": false,
-    "opacity": 100,
-    "visible": true,
-    "allLocked": false,
-    "transparentPixelsLocked": false,
-    "pixelsLocked": false,
-    "positionLocked": false,
-    "blendMode": ""
-  }],
+  "starterLayerFormats": [],
 
   "LayerFormatObject": {
     "name": "Default Name",
@@ -60,5 +38,4 @@
     "isBackgroundLayer": false,
     "duplicate": false
   }
-  
 }
