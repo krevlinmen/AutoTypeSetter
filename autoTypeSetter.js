@@ -333,33 +333,151 @@ function readConfig() {
 
   if (config === undefined){
     config = getCopy(defaultConfig)
-    delete  config.LayerFormatObject
+    delete config.LayerFormatObject
     return
   }
 
+  clearConfig() //* Asserting Integrity
 
-  //* -------- Asserting Integrity
+}
 
-  if (config.disableStarterLayer === undefined)
-    config.disableStarterLayer = defaultConfig.disableStarterLayer
+function clearConfig(configObject){
 
-  if (!Array.isArray(config.customTextFormats))
-    config.customTextFormats = defaultConfig.customTextFormats
-  if (!Array.isArray(config.starterLayerFormats))
-    config.starterLayerFormats = defaultConfig.starterLayerFormats
+  if (configObject === undefined) configObject = config
 
-  if (typeof config.groupLayer != "object" || config.groupLayer === null || Array.isArray(config.groupLayer))
-    config.groupLayer = defaultConfig.groupLayer
-  if (typeof config.defaultTextFormat != "object" || config.defaultTextFormat === null || Array.isArray(config.defaultTextFormat))
-    config.defaultTextFormat = defaultConfig.defaultTextFormat
+  //! IMPORTANT
+  //* Every Object inside 'config' is considered a 'LayerFormatObject'
+
+  for (var i in defaultConfig){
+    var defValue = defaultConfig[i]
+
+    //? Ignore 'LayerFormatObject' object
+    if (i == "LayerFormatObject"){
+      delete configObject[i]
+      continue
+    }
+
+    //? If Undefined, just take the default value
+    if (configObject[i] === undefined || configObject[i] === null || isNaN(configObject[i])){
+      configObject[i] = defValue
+      continue;
+    }
+
+    //? From here, configObject[i] is defined, and not 'NaN' or 'null'
 
 
-  delete config.groupLayer.isBackgroundLayer
-  delete config.defaultTextFormat.isBackgroundLayer
+    //* Type Validation
 
-  for (var i in config.customTextFormats)
-    delete config.customTextFormats[i].isBackgroundLayer
+    if (defValue !== null && typeof defValue == "object"){
 
+      if (Array.isArray(defValue)){
+        //? It is a Array []
+
+        //? If it is a Object {}, insert this object in a Array
+        if (configObject[i] !== null && typeof configObject[i] == "object" && !Array.isArray(configObject[i]) )
+          configObject[i] = [ configObject[i] ]
+        //? If it is not a Array [], use default
+        else if (!Array.isArray(configObject[i])){
+          configObject[i] = defValue
+          continue
+        }
+
+        //* LayerFormatObject Validation
+
+        for (var j in configObject[i]){
+
+          validateLayerFormatObject(configObject[i][j])
+
+          if ( !(i == "starterLayerFormats" && j < 1 ) )
+            delete configObject[i][j].isBackgroundLayer
+          if ( !(i == "starterLayerFormats" && j > 0 ) )
+            delete configObject[i][j].duplicate
+        }
+
+      } else {
+        //? It is a Object {}
+
+        //? If it is not a Object {}, use default
+        if (typeof configObject[i] != "object" || configObject[i] === null || Array.isArray(configObject[i]) ){
+          configObject[i] = defValue
+          continue
+        }
+
+        //* LayerFormatObject Validation
+        validateLayerFormatObject( configObject[i] )
+        delete configObject[i].isBackgroundLayer
+        delete configObject[i].duplicate
+      }
+    }
+    else if (typeof defValue == "number"){
+      //? It is a Number
+
+      if (typeof configObject[i] == "string"){
+
+        //? Replace everything that isn't numbers
+        configObject[i] = configObject[i].replace(/[^0-9]/g, '')
+
+        //? If the string have no length (""), use default
+        if (!configObject[i].length){
+          configObject[i] = defValue
+          continue
+        }
+      }
+
+      //? Parse as float
+      configObject[i] = parseFloat(configObject[i])
+
+      //? If parsing the value as integer, generates 'NaN', use default
+      if (isNaN(configObject[i])){
+        configObject[i] = defValue
+        continue
+      }
+
+    }
+    else if (typeof defValue == "boolean"){
+      //? It is a boolean true/false
+
+      //? An easier approach to avoid unexpected results
+      if (typeof configObject[i] != "boolean"){
+        configObject[i] = defValue
+        continue
+      }
+    }
+    else if (typeof defValue == "string"){
+      //? It is a String ""
+
+      //? Convert it to string
+      if (typeof configObject[i] == "number")
+        configObject[i] = configObject[i].toString()
+      else if (typeof configObject[i] != "string"){
+        configObject[i] = defValue
+        continue
+      }
+    }
+  }
+
+  function validateLayerFormatObject(obj){
+
+    const optionObjects = {
+      justification: justificationObj,
+      blendMode: blendModeObj,
+      language: languageObj,
+      font: undefined
+    }
+
+    for (var k in optionObjects){
+      if (isNotUndef(obj[k])){
+        if (k != "font") obj[k] = obj[k].toUpperCase()
+        if (undefined === ( k == "font" ? getFont(obj[k]) : getKeyFromValue(optionObjects[k], obj[k])) )
+          obj[k] = defaultConfig.LayerFormatObject[k]
+      }
+    }
+
+    for (var k in obj){
+      if (obj[k] === defaultConfig.LayerFormatObject[k])
+        delete obj[k]
+    }
+  }
 }
 
 
@@ -515,15 +633,15 @@ function getFont(fontName) {
 
 function getTypeFolder(groupIndex) {
   var groupName
- 
+
   if (groupIndex){//?if groupindex exists, adds the index, else goes for the main folder
     groupName = config.groupLayer.name + "_" + groupIndex
   }
   else {
     groupName = config.groupLayer.name
   }
- 
- 
+
+
 
   if (config.alwaysCreateGroup && !alreadyCreatedTextFolder) {
     alreadyCreatedTextFolder = true
@@ -853,15 +971,15 @@ function formatLayer(layer, format) {
 
 function writeTextLayer(text, activateDuplication, positionArray, format) {
 
-  
+
   function defaultTextLayer() {
     //* Creating PlaceHolder Layer
     if (config.columnGroup){
       mainGroup = getTypeFolder()
     }
-   
+
     currentGroup = getTypeFolder(config.columnGroup ? positionArray.group : undefined)
-    
+
     const txtLayer = currentGroup.artLayers.add()
     txtLayer.name = "PlaceHolder Layer"
     txtLayer.kind = LayerKind.TEXT
@@ -872,9 +990,9 @@ function writeTextLayer(text, activateDuplication, positionArray, format) {
     return txtLayer;
   }
 
-  
+
   const txtLayer = duplicatedLayer === undefined ? defaultTextLayer() : duplicatedLayer
- 
+
 
   if (config.columnGroup){
   if (!currentGroup.name.endsWith((positionArray.group.toString()))){
@@ -960,9 +1078,9 @@ function createProgressBarObj() {
 
 
 /*
-Code for Import https://scriptui.joonas.me — (Triple click to select): 
+Code for Import https://scriptui.joonas.me — (Triple click to select):
 {"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":false,"borderless":false,"resizeable":false},"text":"Processing files","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"Progressbar","parentId":6,"style":{"enabled":true,"varName":"progressBar","preferredSize":[300,25],"alignment":"fill","helpTip":null}},"item-2":{"id":2,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":null}},"item-4":{"id":4,"type":"ListBox","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"multiselect":false,"numberOfColumns":1,"columnWidths":"[]","columnTitles":"[]","showHeaders":false},"listItems":"Item 1, Item 2","preferredSize":[0,0],"alignment":"fill","helpTip":null}},"item-6":{"id":6,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Panel","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":0,"alignChildren":["fill","center"],"alignment":null}}},"order":[0,6,1,2,4],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"none"}}
-*/ 
+*/
 
 // WIN
 // ===
@@ -976,25 +1094,25 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
 // PANEL1
 // ======
 var panel1 = this.win.add("panel", undefined, undefined, {name: "panel1"});
-    panel1.orientation = "column"; 
-    panel1.alignChildren = ["fill","center"]; 
-    panel1.spacing = 0; 
-    panel1.margins = 0; 
+    panel1.orientation = "column";
+    panel1.alignChildren = ["fill","center"];
+    panel1.spacing = 0;
+    panel1.margins = 0;
 
-  this.progressBar = panel1.add("progressbar", undefined, undefined, {name: "progressBar"}); 
-    this.progressBar.maxvalue = 1; 
-    this.progressBar.value = 0; 
-    this.progressBar.preferredSize.width = 300; 
-    this.progressBar.preferredSize.height = 25; 
-    this.progressBar.alignment = ["fill","center"]; 
-
-
-var divider0 = this.win.add("panel", undefined, undefined, {name: "divider1"}); 
-    divider0.alignment = "fill"; 
+  this.progressBar = panel1.add("progressbar", undefined, undefined, {name: "progressBar"});
+    this.progressBar.maxvalue = 1;
+    this.progressBar.value = 0;
+    this.progressBar.preferredSize.width = 300;
+    this.progressBar.preferredSize.height = 25;
+    this.progressBar.alignment = ["fill","center"];
 
 
-this.listBox = this.win.add("listbox", undefined, undefined, {name: "listbox1"}); 
-    this.listBox.alignment = ["fill","top"]; 
+var divider0 = this.win.add("panel", undefined, undefined, {name: "divider1"});
+    divider0.alignment = "fill";
+
+
+this.listBox = this.win.add("listbox", undefined, undefined, {name: "listbox1"});
+    this.listBox.alignment = ["fill","top"];
 }
 
 function formatProgressBarObj(progressBar,imgDir){
@@ -1348,6 +1466,7 @@ function formatUserInterface() {
   readConfig()
   UI.arrayFiles = []
   UI.Executing = function () {}
+  UI.firstFont = undefined
 
 
   //* Dropdown Sizes
@@ -1393,6 +1512,7 @@ function formatUserInterface() {
 
     var fontListDDFont = getFont(isNotUndef(config.defaultTextFormat.font) ? config.defaultTextFormat.font :  defaultConfig.LayerFormatObject.font)
     UI.fontListDD.selection = isNotUndef(fontListDDFont) ? UI.fontListDD.find(fontListDDFont.name) | 0 : 0
+    if (UI.firstFont === undefined) UI.firstFont = UI.fontListDD.selection.text
 
     var justificationDDKey = getKeyFromValue(justificationObj, isNotUndef(config.defaultTextFormat.justification) ? config.defaultTextFormat.justification.toUpperCase() :  defaultConfig.LayerFormatObject.justification)
     UI.justificationDD.selection = UI.justificationDD.find( justificationDDKey ) | 0
@@ -1426,10 +1546,13 @@ function formatUserInterface() {
 
     setValidConfigValue(UI.boxTextCB.value, config.defaultTextFormat, [ "LayerFormatObject" , "boxText" ])
 
-    setValidConfigValue(UI.fontListDD.selection.text, config.defaultTextFormat, [ "LayerFormatObject" , "font" ])
+    var fontListDDSelection = UI.fontListDD.selection.index ? UI.fontListDD.selection.text : defaultConfig.LayerFormatObject.font
+    if (UI.firstFont != UI.fontListDD.selection.text)
+      setValidConfigValue(fontListDDSelection, config.defaultTextFormat, [ "LayerFormatObject" , "font" ])
     setValidConfigValue(justificationObj[UI.justificationDD.selection.text], config.defaultTextFormat, [ "LayerFormatObject" , "justification" ])
     setValidConfigValue(languageObj[UI.languageDD.selection.text], config.defaultTextFormat, [ "LayerFormatObject" , "language" ])
 
+    clearConfig() //* Asserting Integrity
   }
 
   function saveConfigArchive(configObject) {
@@ -1457,6 +1580,7 @@ function formatUserInterface() {
 
     }
 
+    clearConfig(configObject) //* Asserting Integrity
 
     try {
       const newFile = getFileFromScriptPath(savedFilePath)
@@ -1979,7 +2103,7 @@ function createStarterLayerUI(repeatIndex){
     }else{
       tabPanel_nav.add ("item", "Raw Layer")
     }
-    
+
     tabPanel_nav.selection = index
 
 
@@ -2063,6 +2187,8 @@ function showStarterLayerUI(){
 
         setValidConfigValue(blendModeObj[ti.blendModeDD.selection.text], layerFormat, [ "LayerFormatObject" , "blendMode" ] )
       }
+
+      clearConfig() //* Asserting Integrity
     }
 
     var repeatIndex = 0
