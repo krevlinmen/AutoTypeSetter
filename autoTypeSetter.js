@@ -700,7 +700,7 @@ function getTypeFolder(groupIndex) {
     if (!groupIndex){ //? If its not an indexed group (column Group only)
     textFolder = activeDocument.layerSets.getByName(groupName)}
     else{
-        textFolder = mainGroup.layerSets.getByName(groupname) //? Gets nested groups inside the main group
+        textFolder = mainGroup.layerSets.getByName(groupName) //? Gets nested groups inside the main group
     }
   } catch (error) {
     //? If not found, create one
