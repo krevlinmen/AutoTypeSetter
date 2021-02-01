@@ -1594,7 +1594,7 @@ function formatUserInterface() {
 
       newFile.encoding = 'UTF8'; // set to 'UTF8' or 'UTF-8'
       newFile.open("w");
-      newFile.write(JSON.stringify(configObject))
+      newFile.write(JSON.stringify(configObject, null, 2))
       newFile.close();
 
     } catch (error) {
