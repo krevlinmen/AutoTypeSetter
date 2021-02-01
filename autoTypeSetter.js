@@ -148,7 +148,7 @@ function processText(arrayFiles) {
 
 
   //? Function for inserting texts in each page
-  
+
   function insertPageTexts(page) {
     const positionArray = calculatePositions(page)
     var currentGroup
@@ -657,14 +657,6 @@ function getSpecificImage(arr, num) {
   return undefined;
 }
 
-function getIndexOf(arr, value) {
-  for (var i in arr) {
-    if (value === arr[i])
-      return i
-  }
-  return -1;
-}
-
 function getFontNames(){
   //? This function is only used as a UI Dropdown list
   //? The first option is hardcoded
@@ -798,16 +790,16 @@ function createImageArray(arrayFiles) {
 
       if (duplicates.length > 1) {
         duplicates.sort(function (a, b) {//? Sort duplicate files
-          const aR = getIndexOf(prioritizeOrder, getExtension(a.name).toLowerCase())
-          const bR = getIndexOf(prioritizeOrder, getExtension(b.name).toLowerCase())
-          if (aR == -1) return 1
-          if (bR == -1) return -1
+          const aR = getKeyFromValue(prioritizeOrder, getExtension(a.name).toLowerCase())
+          const bR = getKeyFromValue(prioritizeOrder, getExtension(b.name).toLowerCase())
+          if (aR === undefined) return 1
+          if (bR === undefined) return -1
           return aR - bR
         })
       }
 
     for (var j = 1; j < duplicates.length; j++) { //? Remove duplicates from main array
-      var index = getIndexOf(imageArray, duplicates[j])
+      var index = getKeyFromValue(imageArray, duplicates[j])
       var removed = imageArray.splice(index, 1)
       //alert("removing " + removed[0].name)
     }
