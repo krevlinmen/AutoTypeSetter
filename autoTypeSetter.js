@@ -346,27 +346,71 @@ function clearConfig(configObject){
   if (configObject === undefined) configObject = config
 
   //! IMPORTANT
-  //* Every Object inside 'config' is considered a 'LayerFormatObject'
+  //* Every Object {} inside 'config' is considered a 'LayerFormatObject'
 
   for (var i in defaultConfig){
+
+    //* Type Validation
+
+    var isDefault = validatePropertyType(configObject, defaultConfig, i)
+    if (isDefault) continue;
+
+    //? From here, configObject[i] is defined, not 'NaN' or 'null' or equal to the default
+
+    //* LayerFormatObject Validation
+
     var defValue = defaultConfig[i]
 
+    if (defValue !== null && typeof defValue == "object"){
+
+      if (Array.isArray(defValue)){
+        //? It is a Array []
+
+        for (var j in configObject[i]){
+
+          //? Deleting problematic properties
+
+          if ( !(i == "starterLayerFormats" && j < 1 ) )
+            //? We delete if this is not the first layer of "starterLayerFormats"
+            delete configObject[i][j].isBackgroundLayer
+
+          if ( !(i == "starterLayerFormats" && j > 0 ) )
+            //? We delete if this is not the subsequent layers of "starterLayerFormats"
+            delete configObject[i][j].duplicate
+
+          validateLayerFormatObject(configObject[i][j], configObject[i][j].duplicate ? configObject[i][j-1] : undefined )
+        }
+
+      } else {
+
+        //? Deleting problematic properties
+        delete configObject[i].isBackgroundLayer
+        delete configObject[i].duplicate
+
+        validateLayerFormatObject( configObject[i] )
+      }
+    }
+  }
+
+  function validatePropertyType(configObject, defaultObject, key){
+    var defValue = defaultObject[key]
+
     //? Ignore 'LayerFormatObject' object
-    if (i == "LayerFormatObject"){
-      delete configObject[i]
-      continue
+
+    if (key == "aaaaa") alert(defaultObject[key])
+
+    if (key == "LayerFormatObject" || defaultObject[key] === undefined){
+      delete configObject[key]
+      return true
     }
 
     //? If Undefined, just take the default value
-    if (configObject[i] === undefined || configObject[i] === null || isNaN(configObject[i])){
-      configObject[i] = defValue
-      continue;
+    if (configObject[key] === undefined || configObject[key] === null || isNaN(configObject[key])){
+      configObject[key] = defValue
+      return true;
     }
 
-    //? From here, configObject[i] is defined, and not 'NaN' or 'null'
-
-
-    //* Type Validation
+    //? From here, configObject[i] is defined, not 'NaN' or 'null' or equal to the default
 
     if (defValue !== null && typeof defValue == "object"){
 
@@ -374,63 +418,46 @@ function clearConfig(configObject){
         //? It is a Array []
 
         //? If it is a Object {}, insert this object in a Array
-        if (configObject[i] !== null && typeof configObject[i] == "object" && !Array.isArray(configObject[i]) )
-          configObject[i] = [ configObject[i] ]
+        if (configObject[key] !== null && typeof configObject[key] == "object" && !Array.isArray(configObject[key]) )
+          configObject[key] = [ configObject[key] ]
         //? If it is not a Array [], use default
-        else if (!Array.isArray(configObject[i])){
-          configObject[i] = defValue
-          continue
-        }
-
-        //* LayerFormatObject Validation
-
-        for (var j in configObject[i]){
-
-          validateLayerFormatObject(configObject[i][j])
-
-          if ( !(i == "starterLayerFormats" && j < 1 ) )
-            delete configObject[i][j].isBackgroundLayer
-          if ( !(i == "starterLayerFormats" && j > 0 ) )
-            delete configObject[i][j].duplicate
+        else if (!Array.isArray(configObject[key])){
+          configObject[key] = defValue
+          return true
         }
 
       } else {
         //? It is a Object {}
 
         //? If it is not a Object {}, use default
-        if (typeof configObject[i] != "object" || configObject[i] === null || Array.isArray(configObject[i]) ){
-          configObject[i] = defValue
-          continue
+        if (typeof configObject[key] != "object" || configObject[key] === null || Array.isArray(configObject[key]) ){
+          configObject[key] = defValue
+          return true
         }
-
-        //* LayerFormatObject Validation
-        validateLayerFormatObject( configObject[i] )
-        delete configObject[i].isBackgroundLayer
-        delete configObject[i].duplicate
       }
     }
     else if (typeof defValue == "number"){
       //? It is a Number
 
-      if (typeof configObject[i] == "string"){
+      if (typeof configObject[key] == "string"){
 
         //? Replace everything that isn't numbers
-        configObject[i] = configObject[i].replace(/[^0-9]/g, '')
+        configObject[key] = configObject[key].replace(/[^0-9]/g, '')
 
         //? If the string have no length (""), use default
-        if (!configObject[i].length){
-          configObject[i] = defValue
-          continue
+        if (!configObject[key].length){
+          configObject[key] = defValue
+          return true
         }
       }
 
       //? Parse as float
-      configObject[i] = parseFloat(configObject[i])
+      configObject[key] = parseFloat(configObject[key])
 
       //? If parsing the value as integer, generates 'NaN', use default
-      if (isNaN(configObject[i])){
-        configObject[i] = defValue
-        continue
+      if (isNaN(configObject[key])){
+        configObject[key] = defValue
+        return true
       }
 
     }
@@ -438,44 +465,62 @@ function clearConfig(configObject){
       //? It is a boolean true/false
 
       //? An easier approach to avoid unexpected results
-      if (typeof configObject[i] != "boolean"){
-        configObject[i] = defValue
-        continue
+      if (typeof configObject[key] != "boolean"){
+        configObject[key] = defValue
+        return true
       }
     }
     else if (typeof defValue == "string"){
       //? It is a String ""
 
       //? Convert it to string
-      if (typeof configObject[i] == "number")
-        configObject[i] = configObject[i].toString()
-      else if (typeof configObject[i] != "string"){
-        configObject[i] = defValue
-        continue
+      if (typeof configObject[key] == "number")
+        configObject[key] = configObject[key].toString()
+      else if (typeof configObject[key] != "string"){
+        configObject[key] = defValue
+        return true
       }
     }
   }
 
-  function validateLayerFormatObject(obj){
+  function validateLayerFormatObject(obj, objBefore){
 
     const optionObjects = {
       justification: justificationObj,
       blendMode: blendModeObj,
       language: languageObj,
-      font: undefined
+      font: null
     }
 
     for (var k in optionObjects){
+
+      //? If the property exists
       if (isNotUndef(obj[k])){
+
+        //? If it is not a font, turn it uppercase
         if (k != "font") obj[k] = obj[k].toUpperCase()
+
+        //? If we try to parse it as the "actual useful value", and get undefined, use default
         if (undefined === ( k == "font" ? getFont(obj[k]) : getKeyFromValue(optionObjects[k], obj[k])) )
           obj[k] = defaultConfig.LayerFormatObject[k]
       }
     }
 
+    //? Validate "duplicate"
+    validatePropertyType(obj, defaultConfig.LayerFormatObject, "duplicate")
+    //? If "duplicate" is not true, set objBefore as undefined
+    if (!obj["duplicate"]) objBefore = undefined
+
     for (var k in obj){
-      if (obj[k] === defaultConfig.LayerFormatObject[k])
+
+      //* Type Validation
+      validatePropertyType(obj, defaultConfig.LayerFormatObject, k)
+
+      //? We delete the property if the value is equal the default one
+      //? If objBefore is defined, we only delete the property if objBefore[k] is undefined
+      if (obj[k] === defaultConfig.LayerFormatObject[k] && (isNotUndef(objBefore) ? objBefore[k] === undefined : true ))
         delete obj[k]
+
     }
   }
 }
