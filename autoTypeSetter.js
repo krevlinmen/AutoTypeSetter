@@ -50,15 +50,19 @@ UI 3
   function readFiles(files) {
     for (var i in files)
       try {
+        //? If files[i] is a folder, it will not throw a error
         var moreFiles = files[i].getFiles()
         readFiles(moreFiles)
       } catch (error) {
+        //? If a error was thrown, it is a file, not a folder
         var name = files[i].name
+        //? Only read files terminated in ".js"
         if (!name.slice(name.length - 3).indexOf(".js"))
           $.evalFile(files[i]);
       }
   }
 
+  //? Get all files from "lib" folder
   const files = getFileFromScriptPath("lib/").getFiles()
   readFiles(files)
 })()
@@ -117,7 +121,7 @@ function main() {
     }
   }
 
-
+  //? Show UI window
   $.writeln(UI.win.show());
 
   //? Restore Configurations
@@ -126,6 +130,8 @@ function main() {
 
 function processText(arrayFiles) {
 
+
+  //? Get Files
 
   var multipleArchives = false
 
@@ -141,13 +147,12 @@ function processText(arrayFiles) {
 
 
 
-
+  //? Function for inserting texts in each page
+  
   function insertPageTexts(page) {
     const positionArray = calculatePositions(page)
     var currentGroup
     var mainGroup
-    // alert(page)
-    // alert(positionArray)
 
     for (var i in page) {
       var line = page[i]
@@ -169,7 +174,7 @@ function processText(arrayFiles) {
         }
       }
 
-      writeTextLayer(line, i < page.length - 1, positionArray[i], format,currentGroup)
+      writeTextLayer(line, i < page.length - 1, positionArray[i], format, currentGroup)
 
     }
 
@@ -177,12 +182,14 @@ function processText(arrayFiles) {
 
   if (multipleArchives) {
 
+    //? Update Progress Bar
     formatProgressBarObj(progressBarObj,filteredFiles[1])
 
-    for (var key in content) { //File editing loop
+    for (var key in content) {
 
-      var keyNum = parseInt(key)
-      if (config.ignorePageNumber && (keyNum - 1) >= imageArrayDir.length) break;
+      var keyNum = parseInt(key) //? Fallback
+      if (config.ignorePageNumber && (keyNum - 1) >= imageArrayDir.length)
+        break; //? No files left
       var found = config.ignorePageNumber ? imageArrayDir[keyNum - 1] : getSpecificImage(imageArrayDir, keyNum)
 
       if (found === undefined) continue;
@@ -195,6 +202,10 @@ function processText(arrayFiles) {
     }
     progressBarObj.win.close()
   } else {
+
+    //? There's only one file selected
+    //? It MUST be a text file - assured in createContentObj()
+    //? And The user MUST have a open active document
 
     try {
       if (activeDocument.layers[0])
@@ -259,13 +270,13 @@ function saveAndCloseFile(file,imageArrayDir) {
   progressBarObj.progressBar.value += 1 / imageArrayDir.length
   progressBarObj.listBox.remove(0)
 
-
 }
 
 function applyStarterLayerFormats() {
 
   if (config.disableStarterLayer) return
 
+  //? Get first layer (from bottom to top)
   var currentLayer = activeDocument.layers[activeDocument.layers.length - 1]
 
   for (var i in config.starterLayerFormats) {
@@ -274,9 +285,9 @@ function applyStarterLayerFormats() {
     if (i > 0 && isNotUndef(format.duplicate) && format.duplicate)
       currentLayer = currentLayer.duplicate()
     else if (i > 0) {
-      var newL = activeDocument.artLayers.add()
-      newL.move(currentLayer, ElementPlacement.PLACEBEFORE)
-      currentLayer = newL
+      var newLayer = activeDocument.artLayers.add()
+      newLayer.move(currentLayer, ElementPlacement.PLACEBEFORE)
+      currentLayer = newLayer
     }
 
     formatLayer(currentLayer, format)
@@ -327,10 +338,10 @@ function readJson(path, name, isUnnecessary){
 function readConfig() {
 
   //* Reading File
-
   const hasSavedConfig = getFileFromScriptPath(savedFilePath).exists
   config = readJson(savedFilePath, "Saved configuration", !hasSavedConfig)
 
+  //* Use default if it didn't work
   if (config === undefined){
     config = getCopy(defaultConfig)
     delete config.LayerFormatObject
@@ -338,7 +349,6 @@ function readConfig() {
   }
 
   clearConfig() //* Asserting Integrity
-
 }
 
 function clearConfig(configObject){
@@ -547,7 +557,7 @@ function isNewPage(line) {
 function isEqualObjects(obj, sec) {
 
   if ((obj === null || sec === null ||
-      typeof (obj) != 'object' || typeof (sec) != 'object'))
+      typeof (obj) != "object" || typeof (sec) != "object"))
     throwError("\nTypeError: equalObjects received non-objects")
 
 
@@ -556,14 +566,11 @@ function isEqualObjects(obj, sec) {
 
   if (objKeys.length != secKeys.length)
     return false
-  if (!objKeys.length)
-    return true
 
-  //alert("Object Have Properties\nObject 1: " + objKeys + "\nObject 2: " + secKeys)
+  //if (objKeys.length) alert("Object Have Properties\nObject 1: " + objKeys + "\nObject 2: " + secKeys)
 
   for (var i = 0; i < objKeys.length; i++) {
-    if (objKeys[i] != secKeys[i])
-      return false
+
     var j = objKeys[i]
 
     if (obj.hasOwnProperty(j) != sec.hasOwnProperty(j))
@@ -602,7 +609,6 @@ function isEqualObjects(obj, sec) {
 
 
 function getKeyFromValue(obj, value){
-
   for (var k in obj)
     if (obj.hasOwnProperty(k) && obj[k] === value)
       return k
@@ -630,8 +636,10 @@ function getFileFromScriptPath(filename) {
 }
 
 function getPageNumber(str) {
-  var res = str.slice(config.pageIdentifierPrefix.length, str.length - config.pageIdentifierSuffix.length) //? Removes the identifier
-  var str = res.replace(/\D/g, ""); //? Cleans the line, removing NaN text such as "Page" from the identifier
+  //? Removes the Prefix and Suffix
+  var res = str.slice(config.pageIdentifierPrefix.length, str.length - config.pageIdentifierSuffix.length)
+  //? Cleans the line, removing NaN text
+  var str = res.replace(/\D/g, "")
 
   try {
     return parseInt(str)
@@ -641,26 +649,27 @@ function getPageNumber(str) {
 }
 
 function getSpecificImage(arr, num) {
-
   for (var i in arr) {
     var str = arr[i].name
-
     if (num === parseInt(removeExtension(str)))
       return arr[i];
   }
   return undefined;
 }
 
-function getIndexOf(arr, item) {
+function getIndexOf(arr, value) {
   for (var i in arr) {
-    if (item === arr[i])
+    if (value === arr[i])
       return i
   }
   return -1;
 }
 
 function getFontNames(){
+  //? This function is only used as a UI Dropdown list
+  //? The first option is hardcoded
   const fontNames = [ "Maintain Unchanged" ]
+  //? Push every font name in the array
   for (var i = 0; i < app.fonts.length; i++)
     fontNames.push(app.fonts[i].name)
 
