@@ -141,10 +141,9 @@ function processText(arrayFiles) {
     textFile = arrayFiles[0]
   else
     multipleArchives = true
-  const filteredFiles = createImageArray(arrayFiles)
-  const imageArrayDir = multipleArchives ? filteredFiles[0] : undefined
-  const content = createContentObj(multipleArchives)
 
+  const imageFileArray = multipleArchives ? createImageArray(arrayFiles) : undefined
+  const content = createContentObj(multipleArchives)
 
 
   //? Function for inserting texts in each page
@@ -182,22 +181,23 @@ function processText(arrayFiles) {
 
   if (multipleArchives) {
 
-    //? Update Progress Bar
-    formatProgressBarObj(progressBarObj,filteredFiles[1])
+    //? Format Progress Bar
+    formatProgressBarObj(imageFileArray)
+    app.refresh() //? Fallback
 
     for (var key in content) {
 
       var keyNum = parseInt(key) //? Fallback
-      if (config.ignorePageNumber && (keyNum - 1) >= imageArrayDir.length)
+      if (config.ignorePageNumber && (keyNum - 1) >= imageFileArray.length)
         break; //? No files left
-      var found = config.ignorePageNumber ? imageArrayDir[keyNum - 1] : getSpecificImage(imageArrayDir, keyNum)
+      var found = config.ignorePageNumber ? imageFileArray[keyNum - 1] : getSpecificImage(imageFileArray, keyNum)
 
       if (found === undefined) continue;
 
       open(found)
       applyStarterLayerFormats()
       insertPageTexts(content[key]) //Page text Writing Loop
-      saveAndCloseFile(found,imageArrayDir)
+      saveAndCloseFile(found)
 
     }
     progressBarObj.win.close()
@@ -258,7 +258,7 @@ function removeExtension(str) {
   return str.slice(0, str.lastIndexOf("."))
 }
 
-function saveAndCloseFile(file,imageArrayDir) {
+function saveAndCloseFile(file) {
   formatLayer(getTypeFolder(), config.groupLayer)
 
   const saveFile = File(removeExtension(file.fullName) + '.psd')
@@ -267,7 +267,7 @@ function saveAndCloseFile(file,imageArrayDir) {
   alreadyCreatedTextFolder = false;
 
   //? Update progressBar
-  progressBarObj.progressBar.value += 1 / imageArrayDir.length
+  progressBarObj.progressBar.value += 1 / progressBarObj.fullLength
   progressBarObj.listBox.remove(0)
 
 }
@@ -807,11 +807,8 @@ function createImageArray(arrayFiles) {
 
   imageArray = imageArray.sort()
 
-  for (var i in imageArray){
-    fileNames.push(imageArray[i].name)
-  }
 
-  return [imageArray, fileNames]
+  return imageArray
 }
 
 function createContentObj(multipleArchives) {
@@ -1122,22 +1119,13 @@ this.listBox = this.win.add("listbox", undefined, undefined, {name: "listbox1"})
     this.listBox.alignment = ["fill","top"];
 }
 
-function formatProgressBarObj(progressBar,imgDir){
+function formatProgressBarObj(imageFileArray){
 
-  for (var i in imgDir) { //Removes the txt file | Weird code that works up ahead
-    if (imgDir[i].endsWith(".txt")) {
-      imgDir[i] = imgDir[imgDir.length - 1];
-      imgDir.pop();
-      break
-    }
-  }
+  for (var i in imageFileArray) //? Adds each file to the box element on the progress Bar.
+    progressBarObj.listBox.add("item",imageFileArray[i].name)
 
-  imgDir = imgDir.sort()
-
-  for (var i in imgDir){//? Adds each file to the box element on the progress Bar.
-  progressBar.listBox.add("item",imgDir[i])
-}
- progressBar.win.show()
+  progressBarObj.fullLength = imageFileArray.length
+  progressBarObj.win.show()
 }
 
 
