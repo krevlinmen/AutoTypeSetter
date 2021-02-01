@@ -5,8 +5,8 @@ AutoTypeSetter is a script that automatically creates/modifies .psd files, inser
 # Results
 
 Image Input: (written in portuguese)
-![image1](images/example_files/01.png)
 
+![image1](images/example_files/01.png)
 ![image2](images/example_files/02.png)
 
 Text Input:
@@ -30,6 +30,7 @@ Wow! Thanks for saving my cat! Maybe I don't hate you that much!
 ```
 
 .psd Result:
+
 ![result1](images/example_files/result1.png)
 ![result1](images/example_files/result2.png)
 
