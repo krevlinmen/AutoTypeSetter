@@ -145,6 +145,7 @@ function processText(arrayFiles) {
   function insertPageTexts(page) {
     const positionArray = calculatePositions(page)
     var currentGroup
+    var mainGroup
     // alert(page)
     // alert(positionArray)
 
@@ -513,22 +514,35 @@ function getFont(fontName) {
 }
 
 function getTypeFolder(groupIndex) {
-  const groupName = config.groupLayer.name + ( config.columnGroup ? "_" + groupIndex : "" )
+  var groupName
+ 
+  if (groupIndex){//?if groupindex exists, adds the index, else goes for the main folder
+    groupName = config.groupLayer.name + "_" + groupIndex
+  }
+  else {
+    groupName = config.groupLayer.name
+  }
+ 
+ 
 
   if (config.alwaysCreateGroup && !alreadyCreatedTextFolder) {
     alreadyCreatedTextFolder = true
-    return createGroupFolder(groupName)
+    return createGroupFolder(groupName, groupIndex)
   }
 
 
   var textFolder;
   try {
-    //? Try find a folder with name given
-    textFolder = activeDocument.layerSets.getByName(groupName)
+    //? Try to find a folder with name given
+    if (!groupIndex){ //? If its not an indexed group (column Group only)
+    textFolder = activeDocument.layerSets.getByName(groupName)}
+    else{
+        textFolder = mainGroup.layerSets.getByName(groupname) //? Gets nested groups inside the main group
+    }
   } catch (error) {
     //? If not found, create one
 
-    textFolder = createGroupFolder(groupName)
+    textFolder = createGroupFolder(groupName, groupIndex)
   }
   return textFolder;
 }
@@ -732,20 +746,24 @@ function createEmptyLayer(layerName, layerFormat) {
 }
 
 
-function createGroupFolder(groupName, folderFormat) {
+function createGroupFolder(groupName, groupIndex, folderFormat) {
   //? Default Format
   const defaultFormat = {
     color: undefined,
     locked: false,
     type: undefined //levels,text,etc
   }
-
+  const newFolder
   //? Use Default Format if 'format' not given
   if (folderFormat === undefined)
     folderFormat = defaultFormat
 
-  const newFolder = activeDocument.layerSets.add()
-  
+  if (!groupIndex){ //? if group index is present, creates sub group
+   newFolder = activeDocument.layerSets.add()
+  }
+  else {
+    newFolder = mainGroup.layerSets.add()
+  }
   if (folderFormat.locked) newFolder.allLocked = true
   newFolder.name = groupName
 
@@ -835,10 +853,15 @@ function formatLayer(layer, format) {
 
 function writeTextLayer(text, activateDuplication, positionArray, format) {
 
-
+  
   function defaultTextLayer() {
     //* Creating PlaceHolder Layer
-    currentGroup = getTypeFolder(positionArray.group)
+    if (config.columnGroup){
+      mainGroup = getTypeFolder()
+    }
+   
+    currentGroup = getTypeFolder(config.columnGroup ? positionArray.group : undefined)
+    
     const txtLayer = currentGroup.artLayers.add()
     txtLayer.name = "PlaceHolder Layer"
     txtLayer.kind = LayerKind.TEXT
@@ -849,15 +872,16 @@ function writeTextLayer(text, activateDuplication, positionArray, format) {
     return txtLayer;
   }
 
-
+  
   const txtLayer = duplicatedLayer === undefined ? defaultTextLayer() : duplicatedLayer
+ 
 
+  if (config.columnGroup){
   if (!currentGroup.name.endsWith((positionArray.group.toString()))){
     currentGroup = getTypeFolder(positionArray.group)
     txtLayer.move(currentGroup,ElementPlacement.INSIDE)
-
   }
-
+}
   duplicatedLayer = undefined;
 
   if (activateDuplication){
@@ -887,7 +911,7 @@ function calculatePositions(textArray) {
     xPosition: xBorder,
     height: undefined,
     width: activeDocument.width * 0.2, //*maybe customizable in the future
-    group: 0
+    group: 1
   }
 
   for (var i in textArray) {
@@ -934,13 +958,14 @@ function calculatePositions(textArray) {
 
 function createProgressBarObj() {
 
-  /*
-  Code for Import https://scriptui.joon as.me — (Triple click to select):
-  {"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"Processing files","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"Progressbar","parentId":0,"style":{"enabled":true,"varName":"","preferredSize":[50,4],"alignment":"fill","helpTip":null}},"item-2":{"id":2,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":null}},"item-3":{"id":3,"type":"Button","parentId":0,"style":{"enabled":true,"varName":"cancelButton","text":"Cancel","justify":"center","preferredSize":[0,0],"alignment":"right","helpTip":null}}},"order":[0,1,2,3],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
-  */
 
-  // WIN
-  // ===
+/*
+Code for Import https://scriptui.joonas.me — (Triple click to select): 
+{"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":false,"borderless":false,"resizeable":false},"text":"Processing files","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"Progressbar","parentId":6,"style":{"enabled":true,"varName":"progressBar","preferredSize":[300,25],"alignment":"fill","helpTip":null}},"item-2":{"id":2,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":null}},"item-4":{"id":4,"type":"ListBox","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"multiselect":false,"numberOfColumns":1,"columnWidths":"[]","columnTitles":"[]","showHeaders":false},"listItems":"Item 1, Item 2","preferredSize":[0,0],"alignment":"fill","helpTip":null}},"item-6":{"id":6,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Panel","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":0,"alignChildren":["fill","center"],"alignment":null}}},"order":[0,6,1,2,4],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"none"}}
+*/ 
+
+// WIN
+// ===
   this.win = new Window("window");
   this.win.text = "Processing files";
   this.win.orientation = "column";
@@ -948,33 +973,28 @@ function createProgressBarObj() {
   this.win.spacing = 10;
   this.win.margins = 16;
 
+// PANEL1
+// ======
+var panel1 = this.win.add("panel", undefined, undefined, {name: "panel1"});
+    panel1.orientation = "column"; 
+    panel1.alignChildren = ["fill","center"]; 
+    panel1.spacing = 0; 
+    panel1.margins = 0; 
+
+  this.progressBar = panel1.add("progressbar", undefined, undefined, {name: "progressBar"}); 
+    this.progressBar.maxvalue = 1; 
+    this.progressBar.value = 0; 
+    this.progressBar.preferredSize.width = 300; 
+    this.progressBar.preferredSize.height = 25; 
+    this.progressBar.alignment = ["fill","center"]; 
 
 
-
-  this.progressBar = this.win.add("progressbar", undefined, undefined, {
-    name: "progressBar"
-  });
-  this.progressBar.maxvalue = 1;
-  this.progressBar.value = 0;
-  this.progressBar.preferredSize.width = 200;
-  this.progressBar.preferredSize.height = 15;
-  this.progressBar.alignment = ["fill", "top"];
+var divider0 = this.win.add("panel", undefined, undefined, {name: "divider1"}); 
+    divider0.alignment = "fill"; 
 
 
-  this.listBox = this.win.add("listbox", undefined, undefined, {
-    name: "listbox1"
-  });
-
-  var divider1 = this.win.add("panel", undefined, undefined, {
-    name: "divider1"
-  });
-  divider1.alignment = "fill";
-
-  var cancelButton = this.win.add("button", undefined, undefined, {
-    name: "cancelButton"
-  });
-  cancelButton.text = "Cancel";
-  cancelButton.alignment = ["right", "top"];
+this.listBox = this.win.add("listbox", undefined, undefined, {name: "listbox1"}); 
+    this.listBox.alignment = ["fill","top"]; 
 }
 
 function formatProgressBarObj(progressBar,imgDir){
@@ -988,11 +1008,10 @@ function formatProgressBarObj(progressBar,imgDir){
   }
 
   imgDir = imgDir.sort()
-  imgDir[0]+= " | Processing......" //Makes the listBox full length
-  for (var i in imgDir){
+
+  for (var i in imgDir){//? Adds each file to the box element on the progress Bar.
   progressBar.listBox.add("item",imgDir[i])
 }
-  progressBar.listBox.items[0].text = progressBar.listBox.items[0].text.replace(" | Processing......", "")
  progressBar.win.show()
 }
 
@@ -1122,7 +1141,7 @@ this.alwaysCreateGroupCB = panel2.add("checkbox", undefined, undefined, {name: "
 
 this.columnGroupCB = panel2.add("checkbox", undefined, undefined, {name: "columnGroupCB"});
     this.columnGroupCB.helpTip = "Text Columns will be stacked in diferent groups";
-    this.columnGroupCB.text = "Column Group";
+    this.columnGroupCB.text = "Create Column Subgroups";
 
 // PANEL3
 // ======
@@ -1310,10 +1329,10 @@ this.cancelBtn = group12.add("button", undefined, undefined, {name: "cancelBtn"}
 
 var statictext10 = group12.add("group");
     statictext10.orientation = "column";
-    statictext10.alignChildren = ["left","center"];
+    statictext10.alignChildren = ["center","center"];
     statictext10.spacing = 0;
 
-    statictext10.add("statictext", undefined, "Created By ", {name: "statictext10"});
+    statictext10.add("statictext", undefined, "Created By", {name: "statictext10"});
     statictext10.add("statictext", undefined, "KrevlinMen", {name: "statictext10"});
     statictext10.add("statictext", undefined, "ImSamuka", {name: "statictext10"});
 
@@ -1794,6 +1813,7 @@ var blendModeDD = group3.add("dropdownlist", undefined, undefined, {name: "blend
   blendModeDD.maximumSize = dropDownSizes
 
   opacitySlider.onChange = function () {
+
     opacitySlider.helpTip = opacitySlider.value
   }
   opacitySlider.onChanging = opacitySlider.onChange //? Fallback
