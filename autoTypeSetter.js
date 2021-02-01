@@ -718,45 +718,6 @@ function getTypeFolder(groupIndex) {
 
 
 
-function setValidConfigValue(newValue, propertyParent, arrayPropertyPath){
-  //? Function used to set a valid config value
-  //? Examples:
-  // setValidConfigValue("<>", config, "pageIdentifierPrefix")
-  // setValidConfigValue(80, config.groupLayer, ["LayerFormatObject", "opacity"])
-  // setValidConfigValue(null, config.groupLayer, "LayerFormatObject", "opacity")
-
-  if (arguments.length < 3) return //? Not enough arguments
-
-  //? No item is null or NaN
-  if (isNaN(newValue) || null === newValue) return
-
-
-  const props = Array.isArray(arrayPropertyPath) ? arrayPropertyPath : Array.prototype.slice.call(arguments, 2, arguments.length)
-
-
-  var defaultValue = defaultConfig[props[0]];
-  for (var i = 1, l = props.length; i < l; i++)
-    if ( isNotUndef(defaultValue) )
-      defaultValue = defaultValue[props[i]]
-
-
-  if (isNotUndef(defaultValue)){
-    if (undefined === newValue) return
-
-    //? Different types will not be tolerated
-    if (typeof(defaultValue) != typeof(newValue)) return
-  }
-
-  propertyParent[ props[props.length-1] ] = newValue
-}
-
-
-
-
-
-
-
-
 
 
 
@@ -1570,32 +1531,32 @@ function formatUserInterface() {
 
   function getUIConfigs() {
 
-    setValidConfigValue(UI.pageIdentifierPrefixBox.text, config, "pageIdentifierPrefix")
-    setValidConfigValue(UI.pageIdentifierSuffixBox.text, config, "pageIdentifierSuffix")
-    setValidConfigValue(UI.ignorePageNumberCB.value, config, "ignorePageNumber")
+    config.pageIdentifierPrefix = UI.pageIdentifierPrefixBox.text
+    config.pageIdentifierSuffix = UI.pageIdentifierSuffixBox.text
+    config.ignorePageNumber = UI.ignorePageNumberCB.value
 
-    setValidConfigValue(UI.prioritizePSDCB.value, config, "prioritizePSD")
-    setValidConfigValue(UI.selectAllFilesCB.value, config, "selectAllFiles")
-    setValidConfigValue(UI.alwaysCreateGroupCB.value, config, "alwaysCreateGroup")
+    config.prioritizePSD = UI.prioritizePSDCB.value
+    config.selectAllFiles = UI.selectAllFilesCB.value
+    config.alwaysCreateGroup = UI.alwaysCreateGroupCB.value
 
-    setValidConfigValue(UI.columnGroupCB.value, config, "columnGroup")
-    setValidConfigValue(UI.disableCustomFormattingCB.value, config, "disableCustomFormatting")
-    setValidConfigValue(UI.groupNameBox.text, config.groupLayer, [ "LayerFormatObject" , "name" ])
+    config.columnGroup = UI.columnGroupCB.value
+    config.disableCustomFormatting = UI.disableCustomFormattingCB.value
+    config.groupLayer.name = UI.groupNameBox.text
 
-    setValidConfigValue(UI.visibleGroupCB.value, config.groupLayer, [ "LayerFormatObject" , "visible" ])
+    config.groupLayer.visible = UI.visibleGroupCB.value
 
     if (isNaN(parseFloat(UI.fontSizeBox.text)))
       alert("Font size is not a number.")
     else
-      setValidConfigValue(parseFloat(UI.fontSizeBox.text), config.defaultTextFormat, [ "LayerFormatObject" , "size" ])
+      config.defaultTextFormat.size = parseFloat(UI.fontSizeBox.text)
 
-    setValidConfigValue(UI.boxTextCB.value, config.defaultTextFormat, [ "LayerFormatObject" , "boxText" ])
+    config.defaultTextFormat.boxText = UI.boxTextCB.value
 
     var fontListDDSelection = UI.fontListDD.selection.index ? UI.fontListDD.selection.text : defaultConfig.LayerFormatObject.font
     if (UI.firstFont != UI.fontListDD.selection.text)
-      setValidConfigValue(fontListDDSelection, config.defaultTextFormat, [ "LayerFormatObject" , "font" ])
-    setValidConfigValue(justificationObj[UI.justificationDD.selection.text], config.defaultTextFormat, [ "LayerFormatObject" , "justification" ])
-    setValidConfigValue(languageObj[UI.languageDD.selection.text], config.defaultTextFormat, [ "LayerFormatObject" , "language" ])
+      config.defaultTextFormat.font = fontListDDSelection
+    config.defaultTextFormat.justification = justificationObj[UI.justificationDD.selection.text]
+    config.defaultTextFormat.language = languageObj[UI.languageDD.selection.text]
 
     clearConfig() //* Asserting Integrity
   }
@@ -2216,21 +2177,21 @@ function showStarterLayerUI(){
     function getUIConfigs(tabs){
 
       for (var i = 0, len = tabs.length; i < len; i++){
-        var ti = tabs[i].items
+        var tabItems = tabs[i].items
         var layerFormat = config.starterLayerFormats[i]
 
-        setValidConfigValue(ti.nameBox.text, layerFormat, ["LayerFormatObject", "name"] )
-        setValidConfigValue(ti.duplicateCB.value, layerFormat, ["LayerFormatObject", "duplicate"] )
-        setValidConfigValue(ti.isBackgroundLayerCB.value, layerFormat, ["LayerFormatObject", "isBackgroundLayer"] )
-        setValidConfigValue(ti.opacitySlider.value, layerFormat, ["LayerFormatObject", "opacity"] )
-        setValidConfigValue(ti.visibleCB.value, layerFormat, ["LayerFormatObject", "visible"] )
-        setValidConfigValue(ti.groupedCB.value, layerFormat, ["LayerFormatObject", "grouped"] )
-        setValidConfigValue(ti.allLockedCB.value, layerFormat, ["LayerFormatObject", "allLocked"] )
-        setValidConfigValue(ti.transparentPixelsLockedCB.value, layerFormat, ["LayerFormatObject", "transparentPixelsLocked"] )
-        setValidConfigValue(ti.pixelsLockedCB.value, layerFormat, ["LayerFormatObject", "pixelsLocked"] )
-        setValidConfigValue(ti.positionLockedCB.value, layerFormat, ["LayerFormatObject", "positionLocked"] )
+        layerFormat.name = tabItems.nameBox.text
+        layerFormat.duplicate = tabItems.duplicateCB.value
+        layerFormat.isBackgroundLayer = tabItems.isBackgroundLayerCB.value
+        layerFormat.opacity = tabItems.opacitySlider.value
+        layerFormat.visible = tabItems.visibleCB.value
+        layerFormat.grouped = tabItems.groupedCB.value
+        layerFormat.allLocked = tabItems.allLockedCB.value
+        layerFormat.transparentPixelsLocked = tabItems.transparentPixelsLockedCB.value
+        layerFormat.pixelsLocked = tabItems.pixelsLockedCB.value
+        layerFormat.positionLocked = tabItems.positionLockedCB.value
 
-        setValidConfigValue(blendModeObj[ti.blendModeDD.selection.text], layerFormat, [ "LayerFormatObject" , "blendMode" ] )
+        layerFormat.blendMode = blendModeObj[tabItems.blendModeDD.selection.text]
       }
 
       clearConfig() //* Asserting Integrity
