@@ -1496,16 +1496,16 @@ function formatUserInterface() {
 
     //? Simple Ones
 
-    UI.pageIdentifierPrefixBox.text = isNotUndef(config.pageIdentifierPrefix) ? config.pageIdentifierPrefix : defaultConfig.pageIdentifierPrefix
-    UI.pageIdentifierSuffixBox.text = isNotUndef(config.pageIdentifierSuffix) ? config.pageIdentifierSuffix : defaultConfig.pageIdentifierSuffix
-    UI.ignorePageNumberCB.value = isNotUndef(config.ignorePageNumber) ? config.ignorePageNumber : defaultConfig.ignorePageNumber
+    UI.pageIdentifierPrefixBox.text = config.pageIdentifierPrefix
+    UI.pageIdentifierSuffixBox.text = config.pageIdentifierSuffix
+    UI.ignorePageNumberCB.value = config.ignorePageNumber
 
-    UI.prioritizePSDCB.value = isNotUndef(config.prioritizePSD) ? config.prioritizePSD : defaultConfig.prioritizePSD
-    UI.selectAllFilesCB.value = isNotUndef(config.selectAllFiles) ? config.selectAllFiles : defaultConfig.selectAllFiles
-    UI.alwaysCreateGroupCB.value = isNotUndef(config.alwaysCreateGroup) ? config.alwaysCreateGroup : defaultConfig.alwaysCreateGroup
+    UI.prioritizePSDCB.value = config.prioritizePSD
+    UI.selectAllFilesCB.value = config.selectAllFiles
+    UI.alwaysCreateGroupCB.value = config.alwaysCreateGroup
 
-    UI.columnGroupCB.value = isNotUndef(config.columnGroup) ? config.columnGroup : defaultConfig.columnGroup
-    UI.disableCustomFormattingCB.value = isNotUndef(config.disableCustomFormatting) ? config.disableCustomFormatting : defaultConfig.disableCustomFormatting
+    UI.columnGroupCB.value = config.columnGroup
+    UI.disableCustomFormattingCB.value = config.disableCustomFormatting
 
     UI.groupNameBox.text = isNotUndef(config.groupLayer.name) ? config.groupLayer.name : defaultConfig.groupLayer.name
     UI.visibleGroupCB.value = isNotUndef(config.groupLayer.visible) ? config.groupLayer.visible : defaultConfig.LayerFormatObject.visible
@@ -1531,6 +1531,8 @@ function formatUserInterface() {
 
   function getUIConfigs() {
 
+    //? Common Properties
+
     config.pageIdentifierPrefix = UI.pageIdentifierPrefixBox.text
     config.pageIdentifierSuffix = UI.pageIdentifierSuffixBox.text
     config.ignorePageNumber = UI.ignorePageNumberCB.value
@@ -1541,20 +1543,19 @@ function formatUserInterface() {
 
     config.columnGroup = UI.columnGroupCB.value
     config.disableCustomFormatting = UI.disableCustomFormattingCB.value
-    config.groupLayer.name = UI.groupNameBox.text
 
+    //? groupLayer Properties
+
+    config.groupLayer.name = UI.groupNameBox.text
     config.groupLayer.visible = UI.visibleGroupCB.value
 
-    if (isNaN(parseFloat(UI.fontSizeBox.text))) //? Fallback
-      alert("Font size is not a number.")
-    else
-      config.defaultTextFormat.size = parseFloat(UI.fontSizeBox.text)
+    //? defaultTextFormat Properties
 
+    config.defaultTextFormat.size = UI.fontSizeBox.text
     config.defaultTextFormat.boxText = UI.boxTextCB.value
 
-    var fontListDDSelection = UI.fontListDD.selection.index ? UI.fontListDD.selection.text : defaultConfig.LayerFormatObject.font
     if (UI.firstFont != UI.fontListDD.selection.text)
-      config.defaultTextFormat.font = fontListDDSelection
+      config.defaultTextFormat.font = UI.fontListDD.selection.index ? UI.fontListDD.selection.text : defaultConfig.LayerFormatObject.font
     config.defaultTextFormat.justification = justificationObj[UI.justificationDD.selection.text]
     config.defaultTextFormat.language = languageObj[UI.languageDD.selection.text]
 
