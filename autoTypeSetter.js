@@ -848,26 +848,17 @@ function createContentObj(multipleArchives) {
   return content
 }
 
-function createGroupFolder(groupName, groupIndex, folderFormat) {
-  //? Default Format
-  const defaultFormat = {
-    color: undefined,
-    locked: false,
-    type: undefined //levels,text,etc
-  }
-  const newFolder
-  //? Use Default Format if 'format' not given
-  if (folderFormat === undefined)
-    folderFormat = defaultFormat
+function createGroupFolder(groupName, groupIndex, format) {
 
-  if (!groupIndex){ //? if group index is present, creates sub group
-   newFolder = activeDocument.layerSets.add()
-  }
-  else {
-    newFolder = mainGroup.layerSets.add()
-  }
-  if (folderFormat.locked) newFolder.allLocked = true
-  newFolder.name = groupName
+  if (format === undefined) format = {}
+  if (format.name === undefined) format.name = groupName
+
+  if (!groupIndex) //? if group index is present, creates sub group
+    var newFolder = activeDocument.layerSets.add()
+  else
+    var newFolder = mainGroup.layerSets.add()
+
+  formatLayer(newFolder, format)
 
   return newFolder
 
