@@ -72,7 +72,7 @@ UI 3
 
 
 const dropDownSizes = [130, 300]
-const savedFilePath = "config.json"
+const savedConfigPath = "config.json"
 
 const defaultConfig = readJson("lib/defaultConfig.json", "Default configuration")
 
@@ -338,8 +338,8 @@ function readJson(path, name, isUnnecessary){
 function readConfig() {
 
   //* Reading File
-  const hasSavedConfig = getFileFromScriptPath(savedFilePath).exists
-  config = readJson(savedFilePath, "Saved configuration", !hasSavedConfig)
+  const hasSavedConfig = getFileFromScriptPath(savedConfigPath).exists
+  config = readJson(savedConfigPath, "Saved configuration", !hasSavedConfig)
 
   //* Use default if it didn't work
   if (config === undefined){
@@ -511,7 +511,7 @@ function clearConfig(configObject){
         if (k != "font") obj[k] = obj[k].toUpperCase()
 
         //? If we try to parse it as the "actual useful value", and get undefined, use default
-        if (undefined === ( k == "font" ? getFont(obj[k]) : getKeyFromValue(optionObjects[k], obj[k])) )
+        if (undefined === ( k == "font" ? getFont(obj[k]) : getKeyOf(optionObjects[k], obj[k])) )
           obj[k] = defaultConfig.LayerFormatObject[k]
       }
     }
@@ -608,7 +608,7 @@ function isEqualObjects(obj, sec) {
 
 
 
-function getKeyFromValue(obj, value){
+function getKeyOf(obj, value){
   for (var k in obj)
     if (obj.hasOwnProperty(k) && obj[k] === value)
       return k
@@ -790,8 +790,8 @@ function createImageArray(arrayFiles) {
 
       if (duplicates.length > 1) {
         duplicates.sort(function (a, b) {//? Sort duplicate files
-          const aR = getKeyFromValue(prioritizeOrder, getExtension(a.name).toLowerCase())
-          const bR = getKeyFromValue(prioritizeOrder, getExtension(b.name).toLowerCase())
+          const aR = getKeyOf(prioritizeOrder, getExtension(a.name).toLowerCase())
+          const bR = getKeyOf(prioritizeOrder, getExtension(b.name).toLowerCase())
           if (aR === undefined) return 1
           if (bR === undefined) return -1
           return aR - bR
@@ -799,7 +799,7 @@ function createImageArray(arrayFiles) {
       }
 
     for (var j = 1; j < duplicates.length; j++) { //? Remove duplicates from main array
-      var index = getKeyFromValue(imageArray, duplicates[j])
+      var index = getKeyOf(imageArray, duplicates[j])
       var removed = imageArray.splice(index, 1)
       //alert("removing " + removed[0].name)
     }
@@ -1485,7 +1485,7 @@ function formatUserInterface() {
   //* Set New Properties
   UI.win.defaultElement = UI.confirmBtn;
   UI.win.cancelElement = UI.cancelBtn;
-  UI.resetConfigBtn.enabled = getFileFromScriptPath(savedFilePath).exists
+  UI.resetConfigBtn.enabled = getFileFromScriptPath(savedConfigPath).exists
 
 
   setUIConfigs()
@@ -1521,10 +1521,10 @@ function formatUserInterface() {
     UI.fontListDD.selection = isNotUndef(fontListDDFont) ? UI.fontListDD.find(fontListDDFont.name) | 0 : 0
     if (UI.firstFont === undefined) UI.firstFont = UI.fontListDD.selection.text
 
-    var justificationDDKey = getKeyFromValue(justificationObj, isNotUndef(config.defaultTextFormat.justification) ? config.defaultTextFormat.justification.toUpperCase() :  defaultConfig.LayerFormatObject.justification)
+    var justificationDDKey = getKeyOf(justificationObj, isNotUndef(config.defaultTextFormat.justification) ? config.defaultTextFormat.justification.toUpperCase() :  defaultConfig.LayerFormatObject.justification)
     UI.justificationDD.selection = UI.justificationDD.find( justificationDDKey ) | 0
 
-    var languageDDKey = getKeyFromValue(languageObj, isNotUndef(config.defaultTextFormat.language) ? config.defaultTextFormat.language.toUpperCase() :  defaultConfig.LayerFormatObject.language)
+    var languageDDKey = getKeyOf(languageObj, isNotUndef(config.defaultTextFormat.language) ? config.defaultTextFormat.language.toUpperCase() :  defaultConfig.LayerFormatObject.language)
     UI.languageDD.selection = UI.languageDD.find( languageDDKey ) | 0
 
     app.refresh(); //? Fallback
@@ -1591,7 +1591,7 @@ function formatUserInterface() {
     clearConfig(configObject) //* Asserting Integrity
 
     try {
-      const newFile = getFileFromScriptPath(savedFilePath)
+      const newFile = getFileFromScriptPath(savedConfigPath)
 
       newFile.encoding = 'UTF8'; // set to 'UTF8' or 'UTF-8'
       newFile.open("w");
@@ -1628,7 +1628,7 @@ function formatUserInterface() {
 
     getUIConfigs()
 
-    const comparedConfig = getFileFromScriptPath(savedFilePath).exists ? readJson(savedFilePath, "Saved configuration") : defaultConfig
+    const comparedConfig = getFileFromScriptPath(savedConfigPath).exists ? readJson(savedConfigPath, "Saved configuration") : defaultConfig
 
     if (!isEqualObjects(config, comparedConfig)) {
       saveConfigArchive(config)
@@ -1643,7 +1643,7 @@ function formatUserInterface() {
 
 
   UI.resetConfigBtn.onClick = function () {
-    const savedFile = getFileFromScriptPath(savedFilePath)
+    const savedFile = getFileFromScriptPath(savedConfigPath)
     if (!savedFile.exists) return;
 
     try {
@@ -2001,7 +2001,7 @@ var blendModeDD = group3.add("dropdownlist", undefined, undefined, {name: "blend
   pixelsLockedCB.value = isNotUndef(layerFormat.pixelsLocked) ? layerFormat.pixelsLocked : defaultConfig.LayerFormatObject.pixelsLocked
   positionLockedCB.value = isNotUndef(layerFormat.positionLocked) ? layerFormat.positionLocked : defaultConfig.LayerFormatObject.positionLocked
 
-  var blendModeDDKey = getKeyFromValue(blendModeObj, isNotUndef(layerFormat.blendMode) ? layerFormat.blendMode.toUpperCase() : defaultConfig.LayerFormatObject.blendMode)
+  var blendModeDDKey = getKeyOf(blendModeObj, isNotUndef(layerFormat.blendMode) ? layerFormat.blendMode.toUpperCase() : defaultConfig.LayerFormatObject.blendMode)
   blendModeDD.selection = blendModeDD.find( blendModeDDKey ) | 0
 
 
