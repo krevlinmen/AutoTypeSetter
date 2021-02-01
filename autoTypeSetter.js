@@ -848,26 +848,6 @@ function createContentObj(multipleArchives) {
   return content
 }
 
-function createEmptyLayer(layerName, layerFormat) {
-  //? Default Format
-  const defaultFormat = {
-    color: undefined,
-    locked: false,
-    type: undefined //levels, text, etc
-  }
-
-  //? Use Default Format if 'format' not given
-  if (layerFormat === undefined)
-    layerFormat = defaultFormat
-
-  const newLayer = activeDocument.artLayers.add()
-  if (layerFormat.locked) newLayer.allLocked = true
-  newLayer.name = layerName
-
-  return newLayer
-}
-
-
 function createGroupFolder(groupName, groupIndex, folderFormat) {
   //? Default Format
   const defaultFormat = {
