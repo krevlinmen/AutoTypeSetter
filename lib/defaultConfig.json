@@ -6,7 +6,7 @@
   "prioritizePSD": false,
   "selectAllFiles": false,
   "alwaysCreateGroup": false,
-  "ignoreCustomWith": "",
+  "ignoreCustomWith": "%",
 
   "columnGroup": false,
   "disableStarterLayer": true,
