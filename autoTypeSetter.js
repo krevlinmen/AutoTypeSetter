@@ -10,16 +10,23 @@
 #target 'photoshop'
 
 
-
-
-
-
+/* -------------------------------------------------------------------------- */
+/*                             AutoTypeSetter v2.0                            */
+/*                                                                            */
+/*                https://github.com/krevlinmen/AutoTypeSetter                */
+/*                                                                            */
 /* -------------------------------------------------------------------------- */
 /*                                Documentation                               */
+/*                                                                            */
+/*              https://github.com/krevlinmen/AutoTypeSetter/wiki             */
 /*            https://www.adobe.com/devnet/photoshop/scripting.html           */
+/*          https://javascript-tools-guide.readthedocs.io/index.html          */
+/*                                                                            */
 /* -------------------------------------------------------------------------- */
 /*                         User Interface Created With                        */
+/*                                                                            */
 /*                         https://scriptui.joonas.me/                        */
+/*                                                                            */
 /* -------------------------------------------------------------------------- */
 
 
@@ -999,7 +1006,7 @@ function calculatePositions(textArray) {
     else {
           if (isNotUndef(config.customTextFormats)){
             for (var j in config.customTextFormats){
-              if (config.customTextFormats[j].lineIdentifierPrefix === undefined) continue;
+              if (config.customTextFormats[j].lineIdentifierPrefix == undefined) continue;
               if (!config.customTextFormats[j].lineIdentifierPrefix.length) continue;
               if (textArray[i].startsWith(config.customTextFormats[j].lineIdentifierPrefix)) {
                 layerPosition.height = (config.customTextFormats[j].size * 1.1) * Math.ceil(textArray[i].length / (layerPosition.width / (6 * config.customTextFormats[j].size / 7))) //! Attention
