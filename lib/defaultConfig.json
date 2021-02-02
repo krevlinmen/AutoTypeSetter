@@ -10,7 +10,7 @@
 
   "columnGroup": false,
   "disableStarterLayer": true,
-  "disableCustomFormatting": true,
+  "disableCustomTextFormats": true,
 
   "groupLayer": { "name": "Types" },
   "defaultTextFormat": {},

@@ -1,6 +1,6 @@
 {
-  "pageIdentifierPrefix": "Page",
-  "pageIdentifierSuffix": ":",
+  "pageIdentifierPrefix": "PÁGINA",
+  "pageIdentifierSuffix": "",
   "ignorePageNumber": false,
   "prioritizePSD": false,
   "selectAllFiles": false,
@@ -8,8 +8,11 @@
   "ignoreCustomWith": "",
   "columnGroup": false,
   "disableStarterLayer": true,
-  "disableCustomFormatting": true,
-  "groupLayer": { "name": "Types", "visible": false },
+  "disableCustomTextFormats": true,
+  "groupLayer": {
+    "name": "Types",
+    "visible": false
+  },
   "defaultTextFormat": {
     "size": 16,
     "boxText": true,
@@ -17,15 +20,24 @@
     "justification": "CENTER",
     "language": "BRAZILLIANPORTUGUESE"
   },
-  "customTextFormats": [],
+  "customTextFormats": [
+    
+  ],
   "starterLayerFormats": [
-    { "name": "Raw", "allLocked": true },
+    {
+      "name": "Raw",
+      "allLocked": true
+    },
     {
       "name": "Redraw",
       "duplicate": true,
+      "allLocked": false,
       "transparentPixelsLocked": true,
       "positionLocked": true
     },
-    { "name": "Clean", "positionLocked": true }
+    {
+      "name": "Clean",
+      "positionLocked": true
+    }
   ]
 }
