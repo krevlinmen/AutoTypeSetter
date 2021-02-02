@@ -48,9 +48,9 @@ This folder is generally located at:
 
 ![Scripts Location](images/tutorial/script_location.png)
 
-- Optional: You can assign a hotkey to the program. Go to Edit>Hotkeys and in navigator, find the program in File>Automate, and assign a hotkey!
+- Optional: You can assign a hotkey to the program. Go to Edit>Hotkeys and in the navigator, find the program in File>Automate, and assign a hotkey!
 
-- Optional: You can change the color of the button on the menu. Go to Edit>Menu and in navigator, find the program in File>Automate, and assign a color!
+- Optional: You can change the color of the button on the menu. Go to Edit>Menu and in the navigator, find the program in File>Automate, and assign a color!
 
 
 # Example of Usage
@@ -85,7 +85,7 @@ You must use an identifier to separate the content of diferent files. It has to 
 
 # Documentation
 
-This script was made using [Adobe Photoshop 2020 JavaScript Scripting](https://www.adobe.com/devnet/photoshop/scripting.html).
+This script was made using [Adobe Photoshop 2020 JavaScript Scripting](https://www.adobe.com/devnet/photoshop/scripting.html), which is based in [ExtendScript](https://javascript-tools-guide.readthedocs.io/index.html).
 
 Our own documentation can be found [here](https://github.com/krevlinmen/AutoTypeSetter/wiki)
 
