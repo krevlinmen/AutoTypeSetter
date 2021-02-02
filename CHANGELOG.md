@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### TODO
+
+- Option to color in text
+- Option to change antiAliasMethod in text
+- lineIdentifierSuffix for customTextFormats
+- Automatic Update Checking
+- Retro-compatibility with PhotoShop CS6
+- Check Page identifying
+- Check Getting archive number and ambiguous files
+- calculatePositions, check if border of file has been reached
+- Check column groups
+
 ## [2.0] - 2021-02-02
 
 ### Added
@@ -43,6 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Problem selecting ambiguous files (Example: `01.png` and `1.psd`)
 
-[Unreleased]: https://github.com/krevlinmen/AutoTypeSetter/compare/v2.0...HEAD
+[unreleased]: https://github.com/krevlinmen/AutoTypeSetter/compare/v2.0...HEAD
 [2.0]: https://github.com/krevlinmen/AutoTypeSetter/compare/v1.0...v2.0
 [1.0]: https://github.com/krevlinmen/AutoTypeSetter/releases/tag/v1.0
