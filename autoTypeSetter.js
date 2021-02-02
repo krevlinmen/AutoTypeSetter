@@ -139,19 +139,19 @@ function processText(arrayFiles) {
 
 
       if (!config.disableCustomTextFormats){
-        if (isNotUndef(config.ignoreCustomWith) && line.startsWith(config.ignoreCustomWith)){
-          line = line.slice(config.ignoreCustomWith.length)}
-
-          else {if (isNotUndef(config.customTextFormats)){
-
+        if (isNotUndef(config.ignoreCustomWith) && config.ignoreCustomWith.length && line.startsWith(config.ignoreCustomWith)){
+          line = line.slice(config.ignoreCustomWith.length)
+        }
+        else if (isNotUndef(config.customTextFormats)){
             for (var j in config.customTextFormats){
+              if (!config.customTextFormats[j].lineIdentifierPrefix.length) continue;
               if (line.startsWith(config.customTextFormats[j].lineIdentifierPrefix)) {
                 line = line.slice(config.customTextFormats[j].lineIdentifierPrefix.length)
                 format = config.customTextFormats[j]
                 break;
               }
             }
-          }}
+          }
         }
 
 
@@ -997,8 +997,8 @@ function calculatePositions(textArray) {
     else {
           if (isNotUndef(config.customTextFormats)){
             for (var j in config.customTextFormats){
+              if (!config.customTextFormats[j].lineIdentifierPrefix.length) continue;
               if (textArray[i].startsWith(config.customTextFormats[j].lineIdentifierPrefix)) {
-                alert("We got here")
                 layerPosition.height = (config.customTextFormats[j].size * 1.1) * Math.ceil(textArray[i].length / (layerPosition.width / (6 * config.customTextFormats[j].size / 7))) //! Attention
                 break;
               }
