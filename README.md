@@ -48,6 +48,10 @@ This folder is generally located at:
 
 ![Scripts Location](images/tutorial/script_location.png)
 
+- Optional: You can assign a hotkey to the program. Go to Edit>Hotkeys and in navigator, find the program in File>Automate, and assign a hotkey!
+
+- Optional: You can change the color of the button on the menu. Go to Edit>Menu and in navigator, find the program in File>Automate, and assign a color!
+
 
 # Example of Usage
 
