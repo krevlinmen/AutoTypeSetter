@@ -529,6 +529,7 @@ function isNotUndef(p) {
 }
 
 function isNewPage(line) {
+  if (config.pageIdentifierPrefix == "" && config.pageIdentifierSuffix == "") return false
   const res = line.startsWith(config.pageIdentifierPrefix) && line.endsWith(config.pageIdentifierSuffix)
   if (config.ignorePageNumber)
     return res
