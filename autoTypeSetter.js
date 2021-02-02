@@ -144,6 +144,7 @@ function processText(arrayFiles) {
         }
         else if (isNotUndef(config.customTextFormats)){
             for (var j in config.customTextFormats){
+              if (config.customTextFormats[j].lineIdentifierPrefix === undefined) continue;
               if (!config.customTextFormats[j].lineIdentifierPrefix.length) continue;
               if (line.startsWith(config.customTextFormats[j].lineIdentifierPrefix)) {
                 line = line.slice(config.customTextFormats[j].lineIdentifierPrefix.length)
@@ -998,6 +999,7 @@ function calculatePositions(textArray) {
     else {
           if (isNotUndef(config.customTextFormats)){
             for (var j in config.customTextFormats){
+              if (config.customTextFormats[j].lineIdentifierPrefix === undefined) continue;
               if (!config.customTextFormats[j].lineIdentifierPrefix.length) continue;
               if (textArray[i].startsWith(config.customTextFormats[j].lineIdentifierPrefix)) {
                 layerPosition.height = (config.customTextFormats[j].size * 1.1) * Math.ceil(textArray[i].length / (layerPosition.width / (6 * config.customTextFormats[j].size / 7))) //! Attention
