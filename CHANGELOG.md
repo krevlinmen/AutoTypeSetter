@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0]
+## [2.0] - 2021-02-02
 
 ### Added
 
@@ -41,5 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Problem selecting ambiguous files (Example: `01.png` and `1.psd`)
 
-[2.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.0...HEAD
+[unrealeased]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.0...HEAD
+[2.0]: https://github.com/krevlinmen/AutoTypeSetter/compare/v1.0...v2.0
 [1.0]: https://github.com/krevlinmen/AutoTypeSetter/releases/tag/v1.0
