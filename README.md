@@ -2,6 +2,8 @@
 
 AutoTypeSetter is a script that automatically creates/modifies .psd files, inserting pages and text baloons, making the repetitive copy/pasting easier to do.
 
+# Warning! This script currently only works on Photoshop 2020 edition!
+
 # Results
 
 Image Input: (written in portuguese)
