@@ -1,11 +1,3 @@
-/*
-<javascriptresource>
-  <name></name>
-  <menu>help</menu>
-  <enableinfo>false</enableinfo>
-</javascriptresource>
-*/
-
 String.prototype.trim = function () {
   return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
 };
@@ -29,30 +21,6 @@ String.prototype.endsWithArray = function (subArray) {
   return false;
 };
 
-// Array.prototype.slice = function (start, end) {
-//   const slice = []
-//   for (var i = start; i < end; i++) {
-//     slice.push(this[i])
-//   }
-//   return slice
-// }
-
 Array.isArray = function (arg) {
   return Object.prototype.toString.call(arg) === "[object Array]";
 };
-
-// Object.prototype.keys = function () {
-//   const arr = []
-//   for (var k in this)
-//     if (this.hasOwnProperty(k))
-//       arr.push(k)
-//   return arr
-// }
-
-// Object.prototype.copy = function () {
-//   const copy = Array.isArray(this) ? [] : {}
-//   for (var k in this)
-//     if (this.hasOwnProperty(k))
-//       copy[k] = this[k]
-//   return copy
-// }

@@ -1,0 +1,5 @@
+function getAnotherColor(initial) {
+  const decimalRGB = $.colorPicker(initial ? "0x" + initial.slice(1) : 0);
+  if (decimalRGB === -1) return initial;
+  return "#" + decimalRGB.toString(16).toUpperCase();
+}

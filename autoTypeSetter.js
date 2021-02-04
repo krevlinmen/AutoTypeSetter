@@ -7,9 +7,6 @@
 </javascriptresource>
 */
 
-#target 'photoshop'
-
-
 /* -------------------------------------------------------------------------- */
 /*                             AutoTypeSetter v2.0                            */
 /*                                                                            */
@@ -30,35 +27,20 @@
 /* -------------------------------------------------------------------------- */
 
 
-/* ----------------------------- Read Libraries ----------------------------- */
+/* ------------------------- Preprocessor directives ------------------------ */
 
-(function readLibraries() {
-
-  function readFiles(files) {
-    for (var i in files)
-      try {
-        //? If files[i] is a folder, it will not throw a error
-        var moreFiles = files[i].getFiles()
-        readFiles(moreFiles)
-      } catch (error) {
-        //? If a error was thrown, it is a file, not a folder
-        var name = files[i].name
-        //? Only read files terminated in ".js"
-        if (!name.slice(name.length - 3).indexOf(".js"))
-          $.evalFile(files[i]);
-      }
-  }
-
-  //? Get all files from "lib" folder
-  const files = getFileFromScriptPath("lib/").getFiles()
-  readFiles(files)
-})()
-
+//@target "photoshop"
+//@script AutoTypeSetter
+//@includepath "lib"
+//@include "json2.jsxinc"
+//@include "polyfill.jsxinc"
+//@include "functions.jsxinc"
 
 /* ---------------------------- Global Constants ---------------------------- */
 
 
 const dropDownSizes = [130, 300]
+const isWindowAvailable = !!$.global.Window;
 const savedConfigPath = "config.json"
 
 const defaultConfig = readJson("lib/defaultConfig.json", "Default configuration")
