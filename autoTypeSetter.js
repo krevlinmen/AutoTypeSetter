@@ -90,6 +90,8 @@ function main() {
   //? Change Configurations
   app.displayDialogs = DialogModes.ERROR //change to NO by the End
 
+  writeProgramInfo() // Archive for debugging porpoises
+
   UI = formatUserInterface()
   progressBarObj = new createProgressBarObj()
 
@@ -262,6 +264,47 @@ function saveAndCloseFile(file) {
 
 }
 
+function writeProgramInfo() {
+  //? This function creates and updates a file containing
+  //? technical info for debugging purposes
+
+  //? This wasn't done storing a JSON because it's x5 slower
+
+  const file = getFileFromScriptPath("lib/userProgramInfo.txt");
+  const string = file.exists ? readFile(file) : "";
+
+  const appSpecifier = BridgeTalk.appSpecifier;
+
+  //? If this program (identified by appSpecifier) has already opened,
+  //? We don't need to get this info again, so return
+  if (string) {
+    const strArray = string.split("\n");
+
+    for (var i in strArray)
+      if (strArray[i].indexOf("appSpecifier: ") === 0)
+        if (strArray[i].slice("appSpecifier: ".length) === appSpecifier) return;
+  }
+
+  const infoObj = {
+    appSpecifier: appSpecifier,
+    appLocale: BridgeTalk.appLocale,
+    appDisplayName: BridgeTalk.getDisplayName(appSpecifier),
+    os: $.os,
+    locale: $.locale,
+
+    ESBuild: $.build,
+    JSversion: $.version,
+    JSBuildDate: $.buildDate,
+    memCache: $.memCache,
+    screens: $.screens,
+  };
+
+  string += "\n";
+  for (var i in infoObj) string += i + ": " + infoObj[i] + "\n";
+
+  writeFile(file, string);
+}
+
 function applyStarterLayerFormats() {
 
   if (config.disableStarterLayer) return
@@ -293,11 +336,19 @@ function applyStarterLayerFormats() {
 
 
 function readFile(file) {
-  file.encoding = 'UTF8'; // set to 'UTF8' or 'UTF-8'
+  file.encoding = "UTF8";
   file.open("r");
   const rawText = file.read();
   file.close();
-  return rawText
+  return rawText;
+}
+
+function writeFile(file, string) {
+  if (!string) return;
+  file.encoding = "UTF8";
+  file.open("w");
+  file.write(string);
+  file.close();
 }
 
 function readJson(path, name, isUnnecessary){
@@ -1562,12 +1613,7 @@ function formatUserInterface() {
 
     try {
       const newFile = getFileFromScriptPath(savedConfigPath)
-
-      newFile.encoding = 'UTF8'; // set to 'UTF8' or 'UTF-8'
-      newFile.open("w");
-      newFile.write(JSON.stringify(configObject, null, 2))
-      newFile.close();
-
+      writeFile(newFile, JSON.stringify(configObject, null, 2))
     } catch (error) {
       throwError("Something went wrong when registering configuration.", error)
     }
