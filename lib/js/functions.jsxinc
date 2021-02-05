@@ -1,5 +1,112 @@
+function removeExtension(str) {
+  return str.slice(0, str.lastIndexOf("."))
+}
+
 function getAnotherColor(initial) {
   const decimalRGB = $.colorPicker(initial ? "0x" + initial.slice(1) : 0);
   if (decimalRGB === -1) return initial;
   return "#" + decimalRGB.toString(16).toUpperCase();
 }
+
+function readFile(file) {
+  file.encoding = "UTF8";
+  file.open("r");
+  const rawText = file.read();
+  file.close();
+  return rawText;
+}
+
+function writeFile(file, string) {
+  if (!string) return;
+  file.encoding = "UTF8";
+  file.open("w");
+  file.write(string);
+  file.close();
+}
+
+function isNaN(p) {
+  return p !== p
+}
+
+function isNotUndef(p) {
+  return !(p === undefined)
+}
+
+function isEqualObjects(obj, sec) {
+
+  if ((obj === null || sec === null ||
+      typeof (obj) != "object" || typeof (sec) != "object"))
+    throwError("\nTypeError: equalObjects received non-objects")
+
+
+  const objKeys = getKeys(obj)
+  const secKeys = getKeys(sec)
+
+  if (objKeys.length != secKeys.length)
+    return false
+
+  //if (objKeys.length) alert("Object Have Properties\nObject 1: " + objKeys + "\nObject 2: " + secKeys)
+
+  for (var i = 0; i < objKeys.length; i++) {
+
+    var j = objKeys[i]
+
+    if (obj.hasOwnProperty(j) != sec.hasOwnProperty(j))
+      return false
+
+    if (!obj.hasOwnProperty(j))
+      continue;
+
+    var o = obj[j]
+    var s = sec[j]
+
+    //alert("Key: "+ j + "\n\n" + o + "\n" + s + "\n\n" + typeof(o) + "\n" + typeof(s))
+
+    if (typeof (o) != typeof (s))
+      return false
+    if (isNaN(o) != isNaN(s))
+      return false
+    if (o === null != s === null)
+      return false
+
+    if (isNaN(o) && isNaN(s))
+      return true
+
+    if (o != null && typeof (o) === 'object') {
+      if (!isEqualObjects(o, s))
+        return false
+    } else if (o != s)
+      return false
+  }
+
+  return true
+}
+
+
+
+
+
+
+function getKeyOf(obj, value){
+  for (var k in obj)
+    if (obj.hasOwnProperty(k) && obj[k] === value)
+      return k
+}
+
+function getKeys(obj){
+  const arr = []
+  for (var k in obj)
+    if (obj.hasOwnProperty(k))
+      arr.push(k)
+  return arr
+}
+
+
+function getCopy(obj){
+  const copy = Array.isArray(obj) ? [] : {}
+  for (var k in obj)
+    if (obj.hasOwnProperty(k))
+      copy[k] = obj[k]
+  return copy
+}
+
