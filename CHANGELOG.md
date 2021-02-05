@@ -9,15 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TODO
 
-- Option to color in text
-- Option to change antiAliasMethod in text
-- lineIdentifierSuffix for customTextFormats
-- Automatic Update Checking
-- Retro-compatibility with PhotoShop CS6
+- Move UI code to other files
+- Move simple functions to other files
+- Add new window for customTextFormats
+- Add Color, Capitalization and Anti-Alias menus
+- Test Color, Capitalization and Anti-Alias options for Text Format
+- Test lineIdentifierSuffix for customTextFormats
+
 - Check Page identifying
 - Check Getting archive number and ambiguous files
 - calculatePositions, check if border of file has been reached
 - Check column groups
+- Test all features in CC 2018
+- Retro-compatibility with PhotoShop CS6
+- Automatic Update Checking
+
+### Added
+
+- Color, Capitalization and Anti-Alias options for Text Format
+- lineIdentifierSuffix for customTextFormats
 
 ## [2.0] - 2021-02-02
 

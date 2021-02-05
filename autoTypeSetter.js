@@ -45,9 +45,9 @@ const savedConfigPath = "config.json"
 
 const defaultConfig = readJson("lib/defaultConfig.json", "Default configuration")
 
-const justificationObj = readJson("lib/justificationOptions.json", "Justification options list")
-const blendModeObj = readJson("lib/blendModeOptions.json", "Blend Mode options list")
-const languageObj = readJson("lib/languageOptions.json", "Language options list")
+const justificationObj = readJson("lib/dropdown/justificationOptions.json", "Justification options list")
+const blendModeObj = readJson("lib/dropdown/blendModeOptions.json", "Blend Mode options list")
+const languageObj = readJson("lib/dropdown/languageOptions.json", "Language options list")
 const fontNamesArray = getFontNames()
 
 
@@ -135,9 +135,9 @@ function processText(arrayFiles) {
         }
         else if (isNotUndef(config.customTextFormats)){
             for (var j in config.customTextFormats){
-              if (config.customTextFormats[j].lineIdentifierPrefix === undefined) continue;
-              if (!config.customTextFormats[j].lineIdentifierPrefix.length) continue;
-              if (line.startsWith(config.customTextFormats[j].lineIdentifierPrefix)) {
+
+              //? Similar to isNewPage()
+              if (isCustomFormatted(line, config.customTextFormats[j])) {
                 line = line.slice(config.customTextFormats[j].lineIdentifierPrefix.length)
                 format = config.customTextFormats[j]
                 break;
@@ -578,6 +578,15 @@ function isNewPage(line) {
     return res && !isNaN(getPageNumber(line))
 }
 
+function isCustomFormatted(line, format){
+  if (!format.lineIdentifierPrefix && !format.lineIdentifierSuffix) return false
+  if (format.lineIdentifierPrefix === undefined) format.lineIdentifierPrefix = ""
+  if (format.lineIdentifierSuffix === undefined) format.lineIdentifierSuffix = ""
+
+
+  return line.startsWith(format.lineIdentifierPrefix) && line.endsWith(format.lineIdentifierSuffix)
+}
+
 function isEqualObjects(obj, sec) {
 
   if ((obj === null || sec === null ||
@@ -944,10 +953,20 @@ function formatLayer(layer, format) {
     if (isNotUndef(format.size) && format.size > 0)
       txt.size = format.size
 
+    if (isNotUndef(format.color) && format.color.length){
+      const color = new SolidColor();
+      color.rgb.hexValue = format.color.slice(1);
+      txt.color = color
+    }
+
     if (isNotUndef(format.justification) && format.justification.length)
       txt.justification = Justification[format.justification.toUpperCase()]
     if (isNotUndef(format.language) && format.language.length)
       txt.language = Language[format.language.toUpperCase()]
+    if (isNotUndef(format.antiAlias) && format.antiAlias.length)
+      txt.antiAliasMethod = AntiAlias[format.antiAlias.toUpperCase()]
+    if (isNotUndef(format.capitalization) && format.capitalization.length)
+      txt.capitalization = TextCase[format.capitalization.toUpperCase()]
 
 
     if (isNotUndef(format.boxText)) txt.kind = format.boxText ? TextType.PARAGRAPHTEXT : TextType.POINTTEXT
@@ -1032,23 +1051,24 @@ function calculatePositions(textArray) {
   }
 
   for (var i in textArray) {
+    var line = textArray[i]
+
     if (config.disableCustomTextFormats){
-    layerPosition.height = (config.defaultTextFormat.size * 1.1) * Math.ceil(textArray[i].length / (layerPosition.width / (6 * config.defaultTextFormat.size / 7))) //! Attention
+    layerPosition.height = (config.defaultTextFormat.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * config.defaultTextFormat.size / 7))) //! Attention
     }
 
     else {
           if (isNotUndef(config.customTextFormats)){
             for (var j in config.customTextFormats){
-              if (config.customTextFormats[j].lineIdentifierPrefix == undefined) continue;
-              if (!config.customTextFormats[j].lineIdentifierPrefix.length) continue;
-              if (textArray[i].startsWith(config.customTextFormats[j].lineIdentifierPrefix)) {
-                layerPosition.height = (config.customTextFormats[j].size * 1.1) * Math.ceil(textArray[i].length / (layerPosition.width / (6 * config.customTextFormats[j].size / 7))) //! Attention
+              //? Similar to isNewPage()
+              if (isCustomFormatted(line, config.customTextFormats[j])) {
+                layerPosition.height = (config.customTextFormats[j].size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * config.customTextFormats[j].size / 7))) //! Attention
                 break;
               }
             }
           }
         if (layerPosition.height === undefined){
-          layerPosition.height = (config.defaultTextFormat.size * 1.1) * Math.ceil(textArray[i].length / (layerPosition.width / (6 * config.defaultTextFormat.size / 7))) //! Attention
+          layerPosition.height = (config.defaultTextFormat.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * config.defaultTextFormat.size / 7))) //! Attention
         }
     }
     positionData.push(getCopy(layerPosition))

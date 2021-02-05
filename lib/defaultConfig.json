@@ -6,7 +6,7 @@
   "prioritizePSD": false,
   "selectAllFiles": false,
   "alwaysCreateGroup": false,
-  "ignoreCustomWith": "%",
+  "ignoreCustomWith": "",
 
   "columnGroup": false,
   "disableStarterLayer": true,
@@ -29,11 +29,15 @@
     "positionLocked": false,
 
     "lineIdentifierPrefix": "",
+    "lineIdentifierSuffix": "",
     "size": 0,
     "font": "",
+    "color": "",
+    "boxText": false,
     "justification": "",
     "language": "",
-    "boxText": false,
+    "antiAlias": "",
+    "capitalization": "",
 
     "isBackgroundLayer": false,
     "duplicate": false
