@@ -1,0 +1,108 @@
+/* -------------------------------------------------------------------------- */
+/*                              ProgressBar Class                             */
+/* -------------------------------------------------------------------------- */
+/*                                   Methods                                  */
+/*                                                                            */
+/*                         initialize(imageFileArray)                         */
+/*                                  update()                                  */
+/*                                   close()                                  */
+/* -------------------------------------------------------------------------- */
+
+function ProgressBar() {  /* ------------------------- Window Object Creation ------------------------- */
+
+  /*
+  Code for Import https://scriptui.joonas.me — (Triple click to select):
+  {"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":false,"borderless":false,"resizeable":false},"text":"Processing files","preferredSize":[0,400],"margins":16,"orientation":"column","spacing":10,"alignChildren":["fill","top"]}},"item-1":{"id":1,"type":"progressbar","parentId":6,"style":{"enabled":true,"varName":"progressBar","preferredSize":[300,20],"alignment":null,"helpTip":null}},"item-4":{"id":4,"type":"ListBox","parentId":0,"style":{"enabled":true,"varName":"listbox","creationProps":{"multiselect":false,"numberOfColumns":1,"columnWidths":"[]","columnTitles":"","showHeaders":false},"listItems":"Item 1, Item 2","preferredSize":[0,0],"alignment":null,"helpTip":null,"selection":[0,1]}},"item-6":{"id":6,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":0,"alignChildren":["fill","center"],"alignment":null}},"item-7":{"id":7,"type":"StaticText","parentId":8,"style":{"enabled":true,"varName":"currentlyWorking","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"item","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-8":{"id":8,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Currently Working","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}}},"order":[0,6,1,8,7,4],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"var"}}
+  */
+
+  // WIN
+  // ===
+  this.win = new Window("window");
+  this.win.text = "Processing files";
+  this.win.orientation = "column";
+  this.win.alignChildren = ["fill", "top"];
+  this.win.spacing = 10;
+  this.win.margins = 16;
+  this.win.preferredSize.height = 400;
+
+  // PANEL1
+  // ======
+  const panel1 = this.win.add("panel", undefined, undefined, {
+    name: "panel1",
+  });
+  panel1.orientation = "column";
+  panel1.alignChildren = ["fill", "center"];
+  panel1.spacing = 0;
+  panel1.margins = 0;
+
+  this.progressBar = panel1.add("progressbar", undefined, undefined, {
+    name: "progressBar",
+  });
+  this.progressBar.maxvalue = 1;
+  this.progressBar.value = 0;
+  this.progressBar.preferredSize.width = 300;
+  this.progressBar.preferredSize.height = 25;
+
+  // PANEL2
+  // ======
+  const panel2 = this.win.add("panel", undefined, undefined, {
+    name: "panel2",
+  });
+  panel2.text = "Currently Working";
+  panel2.orientation = "column";
+  panel2.alignChildren = ["fill", "top"];
+  panel2.spacing = 10;
+  panel2.margins = 10;
+
+  this.currentlyWorking = panel2.add("statictext", undefined, undefined, {
+    name: "currentlyWorking",
+  });
+  this.currentlyWorking.text = "";
+  this.currentlyWorking.justify = "center";
+
+  this.listBox = this.win.add("listbox");
+
+  /* ---------------------------- Set Class Methods --------------------------- */
+
+  this.initialize = function initialize(files) {
+    //? Clear All
+    this.listBox.removeAll();
+
+    //? Adds each file and page to the box element on the progress Bar.
+    for (var page in files)
+      this.listBox.add(
+        "item",
+        "Page " + page + "  ->  " + (files[page] ? files[page].name : "")
+      );
+
+    //? fullLength is used in Updating the bar
+    this.fullLength = getKeys(files).length;
+
+    //? First currently working
+    this.update();
+    this.progressBar.value = 0;
+
+    //? Open the window
+    this.win.show();
+  };
+
+  this.update = function update() {
+    //? Change Progress bar value
+    this.progressBar.value = 1 - this.listBox.items.length / this.fullLength;
+
+    if (this.listBox.items.length) {
+      //? Update currently working
+      this.currentlyWorking.text = this.listBox.items[0].text;
+
+      //? Delete the file name already processed
+      this.listBox.remove(0);
+    } else {
+      this.currentlyWorking.text = "Done";
+      this.close();
+    }
+  };
+
+  this.close = function () {
+    this.win.close();
+  };
+}

@@ -35,6 +35,7 @@
 //@include "json2.jsxinc"
 //@include "polyfill.jsxinc"
 //@include "functions.jsxinc"
+//@include "ProgressBar.jsxinc"
 
 /* ---------------------------- Global Constants ---------------------------- */
 
@@ -50,13 +51,13 @@ const blendModeObj = readJson("lib/dropdown/blendModeOptions.json", "Blend Mode 
 const languageObj = readJson("lib/dropdown/languageOptions.json", "Language options list")
 const fontNamesArray = getFontNames()
 
-
 /* ---------------------------- Global Variables ---------------------------- */
 
 var textFile;
 var duplicatedLayer;
 var alreadyCreatedTextFolder = false;
 var config = {};
+var progressBarObj;
 
 /* -------------------------------------------------------------------------- */
 /*                                    Main                                    */
@@ -70,18 +71,20 @@ function main() {
   //? Save Configurations
   const savedDialogMode = app.displayDialogs
   //? Change Configurations
-  app.displayDialogs = DialogModes.ERROR //change to NO by the End
+  app.displayDialogs = DialogModes.ALL //change to NO by the End
 
   writeProgramInfo() // Archive for debugging porpoises
 
   UI = formatUserInterface()
-  progressBarObj = new createProgressBarObj()
 
   UI.Executing = function () {
+
+    alert("Executing")
 
     try {
 
       //* The Whole program is this line
+
       processText(UI.arrayFiles)
 
     } catch (error) {
@@ -115,7 +118,6 @@ function processText(arrayFiles) {
 
   const imageFileArray = multipleArchives ? createImageArray(arrayFiles) : undefined
   const content = createContentObj(multipleArchives)
-
 
   //? Function for inserting texts in each page
 
@@ -153,28 +155,39 @@ function processText(arrayFiles) {
 
   }
 
+
   if (multipleArchives) {
 
-    //? Format Progress Bar
-    formatProgressBarObj(imageFileArray)
-    app.refresh() //? Fallback
+    const filesOrder = {}
 
-    for (var key in content) {
-
-      var keyNum = parseInt(key) //? Fallback
-      if (config.ignorePageNumber && (keyNum - 1) >= imageFileArray.length)
+    for (var pageKey in content) {
+      var pageNumber = parseInt(pageKey)
+      if (config.ignorePageNumber && (pageNumber - 1) >= imageFileArray.length)
         break; //? No files left
-      var found = config.ignorePageNumber ? imageFileArray[keyNum - 1] : getSpecificImage(imageFileArray, keyNum)
-
-      if (found === undefined) continue;
-
-      open(found)
-      applyStarterLayerFormats()
-      insertPageTexts(content[key]) //Page text Writing Loop
-      saveAndCloseFile(found)
-
+      filesOrder[pageKey] = config.ignorePageNumber ? imageFileArray[pageNumber - 1] : getSpecificImage(imageFileArray, pageNumber)
     }
-    progressBarObj.win.close()
+
+    //? Initialize Progress Bar
+    progressBarObj = new ProgressBar()
+    progressBarObj.initialize(filesOrder)
+
+    for (var pageKey in filesOrder){
+      var file = filesOrder[pageKey]
+
+      if (file){
+        open(file)
+        applyStarterLayerFormats()
+        insertPageTexts(content[pageKey]) //Page text Writing Loop
+        saveAndCloseFile(file)
+      }
+
+      progressBarObj.update()
+    }
+
+
+    //? Close Progress Bar - Fallback
+    progressBarObj.close()
+
   } else {
 
     //? There's only one file selected
@@ -191,8 +204,8 @@ function processText(arrayFiles) {
     applyStarterLayerFormats()
 
     //? Everything will be used
-    for (var key in content) {
-      insertPageTexts(content[key])
+    for (var pageKey in content) {
+      insertPageTexts(content[pageKey])
     }
 
   }
@@ -220,12 +233,15 @@ function throwError(message, error) {
   } catch (error) {}
 
   try {
-    progressBarObj.win.close()
+    progressBarObj.close()
   } catch (error) {}
 
   if (error === undefined)
     throw new Error(message)
-  else throw error
+  else {
+    alert(error)
+    throw error
+  }
 }
 
 function removeExtension(str) {
@@ -239,11 +255,6 @@ function saveAndCloseFile(file) {
   activeDocument.saveAs(saveFile)
   activeDocument.close()
   alreadyCreatedTextFolder = false;
-
-  //? Update progressBar
-  progressBarObj.progressBar.value += 1 / progressBarObj.fullLength
-  progressBarObj.listBox.remove(0)
-
 }
 
 function writeProgramInfo() {
@@ -1111,58 +1122,6 @@ function calculatePositions(textArray) {
 /* -------------------------------------------------------------------------- */
 /*                               User Interface                               */
 /* -------------------------------------------------------------------------- */
-
-
-function createProgressBarObj() {
-
-
-/*
-Code for Import https://scriptui.joonas.me — (Triple click to select):
-{"activeId":0,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Window","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":false,"borderless":false,"resizeable":false},"text":"Processing files","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"progressbar","parentId":6,"style":{"enabled":true,"varName":"progressBar","preferredSize":[300,25],"alignment":"fill","helpTip":null}},"item-2":{"id":2,"type":"Divider","parentId":0,"style":{"enabled":true,"varName":null}},"item-4":{"id":4,"type":"ListBox","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"multiselect":false,"numberOfColumns":1,"columnWidths":"[]","columnTitles":"[]","showHeaders":false},"listItems":"Item 1, Item 2","preferredSize":[0,0],"alignment":"fill","helpTip":null}},"item-6":{"id":6,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Panel","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":0,"alignChildren":["fill","center"],"alignment":null}}},"order":[0,6,1,2,4],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"none"}}
-*/
-
-// WIN
-// ===
-  this.win = new Window("window");
-  this.win.text = "Processing files";
-  this.win.orientation = "column";
-  this.win.alignChildren = ["center", "top"];
-  this.win.spacing = 10;
-  this.win.margins = 16;
-
-// PANEL1
-// ======
-var panel1 = this.win.add("panel", undefined, undefined, {name: "panel1"});
-    panel1.orientation = "column";
-    panel1.alignChildren = ["fill","center"];
-    panel1.spacing = 0;
-    panel1.margins = 0;
-
-  this.progressBar = panel1.add("progressbar", undefined, undefined, {name: "progressBar"});
-    this.progressBar.maxvalue = 1;
-    this.progressBar.value = 0;
-    this.progressBar.preferredSize.width = 300;
-    this.progressBar.preferredSize.height = 25;
-    this.progressBar.alignment = ["fill","center"];
-
-
-var divider0 = this.win.add("panel", undefined, undefined, {name: "divider1"});
-    divider0.alignment = "fill";
-
-
-this.listBox = this.win.add("listbox", undefined, undefined, {name: "listbox1"});
-    this.listBox.alignment = ["fill","top"];
-}
-
-function formatProgressBarObj(imageFileArray){
-
-  for (var i in imageFileArray) //? Adds each file to the box element on the progress Bar.
-    progressBarObj.listBox.add("item",imageFileArray[i].name)
-
-  progressBarObj.fullLength = imageFileArray.length
-  progressBarObj.win.show()
-}
-
 
 
 
