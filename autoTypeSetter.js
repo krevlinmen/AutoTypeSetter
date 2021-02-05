@@ -52,6 +52,9 @@ const blendModeObj = readJson("lib/dropdown/blendModeOptions.json", "Blend Mode 
 const languageObj = readJson("lib/dropdown/languageOptions.json", "Language options list")
 const fontNamesArray = getFontNames()
 
+//* ------- MainWindow ------
+
+const mainWindowObj = MainWindow()
 
 //* ------- ProcessingWindow ------
 
@@ -98,28 +101,24 @@ function main() {
 
   writeProgramInfo() // Archive for debugging porpoises
 
-  UI = formatUserInterface()
-
-  UI.Executing = function () {
-
+  mainWindowObj.Executing = function () {
     alert("Executing")
 
-    try {
+    //* The Whole program is this line
+    processText(mainWindowObj.arrayFiles)
 
-      //* The Whole program is this line
-
-      processText(UI.arrayFiles)
-
-    } catch (error) {
-
-      //? Closes the windows if an error occurs, else PhotoShop crashes
-      throwError("Something really bad happened", error)
-
-    }
+    //* Commented Until we discuss how to handle uncaught errors
+    // try {} catch (error) {
+    //   //? Closes the windows if an error occurs, else PhotoShop crashes
+    //   throwError("Something really bad happened", error)
+    // }
   }
 
+  //? Read Configuration
+  readConfig()
+
   //? Show UI window
-  UI.win.show()
+  mainWindowObj.initialize()
 
   //? Restore Configurations
   app.displayDialogs = savedDialogMode
@@ -219,20 +218,22 @@ function processText(arrayFiles) {
 
 /* --------------------------------- Helpers -------------------------------- */
 
-function throwError(message, error) {
+function throwError(message, error, notCloseWindows) {
 
   //? Always show error message
   alert(message)
 
   //? Closes windows, else Crash
 
-  try {
-    UI.win.close()
-  } catch (error) {}
+  if (!notCloseWindows){
+    try {
+      mainWindowObj.win.close()
+    } catch (error) {}
 
-  try {
-    ProcessingWindowObj.close()
-  } catch (error) {}
+    try {
+      ProcessingWindowObj.close()
+    } catch (error) {}
+  }
 
   if (error === undefined)
     throw new Error(message)
@@ -324,9 +325,9 @@ function applyStarterLayerFormats() {
 
 
 
-function readJson(path, name, isUnnecessary){
+function readJson(pathOrFile, name, isUnnecessary){
 
-  var file = getFileFromScriptPath(path)
+  var file = typeof pathOrFile == "string" ? getFileFromScriptPath(pathOrFile) : pathOrFile
 
   //? Check if the file Exists
   if (!file.exists)
@@ -336,14 +337,14 @@ function readJson(path, name, isUnnecessary){
   try {
     var text = readFile(file)
   } catch (error) {
-    throwError("Error while reading " + name + ".\nPlease check if the program can read the file.", error)
+    throwError("Error while reading " + name + ".\nPlease check if the program can read the file.", error, isUnnecessary)
   }
 
   //? Converting JSON to Object
   try {
     var object = JSON.parse(text)
   } catch (error) {
-    throwError("Error while converting " + name + " to a object.\nPlease check if the file is a valid JSON.", error)
+    throwError("Error while converting " + name + " to a object.\nPlease check if the file is a valid JSON.", error, isUnnecessary)
   }
 
   return object
@@ -364,6 +365,38 @@ function readConfig() {
 
   clearConfig() //* Asserting Integrity
 }
+
+
+function saveConfig(configObject) {
+
+  const importing = configObject === undefined
+
+  if (importing) {
+    const file = File.openDialog("Select Configuration File", "JSON:*.json", false)
+    if (!file) return;
+    try {
+      configObject = readJson(file, "Configuration File", true)
+    } catch (error) {}
+  }
+
+  if (!configObject) return;
+
+  clearConfig(configObject) //* Asserting Integrity
+
+  try {
+    const newFile = getFileFromScriptPath(savedConfigPath)
+    writeFile(newFile, JSON.stringify(configObject, null, 2))
+  } catch (error) {
+    throwError("Something went wrong when registering configuration.", error)
+  }
+
+  alert((importing ? "Imported" : "Saved" ) + " Successfully! :D" + (importing ? "\nUnfortunately, it may take a while we read and update the screen" : "" ))
+
+  if (importing) readConfig()
+
+  return true //? Success
+}
+
 
 function clearConfig(configObject){
 
@@ -1083,13 +1116,12 @@ function calculatePositions(textArray) {
 
 
 
-function formatUserInterface() {
+function MainWindow() {
 
   //* Create a new one by default
-  const UI = new createUserInterface(getKeys(justificationObj), getKeys(languageObj), fontNamesArray)
+  const UI = new createMainWindow(getKeys(justificationObj), getKeys(languageObj), fontNamesArray)
 
   //* Set New Variables
-  readConfig()
   UI.arrayFiles = []
   UI.Executing = undefined
   UI.firstFont = undefined
@@ -1105,9 +1137,6 @@ function formatUserInterface() {
   UI.win.defaultElement = UI.confirmBtn;
   UI.win.cancelElement = UI.cancelBtn;
   UI.resetConfigBtn.enabled = getFileFromScriptPath(savedConfigPath).exists
-
-
-  setUIConfigs()
 
 
   //* Functions
@@ -1182,61 +1211,25 @@ function formatUserInterface() {
     clearConfig() //* Asserting Integrity
   }
 
-  function saveConfigArchive(configObject) {
-
-    const importing = configObject === undefined
-
-    if (importing) {
-      const file = File.openDialog("Select Configuration File", "JSON:*.json", false)
-      if (file === null) return;
-
-      //? Reading the file
-      try {
-        var text = readFile(file)
-      } catch (error) {
-        throwError("Error while reading your file.\nPlease check if the program can read the file.", error)
-      }
-
-      //? Converting JSON to Object
-      try {
-        configObject = JSON.parse(text)
-      } catch (error) {
-        throwError("Error while converting your file to a object.\nPlease check if the file is a valid JSON.", error)
-      }
-
-
-    }
-
-    clearConfig(configObject) //* Asserting Integrity
-
-    try {
-      const newFile = getFileFromScriptPath(savedConfigPath)
-      writeFile(newFile, JSON.stringify(configObject, null, 2))
-    } catch (error) {
-      throwError("Something went wrong when registering configuration.", error)
-    }
-
-
-    UI.resetConfigBtn.enabled = true;
-
-    alert((importing ? "Imported" : "Saved" ) + " Successfully! :D" + (importing ? "\nUnfortunately, it may take a while we read and update the screen" : "" ))
-
-    if (importing){
-      readConfig()
-      setUIConfigs()
-      app.refresh()
-    }
-
-  }
-
 
   //* Set Methods
+
+  UI.initialize = function () {
+    setUIConfigs()
+    UI.win.show()
+  }
 
   UI.openFolderBtn.onClick = function () {
     getFileFromScriptPath("").execute()
   }
 
-  UI.registerConfigBtn.onClick = saveConfigArchive
+  UI.registerConfigBtn.onClick = function () {
+    if ( saveConfig() ){ //? Blank to import
+      UI.resetConfigBtn.enabled = true;
+      setUIConfigs()
+      app.refresh()
+    }
+  }
 
   UI.saveConfigBtn.onClick = function () {
 
@@ -1245,7 +1238,7 @@ function formatUserInterface() {
     const comparedConfig = getFileFromScriptPath(savedConfigPath).exists ? readJson(savedConfigPath, "Saved configuration") : defaultConfig
 
     if (!isEqualObjects(config, comparedConfig)) {
-      saveConfigArchive(config)
+      saveConfig(config)
     } else {
       alert("Nothing changed.")
     }
@@ -1293,10 +1286,9 @@ function formatUserInterface() {
         UI.arrayFiles = File.openDialog("Select Files", ["All:*.txt;*.png;*.jpeg;*.jpg;*.psd;*.psb", "Text:*.txt", "Images:*.png;*.jpeg;*.jpg;*.psd;*.psb"], true)
       else
         UI.arrayFiles = Folder.selectDialog("Select Folder").getFiles()
-    } catch (error) {
-      UI.arrayFiles = []
-    }
-    if (UI.arrayFiles === null) UI.arrayFiles = []
+    } catch (error) {}
+
+    if (!Array.isArray(UI.arrayFiles)) arrayFiles = []
 
     if (UI.arrayFiles.length) {
       UI.confirmBtn.enabled = true;
