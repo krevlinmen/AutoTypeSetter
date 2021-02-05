@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### TODO
 
 - Move UI code to other files
-- Move simple functions to other files
 - Add new window for customTextFormats
 - Add Color, Capitalization and Anti-Alias menus
 - Test Color, Capitalization and Anti-Alias options for Text Format
@@ -27,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Option to see and cancel files currently being processed
 - Color, Capitalization and Anti-Alias options for Text Format
 - lineIdentifierSuffix for customTextFormats
 

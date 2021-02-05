@@ -35,7 +35,7 @@
 //@include "json2.jsxinc"
 //@include "polyfill.jsxinc"
 //@include "functions.jsxinc"
-//@include "ProgressBar.jsxinc"
+//@include "ProcessingWindow.jsxinc"
 
 /* ---------------------------- Global Constants ---------------------------- */
 
@@ -51,13 +51,35 @@ const blendModeObj = readJson("lib/dropdown/blendModeOptions.json", "Blend Mode 
 const languageObj = readJson("lib/dropdown/languageOptions.json", "Language options list")
 const fontNamesArray = getFontNames()
 
+
+//* ------- ProcessingWindow ------
+
+//? Create Window
+const ProcessingWindowObj = new ProcessingWindow()
+
+//? Cancel Button Function
+ProcessingWindowObj.cancelBtn.onClick = function () {
+  continueProcessing = false
+  //? Close Window
+  ProcessingWindowObj.close()
+}
+
+//? Start Button Method
+ProcessingWindowObj.startBtn.onClick = function () {
+  ProcessingWindowObj.startBtn.enabled = false;
+  ProcessingWindowObj.startBtn.onClick = undefined; //? Ensure this will run only once
+  if (typeof ExecuteProcess === "function") ExecuteProcess();
+  ProcessingWindowObj.close();
+};
+
 /* ---------------------------- Global Variables ---------------------------- */
 
 var textFile;
 var duplicatedLayer;
 var alreadyCreatedTextFolder = false;
 var config = {};
-var progressBarObj;
+var continueProcessing = true
+var ExecuteProcess = function () {}
 
 /* -------------------------------------------------------------------------- */
 /*                                    Main                                    */
@@ -71,7 +93,7 @@ function main() {
   //? Save Configurations
   const savedDialogMode = app.displayDialogs
   //? Change Configurations
-  app.displayDialogs = DialogModes.ALL //change to NO by the End
+  app.displayDialogs = DialogModes.NO //change to NO by the End
 
   writeProgramInfo() // Archive for debugging porpoises
 
@@ -96,7 +118,7 @@ function main() {
   }
 
   //? Show UI window
-  $.writeln(UI.win.show());
+  UI.win.show()
 
   //? Restore Configurations
   app.displayDialogs = savedDialogMode
@@ -118,48 +140,11 @@ function processText(arrayFiles) {
 
   const imageFileArray = multipleArchives ? createImageArray(arrayFiles) : undefined
   const content = createContentObj(multipleArchives)
-
-  //? Function for inserting texts in each page
-
-  function insertPageTexts(page) {
-    const positionArray = calculatePositions(page)
-    var currentGroup
-    var mainGroup
-
-    for (var i in page) {
-      var line = page[i]
-      var format = undefined
-
-
-      if (!config.disableCustomTextFormats){
-        if (isNotUndef(config.ignoreCustomWith) && config.ignoreCustomWith.length && line.startsWith(config.ignoreCustomWith)){
-          line = line.slice(config.ignoreCustomWith.length)
-        }
-        else if (isNotUndef(config.customTextFormats)){
-            for (var j in config.customTextFormats){
-
-              //? Similar to isNewPage()
-              if (isCustomFormatted(line, config.customTextFormats[j])) {
-                line = line.slice(config.customTextFormats[j].lineIdentifierPrefix.length)
-                format = config.customTextFormats[j]
-                break;
-              }
-            }
-          }
-        }
-
-
-      writeTextLayer(line, i < page.length - 1, positionArray[i], format, currentGroup)
-
-    }
-
-  }
-
+  const filesOrder = multipleArchives ? {} : []
 
   if (multipleArchives) {
 
-    const filesOrder = {}
-
+    //* Populating filesOrder
     for (var pageKey in content) {
       var pageNumber = parseInt(pageKey)
       if (config.ignorePageNumber && (pageNumber - 1) >= imageFileArray.length)
@@ -167,26 +152,24 @@ function processText(arrayFiles) {
       filesOrder[pageKey] = config.ignorePageNumber ? imageFileArray[pageNumber - 1] : getSpecificImage(imageFileArray, pageNumber)
     }
 
-    //? Initialize Progress Bar
-    progressBarObj = new ProgressBar()
-    progressBarObj.initialize(filesOrder)
+    //* Process Function
+    ExecuteProcess = function () {
+      for (var pageKey in filesOrder){
+        var file = filesOrder[pageKey]
 
-    for (var pageKey in filesOrder){
-      var file = filesOrder[pageKey]
+        if (!continueProcessing) break;
 
-      if (file){
-        open(file)
-        applyStarterLayerFormats()
-        insertPageTexts(content[pageKey]) //Page text Writing Loop
-        saveAndCloseFile(file)
+        if (file){
+          if (continueProcessing) open(file)
+          if (continueProcessing) applyStarterLayerFormats()
+          if (continueProcessing) insertPageTexts(content[pageKey]) //Page text Writing Loop
+          if (continueProcessing) saveAndCloseFile(file)
+        }
+
+        //? Update Window
+        ProcessingWindowObj.update()
       }
-
-      progressBarObj.update()
     }
-
-
-    //? Close Progress Bar - Fallback
-    progressBarObj.close()
 
   } else {
 
@@ -194,21 +177,35 @@ function processText(arrayFiles) {
     //? It MUST be a text file - assured in createContentObj()
     //? And The user MUST have a open active document
 
+    //* Assure there's a document open
     try {
       if (activeDocument.layers[0])
         multipleArchives = false //useless
     } catch (error) {
-      throwError("No document open.", error)
+      throwError("No document open.\nIf you only select a text file, you need to have a document open.")
     }
 
-    applyStarterLayerFormats()
-
-    //? Everything will be used
+    //* Populating filesOrder
     for (var pageKey in content) {
-      insertPageTexts(content[pageKey])
+      var page = content[pageKey]
+      for (var lineKey in page)
+        filesOrder.push(page[lineKey])
     }
 
+    //* Process Function
+    ExecuteProcess = function () {
+      if (continueProcessing) applyStarterLayerFormats()
+
+      //? Everything will be used
+      for (var pageKey in content) {
+        if (!continueProcessing) break;
+        insertPageTexts(content[pageKey], true)
+      }
+    }
   }
+
+  //* Open Window
+  ProcessingWindowObj.initialize(filesOrder)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -233,7 +230,7 @@ function throwError(message, error) {
   } catch (error) {}
 
   try {
-    progressBarObj.close()
+    ProcessingWindowObj.close()
   } catch (error) {}
 
   if (error === undefined)
@@ -691,7 +688,7 @@ function createImageArray(arrayFiles) {
     if (!file.name.endsWithArray(['.txt', '.png', '.jpeg', '.jpg', '.psd', '.psb']))
       alert("One or more files are not supported by this script!\nThis script only supports the extensions:\n.png, .jpg, .jpeg, .psd, .psb, .txt")
     else if (file.name.endsWith('.txt'))
-      textFile = file
+      textFile = !textFile ? file : throwError("More than one text file recognized.")
     else
       imageArray.push(file)
 
@@ -778,23 +775,34 @@ function createContentObj(multipleArchives) {
   var current = 0
   for (var t in textArray) {
     var line = textArray[t].trim()
+    if (!line) continue; //* Remove Blank strings
 
     if (isNewPage(line)) {
       current = config.ignorePageNumber ? current + 1 : getPageNumber(line)
       content[current] = []
-    } else if (current && line.length) {
-
+    } else {
       content[current].push(line)
     }
   }
 
-  if (multipleArchives){
+  if (multipleArchives)
     delete content[0] //? Deletes text before the first identifier
 
-    if (!getKeys(content).length)
-      throwError("Not enough text lines to process\n Please check your .txt file and page identifiers")
+
+  //? Check if have lines to process
+  var haveLines = false
+
+  for (var pageKey in content) {
+    var page = content[pageKey]
+    for (var lineKey in page){
+      haveLines = true
+      break;
+    }
+    if (haveLines) break;
   }
 
+  if (!haveLines)
+    throwError("Not enough text lines to process\n Please check your .txt file and/or page identifiers")
 
   return content
 }
@@ -901,6 +909,43 @@ function formatLayer(layer, format) {
 
   //* Visibility - always last
   if (isNotUndef(format.visible)) layer.visible = format.visible
+
+}
+
+
+//? Function for inserting texts in each page
+function insertPageTexts(page, updateAtEachLine) {
+  const positionArray = calculatePositions(page)
+  var currentGroup
+  var mainGroup
+
+  for (var i in page) {
+    var line = page[i]
+    var format = undefined
+
+
+    if (!config.disableCustomTextFormats){
+      if (isNotUndef(config.ignoreCustomWith) && config.ignoreCustomWith.length && line.startsWith(config.ignoreCustomWith)){
+        line = line.slice(config.ignoreCustomWith.length)
+      }
+      else if (isNotUndef(config.customTextFormats)){
+          for (var j in config.customTextFormats){
+
+            //? Similar to isNewPage()
+            if (isCustomFormatted(line, config.customTextFormats[j])) {
+              line = line.slice(config.customTextFormats[j].lineIdentifierPrefix.length)
+              format = config.customTextFormats[j]
+              break;
+            }
+          }
+        }
+      }
+
+    if (!continueProcessing) break;
+
+    writeTextLayer(line, i < page.length - 1, positionArray[i], format, currentGroup)
+    if (updateAtEachLine) ProcessingWindowObj.update()
+  }
 
 }
 
@@ -1361,7 +1406,7 @@ function formatUserInterface() {
   //* Set New Variables
   readConfig()
   UI.arrayFiles = []
-  UI.Executing = function () {}
+  UI.Executing = undefined
   UI.firstFont = undefined
 
 
@@ -1579,6 +1624,8 @@ function formatUserInterface() {
   }
 
   UI.confirmBtn.onClick = function () {
+    UI.confirmBtn.onClick = undefined //? Ensure This will run only once
+
     //* Close Window
     UI.win.close()
 
