@@ -1,0 +1,311 @@
+function createUserInterface(justificationDD_array, languageDD_array, fontListDD_array) {
+
+    /*
+    UI 3
+    {"activeId":22,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"text":"AutoTypeSetter","preferredSize":[0,0],"margins":16,"orientation":"row","spacing":10,"alignChildren":["left","top"],"varName":"win","windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"enabled":true}},"item-1":{"id":1,"type":"Panel","parentId":20,"style":{"text":"Page Identifiers","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"enabled":true}},"item-4":{"id":4,"type":"StaticText","parentId":6,"style":{"text":"Prefix","justify":"left","preferredSize":[0,0],"alignment":null,"varName":null,"helpTip":null,"softWrap":true,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"enabled":true}},"item-5":{"id":5,"type":"EditText","parentId":6,"style":{"text":">>","preferredSize":[60,0],"alignment":null,"varName":"pageIdentifierPrefixBox","helpTip":null,"softWrap":false,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"enabled":true,"justify":"left"}},"item-6":{"id":6,"type":"Group","parentId":1,"style":{"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"center","varName":null,"enabled":true}},"item-9":{"id":9,"type":"Panel","parentId":19,"style":{"text":"Configuration","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"enabled":true}},"item-19":{"id":19,"type":"Group","parentId":0,"style":{"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"enabled":true}},"item-20":{"id":20,"type":"Group","parentId":0,"style":{"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"enabled":true}},"item-21":{"id":21,"type":"Panel","parentId":19,"style":{"text":"Files","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"enabled":true}},"item-22":{"id":22,"type":"StaticText","parentId":21,"style":{"text":"Select a Folder including:\n- A '.txt' file containing the text\n- Image Files ('1.png', '2.jpg')\n\n(if you don't select images, \nthe script will run on a open\ndocument)","justify":"left","preferredSize":[0,0],"alignment":null,"varName":null,"helpTip":null,"softWrap":false,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"enabled":true}},"item-36":{"id":36,"type":"Group","parentId":0,"style":{"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null,"varName":null,"enabled":true}},"item-37":{"id":37,"type":"Button","parentId":36,"style":{"text":"OK","justify":"center","preferredSize":[0,0],"alignment":null,"varName":"confirmBtn","helpTip":null,"enabled":false}},"item-38":{"id":38,"type":"Button","parentId":36,"style":{"text":"Cancel","justify":"center","preferredSize":[0,0],"alignment":null,"varName":"cancelBtn","helpTip":null,"enabled":true}},"item-40":{"id":40,"type":"Checkbox","parentId":1,"style":{"text":"Ignore Page Number","preferredSize":[0,0],"alignment":null,"varName":"ignorePageNumberCB","helpTip":"This will ignore or not numbers between both identifiers","enabled":true,"checked":false}},"item-45":{"id":45,"type":"Group","parentId":1,"style":{"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"center","varName":null,"enabled":true}},"item-46":{"id":46,"type":"StaticText","parentId":45,"style":{"text":"Suffix","justify":"left","preferredSize":[0,0],"alignment":null,"varName":"","helpTip":null,"softWrap":true,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"enabled":true}},"item-47":{"id":47,"type":"EditText","parentId":45,"style":{"text":"","preferredSize":[60,0],"alignment":null,"varName":"pageIdentifierSuffixBox","helpTip":null,"softWrap":false,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"enabled":true,"justify":"left"}},"item-48":{"id":48,"type":"Button","parentId":9,"style":{"enabled":true,"varName":"registerConfigBtn","text":"Import Config","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"Select a JSON with your custom configuration to use!  :D"}},"item-49":{"id":49,"type":"Button","parentId":9,"style":{"enabled":false,"varName":"resetConfigBtn","text":"Reset Config","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"This will delete the JSON you registered"}},"item-50":{"id":50,"type":"Button","parentId":9,"style":{"enabled":true,"varName":"openFolderBtn","text":"Open Scripts Folder","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":""}},"item-52":{"id":52,"type":"Checkbox","parentId":21,"style":{"enabled":true,"varName":"selectAllFilesCB","text":"Select Files Instead","preferredSize":[0,0],"alignment":null,"helpTip":"You need to select all files, not a folder containing these files","checked":false}},"item-53":{"id":53,"type":"StaticText","parentId":21,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"Formats Supported","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"'.png', '.jpeg', '.jpg', '.psd', '.psb'"}},"item-55":{"id":55,"type":"Button","parentId":21,"style":{"enabled":true,"varName":"selectFilesBtn","text":"Select","justify":"center","preferredSize":[0,0],"alignment":"center","helpTip":null}},"item-56":{"id":56,"type":"StaticText","parentId":36,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"Created By \nKrevlinMen\nImSamuka","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-57":{"id":57,"type":"Panel","parentId":20,"style":{"text":"Text Group","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"enabled":true}},"item-58":{"id":58,"type":"Group","parentId":57,"style":{"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":"center","varName":null,"enabled":true}},"item-59":{"id":59,"type":"StaticText","parentId":58,"style":{"text":"Name","justify":"left","preferredSize":[0,0],"alignment":null,"varName":null,"helpTip":null,"softWrap":true,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"enabled":true}},"item-60":{"id":60,"type":"EditText","parentId":58,"style":{"text":"Type","preferredSize":[80,0],"alignment":null,"varName":"groupNameBox","helpTip":null,"softWrap":false,"creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"enabled":true,"justify":"left"}},"item-64":{"id":64,"type":"Checkbox","parentId":57,"style":{"text":"Visible","preferredSize":[0,0],"alignment":null,"varName":"visibleGroupCB","helpTip":"Set Layer to Visible","enabled":true}},"item-65":{"id":65,"type":"Checkbox","parentId":57,"style":{"text":"Always Create Group","preferredSize":[0,0],"alignment":null,"varName":"alwaysCreateGroupCB","helpTip":"Always create a new group, otherwise add text layers to an existing group","enabled":true}},"item-66":{"id":66,"type":"Button","parentId":9,"style":{"enabled":true,"varName":"saveConfigBtn","text":"Save Config","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"Quick Save Current Configuration"}},"item-67":{"id":67,"type":"Group","parentId":0,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-68":{"id":68,"type":"Panel","parentId":20,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Text Format","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["right","top"],"alignment":null}},"item-69":{"id":69,"type":"Group","parentId":68,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-70":{"id":70,"type":"Group","parentId":68,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-71":{"id":71,"type":"Group","parentId":68,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-72":{"id":72,"type":"Group","parentId":68,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-73":{"id":73,"type":"StaticText","parentId":69,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Font","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-74":{"id":74,"type":"DropDownList","parentId":69,"style":{"enabled":true,"varName":"fontListDD","text":"DropDownList","listItems":"font1,font2","preferredSize":[0,0],"alignment":null,"selection":0,"helpTip":null}},"item-75":{"id":75,"type":"StaticText","parentId":70,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Size (px)","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-76":{"id":76,"type":"EditText","parentId":70,"style":{"enabled":true,"varName":"fontSizeBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"16","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":"0 will maintain size Unchanged"}},"item-77":{"id":77,"type":"Checkbox","parentId":70,"style":{"enabled":true,"varName":"boxTextCB","text":"Box Text","preferredSize":[0,0],"alignment":null,"helpTip":null,"checked":false}},"item-78":{"id":78,"type":"StaticText","parentId":71,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Justification","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-79":{"id":79,"type":"DropDownList","parentId":71,"style":{"enabled":true,"varName":"justificationDD","text":"DropDownList","listItems":"center,left","preferredSize":[0,0],"alignment":null,"selection":0,"helpTip":null}},"item-80":{"id":80,"type":"StaticText","parentId":72,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Language","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-81":{"id":81,"type":"DropDownList","parentId":72,"style":{"enabled":true,"varName":"languageDD","text":"DropDownList","listItems":"english, portuguese","preferredSize":[0,0],"alignment":null,"selection":0,"helpTip":null}},"item-82":{"id":82,"type":"Group","parentId":20,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-84":{"id":84,"type":"Button","parentId":82,"style":{"enabled":true,"varName":"starterLayersBtn","text":"Custom Layers Editor","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":null}},"item-85":{"id":85,"type":"Checkbox","parentId":57,"style":{"text":"Column Group","preferredSize":[0,0],"alignment":null,"varName":"columnGroupCB","helpTip":"Text Columns will be stacked in different groups","enabled":true}},"item-86":{"id":86,"type":"Checkbox","parentId":21,"style":{"enabled":true,"varName":"prioritizePSDCB","text":"Prioritize PSD Files","preferredSize":[0,0],"alignment":null,"helpTip":"It will prioritize PSD over more \"raw\" files (PNG, JPG)","checked":false}},"item-87":{"id":87,"type":"Checkbox","parentId":68,"style":{"enabled":true,"varName":"disableCustomTextFormatsCB","text":"Disable Custom Text Formats","preferredSize":[0,0],"alignment":null,"helpTip":"If true, All text will be formatted ONLY by configurations above","checked":true}},"item-88":{"id":88,"type":"Button","parentId":82,"style":{"enabled":false,"varName":"customTextFormatsBtn","text":"Custom Text Formats","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":null}}},"order":[0,67,20,1,6,4,5,45,46,47,40,57,58,59,60,64,65,85,68,69,73,74,70,75,76,77,71,78,79,72,80,81,87,82,84,88,19,21,22,53,52,86,55,9,66,48,50,49,36,37,38,56],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"functionWrapper":false,"compactCode":false,"showDialog":true,"afterEffectsDockable":false,"itemReferenceList":"var"}}
+    */
+
+    // WIN
+    // ===
+    this.win = new Window("dialog");
+        this.win.text = "AutoTypeSetter";
+        this.win.orientation = "row";
+        this.win.alignChildren = ["left","top"];
+        this.win.spacing = 10;
+        this.win.margins = 16;
+
+    // GROUP1
+    // ======
+    var group1 = this.win.add("group", undefined, {name: "group1"});
+        group1.orientation = "row";
+        group1.alignChildren = ["left","center"];
+        group1.spacing = 10;
+        group1.margins = 0;
+
+    // GROUP2
+    // ======
+    var group2 = this.win.add("group", undefined, {name: "group2"});
+        group2.orientation = "column";
+        group2.alignChildren = ["fill","top"];
+        group2.spacing = 10;
+        group2.margins = 0;
+
+    // PANEL1
+    // ======
+    var panel1 = group2.add("panel", undefined, undefined, {name: "panel1"});
+        panel1.text = "Page Identifiers";
+        panel1.orientation = "column";
+        panel1.alignChildren = ["left","top"];
+        panel1.spacing = 10;
+        panel1.margins = 10;
+
+    // GROUP3
+    // ======
+    var group3 = panel1.add("group", undefined, {name: "group3"});
+        group3.orientation = "row";
+        group3.alignChildren = ["right","center"];
+        group3.spacing = 10;
+        group3.margins = 0;
+        group3.alignment = ["center","top"];
+
+    var statictext1 = group3.add("statictext", undefined, undefined, {name: "statictext1"});
+        statictext1.text = "Prefix";
+
+    this.pageIdentifierPrefixBox = group3.add('edittext {properties: {name: "pageIdentifierPrefixBox"}}');
+        this.pageIdentifierPrefixBox.text = ">>";
+        this.pageIdentifierPrefixBox.preferredSize.width = 60;
+
+    // GROUP4
+    // ======
+    var group4 = panel1.add("group", undefined, {name: "group4"});
+        group4.orientation = "row";
+        group4.alignChildren = ["right","center"];
+        group4.spacing = 10;
+        group4.margins = 0;
+        group4.alignment = ["center","top"];
+
+    var statictext2 = group4.add("statictext", undefined, undefined, {name: "statictext2"});
+        statictext2.text = "Suffix";
+
+    this.pageIdentifierSuffixBox = group4.add('edittext {properties: {name: "pageIdentifierSuffixBox"}}');
+        this.pageIdentifierSuffixBox.preferredSize.width = 60;
+
+    // PANEL1
+    // ======
+    this.ignorePageNumberCB = panel1.add("checkbox", undefined, undefined, {name: "ignorePageNumberCB"});
+        this.ignorePageNumberCB.helpTip = "This will ignore or not numbers between both identifiers";
+        this.ignorePageNumberCB.text = "Ignore Page Number";
+
+    // PANEL2
+    // ======
+    var panel2 = group2.add("panel", undefined, undefined, {name: "panel2"});
+        panel2.text = "Text Group";
+        panel2.orientation = "column";
+        panel2.alignChildren = ["left","top"];
+        panel2.spacing = 10;
+        panel2.margins = 10;
+
+    // GROUP5
+    // ======
+    var group5 = panel2.add("group", undefined, {name: "group5"});
+        group5.orientation = "row";
+        group5.alignChildren = ["right","center"];
+        group5.spacing = 10;
+        group5.margins = 0;
+        group5.alignment = ["center","top"];
+
+    var statictext3 = group5.add("statictext", undefined, undefined, {name: "statictext3"});
+        statictext3.text = "Name";
+
+    this.groupNameBox = group5.add('edittext {properties: {name: "groupNameBox"}}');
+        this.groupNameBox.text = "Type";
+        this.groupNameBox.preferredSize.width = 80;
+
+    // PANEL2
+    // ======
+    this.visibleGroupCB = panel2.add("checkbox", undefined, undefined, {name: "visibleGroupCB"});
+        this.visibleGroupCB.helpTip = "Set Layer to Visible";
+        this.visibleGroupCB.text = "Visible";
+
+    this.alwaysCreateGroupCB = panel2.add("checkbox", undefined, undefined, {name: "alwaysCreateGroupCB"});
+        this.alwaysCreateGroupCB.helpTip = "Always create a new group, otherwise add text layers to an existing group";
+        this.alwaysCreateGroupCB.text = "Always Create Group";
+
+    this.columnGroupCB = panel2.add("checkbox", undefined, undefined, {name: "columnGroupCB"});
+        this.columnGroupCB.helpTip = "Text Columns will be stacked in different groups";
+        this.columnGroupCB.text = "Create Column Subgroups";
+
+    // PANEL3
+    // ======
+    var panel3 = group2.add("panel", undefined, undefined, {name: "panel3"});
+        panel3.text = "Text Format";
+        panel3.orientation = "column";
+        panel3.alignChildren = ["right","top"];
+        panel3.spacing = 10;
+        panel3.margins = 10;
+
+    // GROUP6
+    // ======
+    var group6 = panel3.add("group", undefined, {name: "group6"});
+        group6.orientation = "row";
+        group6.alignChildren = ["left","center"];
+        group6.spacing = 10;
+        group6.margins = 0;
+
+    var statictext4 = group6.add("statictext", undefined, undefined, {name: "statictext4"});
+        statictext4.text = "Font";
+
+    this.fontListDD = group6.add("dropdownlist", undefined, undefined, {name: "fontListDD", items: fontListDD_array});
+        this.fontListDD.selection = 0;
+
+    // GROUP7
+    // ======
+    var group7 = panel3.add("group", undefined, {name: "group7"});
+        group7.orientation = "row";
+        group7.alignChildren = ["left","center"];
+        group7.spacing = 10;
+        group7.margins = 0;
+
+    var statictext5 = group7.add("statictext", undefined, undefined, {name: "statictext5"});
+        statictext5.text = "Size (px)";
+
+    this.fontSizeBox = group7.add('edittext {properties: {name: "fontSizeBox"}}');
+        this.fontSizeBox.text = "16";
+        this.fontSizeBox.helpTip = "0 will maintain size Unchanged"
+
+    this.boxTextCB = group7.add("checkbox", undefined, undefined, {name: "boxTextCB"});
+        this.boxTextCB.text = "Box Text";
+
+    // GROUP8
+    // ======
+    var group8 = panel3.add("group", undefined, {name: "group8"});
+        group8.orientation = "row";
+        group8.alignChildren = ["left","center"];
+        group8.spacing = 10;
+        group8.margins = 0;
+
+    var statictext6 = group8.add("statictext", undefined, undefined, {name: "statictext6"});
+        statictext6.text = "Justification";
+
+    this.justificationDD = group8.add("dropdownlist", undefined, undefined, {name: "justificationDD", items: justificationDD_array});
+        this.justificationDD.selection = 0;
+
+    // GROUP9
+    // ======
+    var group9 = panel3.add("group", undefined, {name: "group9"});
+        group9.orientation = "row";
+        group9.alignChildren = ["left","center"];
+        group9.spacing = 10;
+        group9.margins = 0;
+
+    var statictext7 = group9.add("statictext", undefined, undefined, {name: "statictext7"});
+        statictext7.text = "Language";
+
+    this.languageDD = group9.add("dropdownlist", undefined, undefined, {name: "languageDD", items: languageDD_array});
+        this.languageDD.selection = 0;
+
+    // PANEL3
+    // ======
+    this.disableCustomTextFormatsCB = panel3.add("checkbox", undefined, undefined, {name: "disableCustomTextFormatsCB"});
+        this.disableCustomTextFormatsCB.text = "Disable Custom Text Formats";
+        this.disableCustomTextFormatsCB.helpTip = "If true, All text will be formatted ONLY by configurations above"
+        this.disableCustomTextFormatsCB.value = true;
+
+    // GROUP10
+    // =======
+    var group10 = group2.add("group", undefined, {name: "group10"});
+        group10.orientation = "column";
+        group10.alignChildren = ["center","center"];
+        group10.spacing = 10;
+        group10.margins = 0;
+
+    this.starterLayersBtn = group10.add("button", undefined, undefined, {name: "starterLayersBtn"});
+        this.starterLayersBtn.text = "Custom Layers Editor";
+        this.starterLayersBtn.alignment = ["fill","center"];
+
+    // this.customTextFormatsBtn = group10.add("button", undefined, undefined, {name: "customTextFormatsBtn"});
+    //     this.customTextFormatsBtn.enabled = false;
+    //     this.customTextFormatsBtn.text = "Custom Text Formats";
+    //     this.customTextFormatsBtn.alignment = ["fill","center"];
+
+    // GROUP11
+    // =======
+    var group11 = this.win.add("group", undefined, {name: "group11"});
+        group11.orientation = "column";
+        group11.alignChildren = ["fill","top"];
+        group11.spacing = 10;
+        group11.margins = 0;
+
+    // PANEL4
+    // ======
+    var panel4 = group11.add("panel", undefined, undefined, {name: "panel4"});
+        panel4.text = "Files";
+        panel4.orientation = "column";
+        panel4.alignChildren = ["fill","top"];
+        panel4.spacing = 10;
+        panel4.margins = 10;
+
+    var statictext8 = panel4.add("group");
+        statictext8.orientation = "column";
+        statictext8.alignChildren = ["left","center"];
+        statictext8.spacing = 0;
+
+        statictext8.add("statictext", undefined, "Select a Folder including:", {name: "statictext8"});
+        statictext8.add("statictext", undefined, "- A '.txt' file containing the text", {name: "statictext8"});
+        statictext8.add("statictext", undefined, "- Image Files ('1.png', '2.jpg') ", {name: "statictext8"});
+        statictext8.add("statictext", undefined, "", {name: "statictext8"});
+        statictext8.add("statictext", undefined, "(if you don't select images, ", {name: "statictext8"});
+        statictext8.add("statictext", undefined, "the script will run on a open", {name: "statictext8"});
+        statictext8.add("statictext", undefined, "document)", {name: "statictext8"});
+
+    var statictext9 = panel4.add("statictext", undefined, undefined, {name: "statictext9"});
+        statictext9.helpTip = "'.png', '.jpeg', '.jpg', '.psd', '.psb'";
+        statictext9.text = "Formats Supported";
+        statictext9.justify = "center";
+
+    this.selectAllFilesCB = panel4.add("checkbox", undefined, undefined, {name: "selectAllFilesCB"});
+        this.selectAllFilesCB.helpTip = "You need to select all files, not a folder containing these files";
+        this.selectAllFilesCB.text = "Select Files Instead";
+
+    this.prioritizePSDCB = panel4.add("checkbox", undefined, undefined, {name: "prioritizePSDCB"});
+        this.prioritizePSDCB.helpTip = "It will prioritize PSD over more \u0022raw\u0022 files (PNG, JPG)";
+        this.prioritizePSDCB.text = "Prioritize PSD Files";
+
+    this.selectFilesBtn = panel4.add("button", undefined, undefined, {name: "selectFilesBtn"});
+        this.selectFilesBtn.text = "Select";
+        this.selectFilesBtn.alignment = ["center","top"];
+
+    // PANEL5
+    // ======
+    var panel5 = group11.add("panel", undefined, undefined, {name: "panel5"});
+        panel5.text = "Configuration";
+        panel5.orientation = "column";
+        panel5.alignChildren = ["left","top"];
+        panel5.spacing = 10;
+        panel5.margins = 10;
+
+    this.saveConfigBtn = panel5.add("button", undefined, undefined, {name: "saveConfigBtn"});
+        this.saveConfigBtn.helpTip = "Quick Save Current Configuration";
+        this.saveConfigBtn.text = "Save Config";
+        this.saveConfigBtn.alignment = ["fill","top"];
+
+    this.registerConfigBtn = panel5.add("button", undefined, undefined, {name: "registerConfigBtn"});
+        this.registerConfigBtn.helpTip = "Select a JSON with your custom configuration to use!  :D";
+        this.registerConfigBtn.text = "Import Config";
+        this.registerConfigBtn.alignment = ["fill","top"];
+
+    this.openFolderBtn = panel5.add("button", undefined, undefined, {name: "openFolderBtn"});
+        this.openFolderBtn.text = "Open Scripts Folder";
+        this.openFolderBtn.alignment = ["fill","top"];
+
+    this.resetConfigBtn = panel5.add("button", undefined, undefined, {name: "resetConfigBtn"});
+        this.resetConfigBtn.enabled = false;
+        this.resetConfigBtn.helpTip = "This will delete the JSON you registered";
+        this.resetConfigBtn.text = "Reset Config";
+        this.resetConfigBtn.alignment = ["fill","top"];
+
+    // GROUP12
+    // =======
+    var group12 = this.win.add("group", undefined, {name: "group12"});
+        group12.orientation = "column";
+        group12.alignChildren = ["fill","top"];
+        group12.spacing = 10;
+        group12.margins = 0;
+
+    this.confirmBtn = group12.add("button", undefined, undefined, {name: "confirmBtn"});
+        this.confirmBtn.enabled = false;
+        this.confirmBtn.text = "OK";
+
+    this.cancelBtn = group12.add("button", undefined, undefined, {name: "cancelBtn"});
+        this.cancelBtn.text = "Cancel";
+
+    var statictext10 = group12.add("group");
+        statictext10.orientation = "column";
+        statictext10.alignChildren = ["center","center"];
+        statictext10.spacing = 0;
+
+        statictext10.add("statictext", undefined, "Created By", {name: "statictext10"});
+        statictext10.add("statictext", undefined, "KrevlinMen", {name: "statictext10"});
+        statictext10.add("statictext", undefined, "ImSamuka", {name: "statictext10"});
+
+    }
