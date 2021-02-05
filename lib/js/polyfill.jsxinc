@@ -21,6 +21,10 @@ String.prototype.endsWithArray = function (subArray) {
   return false;
 };
 
+String.prototype.withoutExtension = function () {
+  return this.slice(0, this.lastIndexOf("."));
+};
+
 Array.isArray = function (arg) {
   return Object.prototype.toString.call(arg) === "[object Array]";
 };

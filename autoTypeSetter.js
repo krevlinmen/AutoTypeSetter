@@ -244,7 +244,7 @@ function throwError(message, error) {
 function saveAndCloseFile(file) {
   formatLayer(getTypeFolder(), config.groupLayer)
 
-  const saveFile = File(removeExtension(file.fullName) + '.psd')
+  const saveFile = File(file.fullName.withoutExtension() + '.psd')
   activeDocument.saveAs(saveFile)
   activeDocument.close()
   alreadyCreatedTextFolder = false;
@@ -279,7 +279,7 @@ function writeProgramInfo() {
     locale: $.locale,
 
     ESBuild: $.build,
-    JSversion: $.version,
+    JSVersion: $.version,
     JSBuildDate: $.buildDate,
     memCache: $.memCache,
     screens: $.screens,
@@ -578,7 +578,7 @@ function isCustomFormatted(line, format){
 
 
 
-
+//? This Function shall not be in another file
 function getFileFromScriptPath(filename) {
   return File((new File($.fileName)).path + "/" + encodeURI(filename))
 }
@@ -599,7 +599,7 @@ function getPageNumber(str) {
 function getSpecificImage(arr, num) {
   for (var i in arr) {
     var str = arr[i].name
-    if (num === parseInt(removeExtension(str)))
+    if (num === parseInt(str.withoutExtension() ))
       return arr[i];
   }
   return undefined;
@@ -717,7 +717,7 @@ function createImageArray(arrayFiles) {
 
   const filename = function (str) { //? Removes extension from str and parses number if it is a number
     try {
-      return config.ignorePageNumber ? removeExtension(str) : parseInt(removeExtension(str))
+      return config.ignorePageNumber ? str.withoutExtension() : parseInt(str.withoutExtension())
     } catch (error) {
       throwError("Could not read number from file", error)
     }

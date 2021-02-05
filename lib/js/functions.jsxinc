@@ -1,7 +1,3 @@
-function removeExtension(str) {
-  return str.slice(0, str.lastIndexOf("."))
-}
-
 function getAnotherColor(initial) {
   const decimalRGB = $.colorPicker(initial ? "0x" + initial.slice(1) : 0);
   if (decimalRGB === -1) return initial;
