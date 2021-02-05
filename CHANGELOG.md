@@ -20,9 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Check Getting archive number and ambiguous files
 - calculatePositions, check if border of file has been reached
 - Check column groups
+
 - Test all features in CC 2018
-- Retro-compatibility with PhotoShop CS6
-- Automatic Update Checking
+- Retro-compatibility with PhotoShop CS6 - Some scripts have UI, but i don't know how - other people having this problem are probably using windows 7
+- Automatic Update Checking - Only possible with C dll libraries, socket from ExtendScript is a piece of shit
 
 ### Added
 

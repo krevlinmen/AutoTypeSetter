@@ -31,7 +31,7 @@
 
 //@target "photoshop"
 //@script AutoTypeSetter
-//@includepath "lib"
+//@includepath "lib/js"
 //@include "json2.jsxinc"
 //@include "polyfill.jsxinc"
 //@include "functions.jsxinc"
