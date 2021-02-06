@@ -203,10 +203,9 @@ function createMainWindow(justificationDD_array, languageDD_array, fontListDD_ar
         this.starterLayersBtn.text = "Custom Layers Editor";
         this.starterLayersBtn.alignment = ["fill","center"];
 
-    // this.customTextFormatsBtn = group10.add("button", undefined, undefined, {name: "customTextFormatsBtn"});
-    //     this.customTextFormatsBtn.enabled = false;
-    //     this.customTextFormatsBtn.text = "Custom Text Formats";
-    //     this.customTextFormatsBtn.alignment = ["fill","center"];
+    this.customTextFormatsBtn = group10.add("button", undefined, undefined, {name: "customTextFormatsBtn"});
+        this.customTextFormatsBtn.text = "Custom Text Formats";
+        this.customTextFormatsBtn.alignment = ["fill","center"];
 
     // GROUP11
     // =======
