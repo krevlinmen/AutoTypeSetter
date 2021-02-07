@@ -107,6 +107,28 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
     disableThisCB.text = isStarterLayer ? "Disable All" : "Disable Custom Text Formats";
     disableThisCB.value = true;
 
+    if (!isStarterLayer){
+      var group2 = group1.add("group", undefined, {name: "group2"});
+          group2.orientation = "row";
+          group2.alignChildren = ["left","center"];
+          group2.spacing = 0;
+          group2.margins = 0;
+
+      var statictext1 = group2.add("statictext", undefined, undefined, {name: "statictext1"});
+          statictext1.helpTip = "Any line starting with this, will always be formatted as your default format";
+          statictext1.text = "Ignore Custom With:";
+
+      var ignoreCustomWithBox = group2.add('edittext {properties: {name: "ignoreCustomWithBox"}}');
+          ignoreCustomWithBox.helpTip = "Leave blank to disable feature";
+
+          ignoreCustomWithBox.preferredSize.width = identifiersWidth * 0.8;
+
+          ignoreCustomWithBox.text = config.ignoreCustomWith
+          ignoreCustomWithBox.onChanging = function () {
+            config.ignoreCustomWith = ignoreCustomWithBox.text
+          }
+    }
+
   var addTabBtn = group1.add("button", undefined, undefined, {name: "addTabBtn"});
     addTabBtn.helpTip = "Create a new layer below all others";
     addTabBtn.text = "Add Layer";
