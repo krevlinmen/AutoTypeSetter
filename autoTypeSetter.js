@@ -1265,10 +1265,12 @@ function MainWindow() {
 
   UI.starterLayersBtn.onClick = function () {
     showTabbedWindow(true)
+    setUIConfigs()
   }
 
   UI.customTextFormatsBtn.onClick = function () {
     showTabbedWindow(false)
+    setUIConfigs()
   }
 
   UI.resetConfigBtn.onClick = function () {
