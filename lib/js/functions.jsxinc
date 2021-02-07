@@ -1,7 +1,12 @@
+function isHexColor(string){
+  return /^#[0-9A-F]{6}$/i.test(string)
+}
+
 function getAnotherColor(initial) {
   const decimalRGB = $.colorPicker(initial ? "0x" + initial.slice(1) : 0);
   if (decimalRGB === -1) return initial;
-  return "#" + decimalRGB.toString(16).toUpperCase();
+  const hex = decimalRGB.toString(16).toUpperCase();
+  return "#" + ("0".repeat(6 - hex.length)) + hex
 }
 
 function readFile(file) {

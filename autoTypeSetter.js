@@ -43,6 +43,8 @@
 
 
 const dropDownSizes = [130, 300]
+const identifiersWidth = 60 // identifiers
+
 const isWindowAvailable = !!$.global.Window;
 const savedConfigPath = "config.json"
 
@@ -51,7 +53,9 @@ const defaultConfig = readJson("lib/defaultConfig.json", "Default configuration"
 const justificationObj = readJson("lib/dropdown/justificationOptions.json", "Justification options list")
 const blendModeObj = readJson("lib/dropdown/blendModeOptions.json", "Blend Mode options list")
 const languageObj = readJson("lib/dropdown/languageOptions.json", "Language options list")
-const fontNamesArray = getFontNames()
+const antiAliasObj = readJson("lib/dropdown/antiAliasOptions.json", "Anti Aliasing options list")
+const capitalizationObj = readJson("lib/dropdown/capitalizationOptions.json", "Capitalization options list")
+const fontListDD_array = getFontNames()
 
 //* ------- MainWindow ------
 
@@ -317,6 +321,16 @@ function applyStarterLayerFormats() {
 
 }
 
+function ensureFontSizeUI(sizeBox){
+  sizeBox.text = sizeBox.text.replace(/\D/g, '')
+  if (!sizeBox.text.length || isNaN(parseInt(sizeBox.text)))
+    sizeBox.text = 0
+
+  sizeBox.text = parseInt(sizeBox.text,10)
+
+  if (parseInt(sizeBox.text) > 255) sizeBox.text = 255
+}
+
 
 
 
@@ -500,7 +514,7 @@ function clearConfig(configObject){
       if (typeof configObject[key] == "string"){
 
         //? Replace everything that isn't numbers
-        configObject[key] = configObject[key].replace(/[^0-9]/g, '')
+        configObject[key] = configObject[key].replace(/\D/g, '')
 
         //? If the string have no length (""), use default
         if (!configObject[key].length){
@@ -546,8 +560,7 @@ function clearConfig(configObject){
     const optionObjects = {
       justification: justificationObj,
       blendMode: blendModeObj,
-      language: languageObj,
-      font: null
+      language: languageObj
     }
 
     for (var k in optionObjects){
@@ -555,11 +568,10 @@ function clearConfig(configObject){
       //? If the property exists
       if (isNotUndef(obj[k])){
 
-        //? If it is not a font, turn it uppercase
-        if (k != "font") obj[k] = obj[k].toUpperCase()
+        obj[k] = obj[k].toUpperCase()
 
         //? If we try to parse it as the "actual useful value", and get undefined, use default
-        if (undefined === ( k == "font" ? getFont(obj[k]) : getKeyOf(optionObjects[k], obj[k])) )
+        if (undefined === ( getKeyOf(optionObjects[k], obj[k])) )
           obj[k] = defaultConfig.LayerFormatObject[k]
       }
     }
@@ -914,7 +926,7 @@ function formatLayer(layer, format) {
     if (isNotUndef(format.size) && format.size > 0)
       txt.size = format.size
 
-    if (isNotUndef(format.color) && format.color.length){
+    if (isNotUndef(format.color) && format.color.length && isHexColor(format.color)){
       const color = new SolidColor();
       color.rgb.hexValue = format.color.slice(1);
       txt.color = color
@@ -1095,7 +1107,7 @@ function calculatePositions(textArray) {
 function MainWindow() {
 
   //* Create a new one by default
-  const UI = new createMainWindow(getKeys(justificationObj), getKeys(languageObj), fontNamesArray)
+  const UI = new createMainWindow(getKeys(justificationObj), getKeys(languageObj), fontListDD_array)
 
   //* Set New Variables
   UI.arrayFiles = []
@@ -1250,11 +1262,7 @@ function MainWindow() {
   }
 
   UI.fontSizeBox.onChanging = function () {
-    UI.fontSizeBox.text = UI.fontSizeBox.text.replace(/[^0-9]/g, '')
-    if (!UI.fontSizeBox.text.length || isNaN(parseInt(UI.fontSizeBox.text)) )
-      UI.fontSizeBox.text = 0
-
-    if (parseInt(UI.fontSizeBox.text) > 255) UI.fontSizeBox.text = 255
+    ensureFontSizeUI(UI.fontSizeBox)
   }
   UI.fontSizeBox.onChange = UI.fontSizeBox.onChanging
   UI.fontSizeBox.onChanging()

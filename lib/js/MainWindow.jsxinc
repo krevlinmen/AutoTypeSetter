@@ -1,4 +1,4 @@
-function createMainWindow(justificationDD_array, languageDD_array, fontListDD_array) {
+function createMainWindow(justificationDD_array, languageDD_array) {
 
     /*
     UI 3

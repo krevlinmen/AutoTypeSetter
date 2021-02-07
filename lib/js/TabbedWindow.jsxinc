@@ -1,46 +1,70 @@
 function showTabbedWindow(isStarterLayer){
 
-    function setConf(layerFormat, prop, value){
-      if (isNotUndef(value)) layerFormat[prop] = value
+  function setConf(layerFormat, prop, value){
+    if (isNotUndef(value)) layerFormat[prop] = value
+  }
+
+  function getUIConfigs(tabs, LFOArray){
+
+    for (var i = 0, len = tabs.length; i < len; i++){
+      var tabItems = tabs[i].items
+      var layerFormat = LFOArray[i]
+
+      if (isNotUndef(tabItems.nameBox)) setConf(layerFormat, "name", tabItems.nameBox.text)
+      if (isNotUndef(tabItems.duplicateCB)) setConf(layerFormat, "duplicate", tabItems.duplicateCB.value)
+      if (isNotUndef(tabItems.isBackgroundLayerCB)) setConf(layerFormat, "isBackgroundLayer", tabItems.isBackgroundLayerCB.value)
+      if (isNotUndef(tabItems.opacitySlider)) setConf(layerFormat, "opacity", tabItems.opacitySlider.value)
+      if (isNotUndef(tabItems.visibleCB)) setConf(layerFormat, "visible", tabItems.visibleCB.value)
+      if (isNotUndef(tabItems.groupedCB)) setConf(layerFormat, "grouped", tabItems.groupedCB.value)
+      if (isNotUndef(tabItems.allLockedCB)) setConf(layerFormat, "allLocked", tabItems.allLockedCB.value)
+      if (isNotUndef(tabItems.transparentPixelsLockedCB)) setConf(layerFormat, "transparentPixelsLocked", tabItems.transparentPixelsLockedCB.value)
+      if (isNotUndef(tabItems.pixelsLockedCB)) setConf(layerFormat, "pixelsLocked", tabItems.pixelsLockedCB.value)
+      if (isNotUndef(tabItems.positionLockedCB)) setConf(layerFormat, "positionLocked", tabItems.positionLockedCB.value)
+
+      if (isNotUndef(tabItems.lineIdentifierPrefixBox)) setConf(layerFormat, "lineIdentifierPrefix", tabItems.lineIdentifierPrefixBox.text)
+      if (isNotUndef(tabItems.lineIdentifierSuffixBox)) setConf(layerFormat, "lineIdentifierSuffix", tabItems.lineIdentifierSuffixBox.text)
+      if (isNotUndef(tabItems.sizeBox)) setConf(layerFormat, "size", tabItems.sizeBox.text)
+      if (isNotUndef(tabItems.boxTextCB)) setConf(layerFormat, "boxText", tabItems.boxTextCB.value)
+      if (isNotUndef(tabItems.fontBox)) setConf(layerFormat, "font", tabItems.fontBox.text)
+      if (isNotUndef(tabItems.colorBox)) setConf(layerFormat, "color", tabItems.colorBox.text)
+
+      if (isNotUndef(tabItems.antiAliasDD)) setConf(layerFormat, "antiAlias", antiAliasObj[tabItems.antiAliasDD.selection.text])
+      if (isNotUndef(tabItems.justificationDD)) setConf(layerFormat, "justification", justificationObj[tabItems.justificationDD.selection.text])
+      if (isNotUndef(tabItems.languageDD)) setConf(layerFormat, "language", languageObj[tabItems.languageDD.selection.text])
+      if (isNotUndef(tabItems.capitalizationDD)) setConf(layerFormat, "capitalization", capitalizationObj[tabItems.capitalizationDD.selection.text])
+      if (isNotUndef(tabItems.blendModeDD)) setConf(layerFormat, "blendMode", blendModeObj[tabItems.blendModeDD.selection.text])
     }
+  }
 
-    function getUIConfigs(tabs){
+  var repeatIndex = 0
+  const LFOArray = isStarterLayer ? config.starterLayerFormats : config.customTextFormats
 
-      for (var i = 0, len = tabs.length; i < len; i++){
-        var tabItems = tabs[i].items
-        var layerFormat = (isStarterLayer ? config.starterLayerFormats : config.customTextFormats)[i]
+  while (isNotUndef(repeatIndex)) {
 
-        setConf(layerFormat, "name", tabItems.nameBox.text)
-        setConf(layerFormat, "duplicate", tabItems.duplicateCB.value)
-        setConf(layerFormat, "isBackgroundLayer", tabItems.isBackgroundLayerCB.value)
-        setConf(layerFormat, "opacity", tabItems.opacitySlider.value)
-        setConf(layerFormat, "visible", tabItems.visibleCB.value)
-        setConf(layerFormat, "grouped", tabItems.groupedCB.value)
-        setConf(layerFormat, "allLocked", tabItems.allLockedCB.value)
-        setConf(layerFormat, "transparentPixelsLocked", tabItems.transparentPixelsLockedCB.value)
-        setConf(layerFormat, "pixelsLocked", tabItems.pixelsLockedCB.value)
-        setConf(layerFormat, "positionLocked", tabItems.positionLockedCB.value)
+    //? (IN TEXT EDITOR) The first one is the default
+    if (!isStarterLayer)
+      LFOArray.unshift(config.defaultTextFormat)
 
-        setConf(layerFormat, "blendMode", blendModeObj[tabItems.blendModeDD.selection.text])
-      }
+    var obj = TabbedWindow(isStarterLayer, LFOArray, repeatIndex)
+    repeatIndex = obj.repeatIndex
 
-      clearConfig() //* Asserting Integrity
-    }
+    //? Get the configuration from each tab
+    getUIConfigs(obj.tabs, LFOArray)
 
-    var repeatIndex = 0
+    //? (IN TEXT EDITOR) Get the default configuration inserted
+    if (!isStarterLayer)
+      config.defaultTextFormat = LFOArray.shift()
 
-      while (isNotUndef(repeatIndex)){
-
-        var obj = TabbedWindow(isStarterLayer, repeatIndex)
-        repeatIndex = obj.repeat
-
-        getUIConfigs(obj.tabPanel_tabs)
-      }
+    clearConfig() //* Asserting Integrity
 
   }
 
+}
 
-function TabbedWindow(isStarterLayer,repeatIndex){
+
+
+
+function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
   // if isStarterLayer is false, enter customTextFormats mode
 
   /*
@@ -66,8 +90,8 @@ function TabbedWindow(isStarterLayer,repeatIndex){
     group1.margins = 0;
 
   var disableThisCB = group1.add("checkbox", undefined, undefined, {name: "disableThisCB"});
-    disableThisCB.helpTip = isStarterLayer ? "Disable layer creation" : "Disable custom text formats";
-    disableThisCB.text = "Disable All";
+    disableThisCB.helpTip = isStarterLayer ? "Disable layer creation" : "Disable custom text formats and use only the default";
+    disableThisCB.text = isStarterLayer ? "Disable All" : "Disable Custom Text Formats";
     disableThisCB.value = true;
 
   var addTabBtn = group1.add("button", undefined, undefined, {name: "addTabBtn"});
@@ -89,15 +113,15 @@ function TabbedWindow(isStarterLayer,repeatIndex){
     tabPanel_innerwrap.orientation = ["stack"];
 
 
-    // createCustomFormatTab
-
   // * -------------------------------------------------------------------
 
-  const LFOArray = isStarterLayer ? config.starterLayerFormats : config.customTextFormats
+  //? --------- Constants and Variables ---------
+
   const tabPanel_tabs = [];
 
-
   //? --------- Functions ---------
+
+
 
   function deleteTab(index){
     LFOArray.splice(index,1)
@@ -126,7 +150,7 @@ function TabbedWindow(isStarterLayer,repeatIndex){
 
 
     if (win.visible){
-      win.repeat = index
+      repeatIndex = index
       win.close()
     }
   }
@@ -151,6 +175,8 @@ function TabbedWindow(isStarterLayer,repeatIndex){
   tabPanel.alignChildren = ["left","fill"];
   tabPanel_nav.minimumSize = [60, 300]
 
+  tabPanel_nav.selection = repeatIndex
+
   disableThisCB.value = isStarterLayer ? config.disableStarterLayer : config.disableCustomTextFormats
   disableThisCB.onClick = function () {
     if (isStarterLayer)
@@ -159,29 +185,25 @@ function TabbedWindow(isStarterLayer,repeatIndex){
       config.disableCustomTextFormats = disableThisCB.value
   }
 
+  //? --------- Execution ---------
+
 
   //? Add all Layers
   for (var i = 0; i < LFOArray.length; i++)
     addTab(i)
 
-  //? Show the first one by default, or repeatIndex
-  tabPanel_nav.selection = repeatIndex === undefined ? 0 : repeatIndex
-  showTab_tabPanel() //? Fallback of line above
+  //? Show the right tab
+  showTab_tabPanel()
 
-  win.items = {
-    win: win, // dialog
-    tabPanel_tabs: tabPanel_tabs,
-    disableThisCB: disableThisCB, // checkbox
-    addTabBtn: addTabBtn, // button
-    closeBtn: closeBtn, // button
-  };
-
+  //? While repeatIndex is defined, the window will be opened again
+  repeatIndex = undefined
   win.show()
 
   return {
-    tabPanel_tabs: tabPanel_tabs,
-    repeat: win.repeat
-    }
+    repeatIndex: repeatIndex,
+    tabs: tabPanel_tabs
+  }
+
 }
 
 
@@ -203,9 +225,17 @@ function TabbedWindow(isStarterLayer,repeatIndex){
 function createCustomFormatTab(index, layerFormat, tabPanel_innerwrap, tabName){
 
 
+
+
+var antiAliasDD_array = getKeys(antiAliasObj)
+var justificationDD_array = getKeys(justificationObj)
+var languageDD_array = getKeys(languageObj)
+var capitalizationDD_array = getKeys(capitalizationObj)
+var blendModeDD_array = getKeys(blendModeObj)
+
    /*
     Code for Import https://scriptui.joonas.me — (Triple click to select):
-    {"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"text":"Custom Layer Editor","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["left","top"],"varName":"tab","windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"enabled":true}},"item-42":{"id":42,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-43":{"id":43,"type":"StaticText","parentId":42,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Preffix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-44":{"id":44,"type":"EditText","parentId":42,"style":{"enabled":true,"varName":"lineIdentifierPrefixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-48":{"id":48,"type":"Checkbox","parentId":61,"style":{"enabled":true,"varName":"visibleCB","text":"Visible","preferredSize":[0,0],"alignment":null,"helpTip":"Visibility of the layer","checked":true}},"item-51":{"id":51,"type":"Panel","parentId":96,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Font","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-56":{"id":56,"type":"Checkbox","parentId":61,"style":{"enabled":true,"varName":"groupedCB","text":"Clipping Mask","preferredSize":[0,0],"alignment":null,"helpTip":""}},"item-58":{"id":58,"type":"Slider","parentId":59,"style":{"enabled":true,"varName":"opacitySlider","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-59":{"id":59,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","top"],"alignment":"fill"}},"item-60":{"id":60,"type":"StaticText","parentId":59,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Opacity","justify":"left","preferredSize":[0,0],"alignment":"center","helpTip":null}},"item-61":{"id":61,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null}},"item-64":{"id":64,"type":"Button","parentId":96,"style":{"enabled":true,"varName":"deleteBtn","text":"Delete","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"Delete this Layer"}},"item-67":{"id":67,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"row","spacing":10,"alignChildren":["left","top"],"alignment":"fill"}},"item-68":{"id":68,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-69":{"id":69,"type":"StaticText","parentId":68,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Blend Mode","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-70":{"id":70,"type":"DropDownList","parentId":68,"style":{"enabled":true,"varName":"blendModeDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-71":{"id":71,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-72":{"id":72,"type":"StaticText","parentId":71,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Suffix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-73":{"id":73,"type":"EditText","parentId":71,"style":{"enabled":true,"varName":"lineIdentifierSuffixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-74":{"id":74,"type":"EditText","parentId":51,"style":{"enabled":true,"varName":"fontBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-75":{"id":75,"type":"DropDownList","parentId":51,"style":{"enabled":true,"varName":"fontListDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-76":{"id":76,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-77":{"id":77,"type":"StaticText","parentId":76,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Size (px)","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-78":{"id":78,"type":"EditText","parentId":76,"style":{"enabled":true,"varName":"sizeBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":"fill","helpTip":null}},"item-79":{"id":79,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Color","preferredSize":[0,0],"margins":10,"orientation":"row","spacing":10,"alignChildren":["right","top"],"alignment":null}},"item-80":{"id":80,"type":"EditText","parentId":79,"style":{"enabled":true,"varName":"colorBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":"fill","helpTip":null}},"item-81":{"id":81,"type":"Button","parentId":79,"style":{"enabled":true,"varName":"pickColorBtn","text":"Pick Color","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null,"selection":0}},"item-82":{"id":82,"type":"Checkbox","parentId":101,"style":{"enabled":true,"varName":"boxTextCB","text":"Box Text","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-83":{"id":83,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-84":{"id":84,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-85":{"id":85,"type":"StaticText","parentId":84,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Justification","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-86":{"id":86,"type":"DropDownList","parentId":84,"style":{"enabled":true,"varName":"justificationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-87":{"id":87,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-88":{"id":88,"type":"StaticText","parentId":87,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Language","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-89":{"id":89,"type":"DropDownList","parentId":87,"style":{"enabled":true,"varName":"languageDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-90":{"id":90,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-91":{"id":91,"type":"StaticText","parentId":90,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Capitalization","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-92":{"id":92,"type":"DropDownList","parentId":90,"style":{"enabled":true,"varName":"capitalizationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-93":{"id":93,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-94":{"id":94,"type":"StaticText","parentId":93,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Anti Aliasing","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-95":{"id":95,"type":"DropDownList","parentId":93,"style":{"enabled":true,"varName":"antiAliasDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-96":{"id":96,"type":"Group","parentId":67,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-97":{"id":97,"type":"Group","parentId":67,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-99":{"id":99,"type":"StaticText","parentId":100,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"WARNING:\nBoth Line Identifiers\nare Blank!\nThis page is deactivated...\n","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-100":{"id":100,"type":"Group","parentId":96,"style":{"enabled":true,"varName":"warningGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","top"],"alignment":null}},"item-101":{"id":101,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}}},"order":[0,67,96,100,99,42,43,44,71,72,73,101,82,76,77,78,51,74,75,64,97,79,80,81,83,93,94,95,84,85,86,87,88,89,90,91,92,68,69,70,61,48,56,59,60,58],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"functionWrapper":false,"compactCode":false,"showDialog":true,"afterEffectsDockable":false,"itemReferenceList":"var"},"activeId":82}
+    {"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"text":"Custom Layer Editor","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["left","top"],"varName":"tabPanel_innerwrap","windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"enabled":true}},"item-42":{"id":42,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-43":{"id":43,"type":"StaticText","parentId":42,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Prefix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-44":{"id":44,"type":"EditText","parentId":42,"style":{"enabled":true,"varName":"lineIdentifierPrefixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-48":{"id":48,"type":"Checkbox","parentId":102,"style":{"enabled":true,"varName":"visibleCB","text":"Visible","preferredSize":[0,0],"alignment":null,"helpTip":"Visibility of the layer","checked":true}},"item-51":{"id":51,"type":"Panel","parentId":96,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Font","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-56":{"id":56,"type":"Checkbox","parentId":102,"style":{"enabled":true,"varName":"groupedCB","text":"Clipping Mask","preferredSize":[0,0],"alignment":null,"helpTip":""}},"item-58":{"id":58,"type":"Slider","parentId":59,"style":{"enabled":true,"varName":"opacitySlider","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-59":{"id":59,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-60":{"id":60,"type":"StaticText","parentId":59,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Opacity","justify":"left","preferredSize":[0,0],"alignment":"center","helpTip":null}},"item-61":{"id":61,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-64":{"id":64,"type":"Button","parentId":96,"style":{"enabled":true,"varName":"deleteBtn","text":"Delete","justify":"center","preferredSize":[0,0],"alignment":"fill","helpTip":"Delete this format"}},"item-67":{"id":67,"type":"Panel","parentId":105,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"row","spacing":10,"alignChildren":["left","bottom"],"alignment":"fill"}},"item-68":{"id":68,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-69":{"id":69,"type":"StaticText","parentId":68,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Blend Mode","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-70":{"id":70,"type":"DropDownList","parentId":68,"style":{"enabled":true,"varName":"blendModeDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-71":{"id":71,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-72":{"id":72,"type":"StaticText","parentId":71,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Suffix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-73":{"id":73,"type":"EditText","parentId":71,"style":{"enabled":true,"varName":"lineIdentifierSuffixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-74":{"id":74,"type":"EditText","parentId":51,"style":{"enabled":true,"varName":"fontBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-75":{"id":75,"type":"DropDownList","parentId":51,"style":{"enabled":true,"varName":"fontListDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-76":{"id":76,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-77":{"id":77,"type":"StaticText","parentId":76,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Size (px)","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-78":{"id":78,"type":"EditText","parentId":76,"style":{"enabled":true,"varName":"sizeBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":"fill","helpTip":"Leave 0 to not change text size"}},"item-80":{"id":80,"type":"EditText","parentId":103,"style":{"enabled":true,"varName":"colorBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":"Leave blank to not change text color"}},"item-81":{"id":81,"type":"Button","parentId":103,"style":{"enabled":true,"varName":"pickColorBtn","text":"Pick Color","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"Open window to select a color","selection":0}},"item-82":{"id":82,"type":"Checkbox","parentId":101,"style":{"enabled":true,"varName":"boxTextCB","text":"Box Text","preferredSize":[0,0],"alignment":null,"helpTip":"If marked, a \"Text Box\" will be used instead of a \"Point Text\""}},"item-83":{"id":83,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-84":{"id":84,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-85":{"id":85,"type":"StaticText","parentId":84,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Justification","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-86":{"id":86,"type":"DropDownList","parentId":84,"style":{"enabled":true,"varName":"justificationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-87":{"id":87,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-88":{"id":88,"type":"StaticText","parentId":87,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Language","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-89":{"id":89,"type":"DropDownList","parentId":87,"style":{"enabled":true,"varName":"languageDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-90":{"id":90,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-91":{"id":91,"type":"StaticText","parentId":90,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Capitalization","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-92":{"id":92,"type":"DropDownList","parentId":90,"style":{"enabled":true,"varName":"capitalizationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-93":{"id":93,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-94":{"id":94,"type":"StaticText","parentId":93,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Anti Aliasing","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-95":{"id":95,"type":"DropDownList","parentId":93,"style":{"enabled":true,"varName":"antiAliasDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-96":{"id":96,"type":"Group","parentId":67,"style":{"enabled":true,"varName":"column1","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-97":{"id":97,"type":"Group","parentId":67,"style":{"enabled":true,"varName":"column2","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-99":{"id":99,"type":"StaticText","parentId":100,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"WARNING:\nBoth Line Identifiers\nare Blank!\nThis page is deactivated...\n","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-100":{"id":100,"type":"Group","parentId":96,"style":{"enabled":true,"varName":"warningGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","top"],"alignment":null}},"item-101":{"id":101,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-102":{"id":102,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-103":{"id":103,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-104":{"id":104,"type":"StaticText","parentId":103,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Color","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-105":{"id":105,"type":"Group","parentId":0,"style":{"enabled":true,"varName":"tab","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","fill"],"alignment":null}}},"order":[0,105,67,96,100,99,42,43,44,71,72,73,101,82,76,77,78,51,74,75,64,97,83,93,94,95,84,85,86,87,88,89,90,91,92,68,69,70,61,103,104,80,81,59,60,58,102,48,56],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"functionWrapper":false,"compactCode":false,"showDialog":true,"afterEffectsDockable":false,"itemReferenceList":"var"},"activeId":105}
     */
 
 // TAB
@@ -219,26 +249,27 @@ tab.alignChildren = ["fill","top"];
 tab.spacing = 10;
 tab.margins = 0;
 
+
 // PANEL1
 // ======
 var panel1 = tab.add("panel", undefined, undefined, {name: "panel1"});
     panel1.orientation = "row";
-    panel1.alignChildren = ["left","top"];
+    panel1.alignChildren = ["left","bottom"];
     panel1.spacing = 10;
     panel1.margins = 10;
-    panel1.alignment = ["fill","top"];
+    panel1.alignment = ["center","fill"];
 
-// GROUP1
-// ======
-var group1 = panel1.add("group", undefined, {name: "group1"});
-    group1.orientation = "column";
-    group1.alignChildren = ["fill","top"];
-    group1.spacing = 10;
-    group1.margins = 0;
+// COLUMN1
+// =======
+var column1 = panel1.add("group", undefined, {name: "column1"});
+    column1.orientation = "column";
+    column1.alignChildren = ["fill","top"];
+    column1.spacing = 10;
+    column1.margins = 0;
 
 // WARNINGGROUP
 // ============
-var warningGroup = group1.add("group", undefined, {name: "warningGroup"});
+var warningGroup = column1.add("group", undefined, {name: "warningGroup"});
     warningGroup.orientation = "row";
     warningGroup.alignChildren = ["center","top"];
     warningGroup.spacing = 10;
@@ -255,65 +286,67 @@ var statictext1 = warningGroup.add("group");
     statictext1.add("statictext", undefined, "This page is deactivated... ", {name: "statictext1"});
     statictext1.add("statictext", undefined, "", {name: "statictext1"});
 
+// GROUP1
+// ======
+var group1 = column1.add("group", undefined, {name: "group1"});
+    group1.orientation = "row";
+    group1.alignChildren = ["right","center"];
+    group1.spacing = 6;
+    group1.margins = 0;
+
+var statictext2 = group1.add("statictext", undefined, undefined, {name: "statictext2"});
+    statictext2.text = "Prefix";
+
+var lineIdentifierPrefixBox = group1.add('edittext {properties: {name: "lineIdentifierPrefixBox"}}');
+    lineIdentifierPrefixBox.preferredSize.width = 100;
+    lineIdentifierPrefixBox.alignment = ["right","fill"];
+
 // GROUP2
 // ======
-var group2 = group1.add("group", undefined, {name: "group2"});
+var group2 = column1.add("group", undefined, {name: "group2"});
     group2.orientation = "row";
     group2.alignChildren = ["right","center"];
     group2.spacing = 6;
     group2.margins = 0;
 
-var statictext2 = group2.add("statictext", undefined, undefined, {name: "statictext2"});
-    statictext2.text = "Preffix";
-
-var lineIdentifierPrefixBox = group2.add('edittext {properties: {name: "lineIdentifierPrefixBox"}}');
-    lineIdentifierPrefixBox.preferredSize.width = 100;
-    lineIdentifierPrefixBox.alignment = ["right","fill"];
-
-// GROUP3
-// ======
-var group3 = group1.add("group", undefined, {name: "group3"});
-    group3.orientation = "row";
-    group3.alignChildren = ["right","center"];
-    group3.spacing = 6;
-    group3.margins = 0;
-
-var statictext3 = group3.add("statictext", undefined, undefined, {name: "statictext3"});
+var statictext3 = group2.add("statictext", undefined, undefined, {name: "statictext3"});
     statictext3.text = "Suffix";
 
-var lineIdentifierSuffixBox = group3.add('edittext {properties: {name: "lineIdentifierSuffixBox"}}');
+var lineIdentifierSuffixBox = group2.add('edittext {properties: {name: "lineIdentifierSuffixBox"}}');
     lineIdentifierSuffixBox.preferredSize.width = 100;
     lineIdentifierSuffixBox.alignment = ["right","fill"];
 
-// GROUP4
+// GROUP3
 // ======
-var group4 = group1.add("group", undefined, {name: "group4"});
-    group4.orientation = "row";
-    group4.alignChildren = ["right","center"];
-    group4.spacing = 10;
-    group4.margins = 0;
+var group3 = column1.add("group", undefined, {name: "group3"});
+    group3.orientation = "row";
+    group3.alignChildren = ["right","center"];
+    group3.spacing = 10;
+    group3.margins = 0;
 
-var boxTextCB = group4.add("checkbox", undefined, undefined, {name: "boxTextCB"});
+var boxTextCB = group3.add("checkbox", undefined, undefined, {name: "boxTextCB"});
+    boxTextCB.helpTip = "If marked, a \u0022Text Box\u0022 will be used instead of a \u0022Point Text\u0022";
     boxTextCB.text = "Box Text";
 
-// GROUP5
+// GROUP4
 // ======
-var group5 = group1.add("group", undefined, {name: "group5"});
-    group5.orientation = "row";
-    group5.alignChildren = ["right","center"];
-    group5.spacing = 6;
-    group5.margins = 0;
+var group4 = column1.add("group", undefined, {name: "group4"});
+    group4.orientation = "row";
+    group4.alignChildren = ["right","center"];
+    group4.spacing = 6;
+    group4.margins = 0;
 
-var statictext4 = group5.add("statictext", undefined, undefined, {name: "statictext4"});
+var statictext4 = group4.add("statictext", undefined, undefined, {name: "statictext4"});
     statictext4.text = "Size (px)";
 
-var sizeBox = group5.add('edittext {properties: {name: "sizeBox"}}');
+var sizeBox = group4.add('edittext {properties: {name: "sizeBox"}}');
+    sizeBox.helpTip = "Leave 0 to not change text size";
     sizeBox.preferredSize.width = 50;
     sizeBox.alignment = ["right","fill"];
 
 // PANEL2
 // ======
-var panel2 = group1.add("panel", undefined, undefined, {name: "panel2"});
+var panel2 = column1.add("panel", undefined, undefined, {name: "panel2"});
     panel2.text = "Font";
     panel2.orientation = "column";
     panel2.alignChildren = ["fill","top"];
@@ -324,196 +357,355 @@ var fontBox = panel2.add('edittext {properties: {name: "fontBox"}}');
     fontBox.preferredSize.width = 100;
     fontBox.alignment = ["fill","top"];
 
-var fontListDD_array = ["Item"];
 var fontListDD = panel2.add("dropdownlist", undefined, undefined, {name: "fontListDD", items: fontListDD_array});
     fontListDD.selection = 0;
     fontListDD.alignment = ["fill","top"];
 
-// GROUP1
-// ======
-var deleteBtn = group1.add("button", undefined, undefined, {name: "deleteBtn"});
-    deleteBtn.helpTip = "Delete this Layer";
-    deleteBtn.text = "Delete";
-    deleteBtn.alignment = ["fill","top"];
-
-// GROUP6
-// ======
-var group6 = panel1.add("group", undefined, {name: "group6"});
-    group6.orientation = "column";
-    group6.alignChildren = ["fill","top"];
-    group6.spacing = 10;
-    group6.margins = 0;
+// COLUMN2
+// =======
+var column2 = panel1.add("group", undefined, {name: "column2"});
+    column2.orientation = "column";
+    column2.alignChildren = ["fill","top"];
+    column2.spacing = 10;
+    column2.margins = 0;
 
 // PANEL3
 // ======
-var panel3 = group6.add("panel", undefined, undefined, {name: "panel3"});
-    panel3.text = "Color";
-    panel3.orientation = "row";
-    panel3.alignChildren = ["right","top"];
+var panel3 = column2.add("panel", undefined, undefined, {name: "panel3"});
+    panel3.orientation = "column";
+    panel3.alignChildren = ["right","center"];
     panel3.spacing = 10;
     panel3.margins = 10;
 
-var colorBox = panel3.add('edittext {properties: {name: "colorBox"}}');
-    colorBox.preferredSize.width = 50;
-    colorBox.alignment = ["right","fill"];
-
-var pickColorBtn = panel3.add("button", undefined, undefined, {name: "pickColorBtn"});
-    pickColorBtn.text = "Pick Color";
-
-// PANEL4
+// GROUP5
 // ======
-var panel4 = group6.add("panel", undefined, undefined, {name: "panel4"});
-    panel4.orientation = "column";
-    panel4.alignChildren = ["right","center"];
-    panel4.spacing = 10;
-    panel4.margins = 10;
+var group5 = panel3.add("group", undefined, {name: "group5"});
+    group5.orientation = "row";
+    group5.alignChildren = ["center","center"];
+    group5.spacing = 10;
+    group5.margins = 0;
+
+var statictext5 = group5.add("statictext", undefined, undefined, {name: "statictext5"});
+    statictext5.text = "Anti Aliasing";
+    statictext5.justify = "center";
+
+var antiAliasDD = group5.add("dropdownlist", undefined, undefined, {name: "antiAliasDD", items: antiAliasDD_array});
+    antiAliasDD.selection = 0;
+    antiAliasDD.alignment = ["center","fill"];
+
+// GROUP6
+// ======
+var group6 = panel3.add("group", undefined, {name: "group6"});
+    group6.orientation = "row";
+    group6.alignChildren = ["center","center"];
+    group6.spacing = 10;
+    group6.margins = 0;
+
+var statictext6 = group6.add("statictext", undefined, undefined, {name: "statictext6"});
+    statictext6.text = "Justification";
+    statictext6.justify = "center";
+
+var justificationDD = group6.add("dropdownlist", undefined, undefined, {name: "justificationDD", items: justificationDD_array});
+    justificationDD.selection = 0;
+    justificationDD.alignment = ["center","fill"];
 
 // GROUP7
 // ======
-var group7 = panel4.add("group", undefined, {name: "group7"});
+var group7 = panel3.add("group", undefined, {name: "group7"});
     group7.orientation = "row";
     group7.alignChildren = ["center","center"];
     group7.spacing = 10;
     group7.margins = 0;
 
-var statictext5 = group7.add("statictext", undefined, undefined, {name: "statictext5"});
-    statictext5.text = "Anti Aliasing";
-    statictext5.justify = "center";
+var statictext7 = group7.add("statictext", undefined, undefined, {name: "statictext7"});
+    statictext7.text = "Language";
+    statictext7.justify = "center";
 
-var antiAliasDD_array = ["Item"];
-var antiAliasDD = group7.add("dropdownlist", undefined, undefined, {name: "antiAliasDD", items: antiAliasDD_array});
-    antiAliasDD.selection = 0;
-    antiAliasDD.alignment = ["center","fill"];
+var languageDD = group7.add("dropdownlist", undefined, undefined, {name: "languageDD", items: languageDD_array});
+    languageDD.selection = 0;
+    languageDD.alignment = ["center","fill"];
 
 // GROUP8
 // ======
-var group8 = panel4.add("group", undefined, {name: "group8"});
+var group8 = panel3.add("group", undefined, {name: "group8"});
     group8.orientation = "row";
     group8.alignChildren = ["center","center"];
     group8.spacing = 10;
     group8.margins = 0;
 
-var statictext6 = group8.add("statictext", undefined, undefined, {name: "statictext6"});
-    statictext6.text = "Justification";
-    statictext6.justify = "center";
+var statictext8 = group8.add("statictext", undefined, undefined, {name: "statictext8"});
+    statictext8.text = "Capitalization";
+    statictext8.justify = "center";
 
-var justificationDD_array = ["Item"];
-var justificationDD = group8.add("dropdownlist", undefined, undefined, {name: "justificationDD", items: justificationDD_array});
-    justificationDD.selection = 0;
-    justificationDD.alignment = ["center","fill"];
+var capitalizationDD = group8.add("dropdownlist", undefined, undefined, {name: "capitalizationDD", items: capitalizationDD_array});
+    capitalizationDD.selection = 0;
+    capitalizationDD.alignment = ["center","fill"];
 
 // GROUP9
 // ======
-var group9 = panel4.add("group", undefined, {name: "group9"});
+var group9 = panel3.add("group", undefined, {name: "group9"});
     group9.orientation = "row";
     group9.alignChildren = ["center","center"];
     group9.spacing = 10;
     group9.margins = 0;
 
-var statictext7 = group9.add("statictext", undefined, undefined, {name: "statictext7"});
-    statictext7.text = "Language";
-    statictext7.justify = "center";
+var statictext9 = group9.add("statictext", undefined, undefined, {name: "statictext9"});
+    statictext9.text = "Blend Mode";
+    statictext9.justify = "center";
 
-var languageDD_array = ["Item"];
-var languageDD = group9.add("dropdownlist", undefined, undefined, {name: "languageDD", items: languageDD_array});
-    languageDD.selection = 0;
-    languageDD.alignment = ["center","fill"];
+var blendModeDD = group9.add("dropdownlist", undefined, undefined, {name: "blendModeDD", items: blendModeDD_array});
+    blendModeDD.selection = 0;
+    blendModeDD.alignment = ["center","fill"];
+
+// PANEL4
+// ======
+var panel4 = column2.add("panel", undefined, undefined, {name: "panel4"});
+    panel4.orientation = "column";
+    panel4.alignChildren = ["fill","top"];
+    panel4.spacing = 10;
+    panel4.margins = 10;
 
 // GROUP10
 // =======
 var group10 = panel4.add("group", undefined, {name: "group10"});
     group10.orientation = "row";
-    group10.alignChildren = ["center","center"];
+    group10.alignChildren = ["right","center"];
     group10.spacing = 10;
     group10.margins = 0;
 
-var statictext8 = group10.add("statictext", undefined, undefined, {name: "statictext8"});
-    statictext8.text = "Capitalization";
-    statictext8.justify = "center";
+var statictext10 = group10.add("statictext", undefined, undefined, {name: "statictext10"});
+    statictext10.text = "Color";
+    statictext10.justify = "center";
 
-var capitalizationDD_array = ["Item"];
-var capitalizationDD = group10.add("dropdownlist", undefined, undefined, {name: "capitalizationDD", items: capitalizationDD_array});
-    capitalizationDD.selection = 0;
-    capitalizationDD.alignment = ["center","fill"];
+var colorBox = group10.add('edittext {properties: {name: "colorBox"}}');
+    colorBox.helpTip = "Leave blank to not change text color";
+    colorBox.preferredSize.width = 50;
+
+var pickColorBtn = group10.add("button", undefined, undefined, {name: "pickColorBtn"});
+    pickColorBtn.helpTip = "Open window to select a color";
+    pickColorBtn.text = "Pick Color";
 
 // GROUP11
 // =======
 var group11 = panel4.add("group", undefined, {name: "group11"});
     group11.orientation = "row";
-    group11.alignChildren = ["center","center"];
+    group11.alignChildren = ["right","center"];
     group11.spacing = 10;
     group11.margins = 0;
 
-var statictext9 = group11.add("statictext", undefined, undefined, {name: "statictext9"});
-    statictext9.text = "Blend Mode";
-    statictext9.justify = "center";
+var statictext11 = group11.add("statictext", undefined, undefined, {name: "statictext11"});
+    statictext11.text = "Opacity";
+    statictext11.alignment = ["right","center"];
 
-var blendModeDD_array = ["Item"];
-var blendModeDD = group11.add("dropdownlist", undefined, undefined, {name: "blendModeDD", items: blendModeDD_array});
-    blendModeDD.selection = 0;
-    blendModeDD.alignment = ["center","fill"];
-
-// PANEL5
-// ======
-var panel5 = group6.add("panel", undefined, undefined, {name: "panel5"});
-    panel5.orientation = "column";
-    panel5.alignChildren = ["left","top"];
-    panel5.spacing = 10;
-    panel5.margins = 10;
-
-var visibleCB = panel5.add("checkbox", undefined, undefined, {name: "visibleCB"});
-    visibleCB.helpTip = "Visibility of the layer";
-    visibleCB.text = "Visible";
-    visibleCB.value = true;
-
-var groupedCB = panel5.add("checkbox", undefined, undefined, {name: "groupedCB"});
-    groupedCB.text = "Clipping Mask";
-
-// GROUP12
-// =======
-var group12 = panel5.add("group", undefined, {name: "group12"});
-    group12.orientation = "row";
-    group12.alignChildren = ["left","top"];
-    group12.spacing = 10;
-    group12.margins = 0;
-    group12.alignment = ["fill","top"];
-
-var statictext10 = group12.add("statictext", undefined, undefined, {name: "statictext10"});
-    statictext10.text = "Opacity";
-    statictext10.alignment = ["left","center"];
-
-var opacitySlider = group12.add("slider", undefined, undefined, undefined, undefined, {name: "opacitySlider"});
+var opacitySlider = group11.add("slider", undefined, undefined, undefined, undefined, {name: "opacitySlider"});
     opacitySlider.minvalue = 0;
     opacitySlider.maxvalue = 100;
     opacitySlider.value = 50;
     opacitySlider.preferredSize.width = 100;
-    opacitySlider.alignment = ["left","fill"];
+    opacitySlider.alignment = ["right","fill"];
 
-// ITEM REFERENCE LIST ( Info: http://jongware.mit.edu/Sui/index_1.html )
-tab.items = {
-tab: tab, // dialog
-warningGroup: warningGroup, // group
-lineIdentifierPrefixBox: lineIdentifierPrefixBox, // edittext
-lineIdentifierSuffixBox: lineIdentifierSuffixBox, // edittext
-sizeBox: sizeBox, // edittext
-boxTextCB: boxTextCB, // checkbox
-fontBox: fontBox, // edittext
-fontListDD: fontListDD, // dropdownlist
-deleteBtn: deleteBtn, // button
-colorBox: colorBox, // edittext
-pickColorBtn: pickColorBtn, // button
-antiAliasDD: antiAliasDD, // dropdownlist
-justificationDD: justificationDD, // dropdownlist
-languageDD: languageDD, // dropdownlist
-capitalizationDD: capitalizationDD, // dropdownlist
-blendModeDD: blendModeDD, // dropdownlist
-visibleCB: visibleCB, // checkbox
-groupedCB: groupedCB, // checkbox
-opacitySlider: opacitySlider // slider
-};
+// GROUP12
+// =======
+var group12 = panel4.add("group", undefined, {name: "group12"});
+    group12.orientation = "row";
+    group12.alignChildren = ["right","center"];
+    group12.spacing = 10;
+    group12.margins = 0;
+
+var visibleCB = group12.add("checkbox", undefined, undefined, {name: "visibleCB"});
+    visibleCB.helpTip = "Visibility of the layer";
+    visibleCB.text = "Visible";
+    visibleCB.value = true;
+
+var groupedCB = group12.add("checkbox", undefined, undefined, {name: "groupedCB"});
+    groupedCB.text = "Clipping Mask";
 
 
-    return tab
+
+ //* -------------------------------------------------------------
+
+  //? --------- Variables ---------
+
+  var changedByBox = true
+  var warningShowing = false
+
+  //? --------- Conditional Object Creation ---------
+
+
+  if (index){
+    //? Index is more than 1
+
+    var deleteBtn = column1.add("button", undefined, undefined, {name: "deleteBtn"});
+    deleteBtn.helpTip = "Delete this format";
+    deleteBtn.text = "Delete";
+    deleteBtn.alignment = ["fill","top"];
+
+    deleteBtn.onClick = function () {
+      tabPanel_innerwrap.deleteTab(index)
+    }
+
+  } else {
+    //? Index is 0
+    group1.enabled = false
+    group2.enabled = false
+  }
+
+  //? --------- Functions ---------
+
+  function setDD(optionObj, DDObj, prop){
+    var DDKey = getKeyOf(optionObj, isNotUndef(layerFormat[prop]) ? layerFormat[prop].toUpperCase() : defaultConfig.LayerFormatObject[prop])
+    DDObj.selection = DDObj.find( DDKey ) | 0
+  }
+
+  function updateFontListDD(fontString) {
+    var fontListDDFont = getFont(fontString)
+    fontListDD.selection = isNotUndef(fontListDDFont) ? fontListDD.find(fontListDDFont.name) | 0 : 0
+  }
+
+  function warning(show){
+    if (warningGroup.enabled == show) return
+    warningGroup.enabled = show
+
+    if (show){
+      statictext1.children[0].text = "WARNING:"
+      statictext1.children[1].text = "Both Line Identifiers"
+      statictext1.children[2].text = "are Blank!"
+      statictext1.children[3].text = "This page is deactivated..."
+    }
+    else
+      for (var i = 0; i < 4; i++)
+        statictext1.children[i].text = ""
+
+
+  }
+
+  //? --------- Set Properties ---------
+
+  tab.alignment = ["fill","fill"];
+  tab.visible = false;
+  panel1.alignChildren = ["fill","top"];
+  column2.alignment = ["fill","top"];
+
+  fontListDD.maximumSize = dropDownSizes
+  antiAliasDD.maximumSize = dropDownSizes
+  justificationDD.maximumSize = dropDownSizes
+  languageDD.maximumSize = dropDownSizes
+  capitalizationDD.maximumSize = dropDownSizes
+  blendModeDD.maximumSize = dropDownSizes
+
+  lineIdentifierPrefixBox.preferredSize.width = identifiersWidth;
+  lineIdentifierSuffixBox.preferredSize.width = identifiersWidth;
+
+  opacitySlider.preferredSize.width = dropDownSizes[0];
+  colorBox.preferredSize.width = identifiersWidth
+  sizeBox.preferredSize.width = identifiersWidth * 0.8
+
+
+  opacitySlider.onChange = function () {
+    opacitySlider.helpTip = opacitySlider.value
+  }
+  opacitySlider.onChanging = opacitySlider.onChange //? Fallback
+
+  sizeBox.onChanging = function () {
+    ensureFontSizeUI(sizeBox)
+  }
+  sizeBox.onChange = sizeBox.onChanging
+
+  colorBox.onChanging = function () {
+    const s = colorBox.text
+    if (s){
+      s = s.replace(/[^0-9A-F]/i,"").toUpperCase()
+      s = "#" + s.replace("#","")
+      s = s.slice(0,"#000000".length)
+    }
+    colorBox.text = s
+  }
+  colorBox.onChange = function () {
+    if (colorBox.active) return
+    const s = colorBox.text
+    if (s && !isHexColor(s)) s = "#000000"
+    colorBox.text = s
+  }
+
+  pickColorBtn.onClick = function (){
+    colorBox.text = getAnotherColor(colorBox.text)
+  }
+
+  fontBox.onChanging = function () {
+    changedByBox = true
+    updateFontListDD(fontBox.text)
+  }
+
+  fontListDD.onChange = function () {
+    if (changedByBox){
+      changedByBox = false
+      return
+    }
+    changedByBox = false
+    fontBox.text = fontListDD.selection.index ? fontListDD.selection.text : defaultConfig.LayerFormatObject.font
+  }
+
+
+
+  if (index){
+    lineIdentifierPrefixBox.onChanging = function () {
+      warning(!lineIdentifierPrefixBox.text.length && !lineIdentifierSuffixBox.text.length)
+    }
+    lineIdentifierSuffixBox.onChanging = lineIdentifierPrefixBox.onChanging
+
+    lineIdentifierPrefixBox.text = isNotUndef(layerFormat.lineIdentifierPrefix) ?  layerFormat.lineIdentifierPrefix : defaultConfig.LayerFormatObject.lineIdentifierPrefix
+    lineIdentifierSuffixBox.text = isNotUndef(layerFormat.lineIdentifierSuffix) ?  layerFormat.lineIdentifierSuffix : defaultConfig.LayerFormatObject.lineIdentifierSuffix
+
+    lineIdentifierPrefixBox.onChanging()
+  }
+
+  sizeBox.text = isNotUndef(layerFormat.size) ?  layerFormat.size : defaultConfig.LayerFormatObject.size
+  boxTextCB.value = isNotUndef(layerFormat.boxText) ?  layerFormat.boxText : defaultConfig.LayerFormatObject.boxText
+  fontBox.text = isNotUndef(layerFormat.font) ?  layerFormat.font : defaultConfig.LayerFormatObject.font
+  colorBox.text = isNotUndef(layerFormat.color) ?  layerFormat.color : defaultConfig.LayerFormatObject.color
+  visibleCB.value = isNotUndef(layerFormat.visible) ? layerFormat.visible : defaultConfig.LayerFormatObject.visible
+  groupedCB.value = isNotUndef(layerFormat.grouped) ? layerFormat.grouped : defaultConfig.LayerFormatObject.grouped
+  opacitySlider.value = isNotUndef(layerFormat.opacity) ? layerFormat.opacity : defaultConfig.LayerFormatObject.opacity
+
+  setDD(antiAliasObj, antiAliasDD, "antiAlias")
+  setDD(justificationObj, justificationDD, "justification")
+  setDD(languageObj, languageDD, "language")
+  setDD(capitalizationObj, capitalizationDD, "capitalization")
+  setDD(blendModeObj, blendModeDD, "blendMode")
+
+  updateFontListDD(isNotUndef(layerFormat.font) ? layerFormat.font :  defaultConfig.LayerFormatObject.font)
+
+  opacitySlider.onChange()
+  sizeBox.onChanging()
+  colorBox.onChanging()
+  colorBox.onChange()
+  fontBox.onChanging()
+
+  if (!index) warning(false)
+
+  tab.items = {
+    tab: tab, // dialog
+    warningGroup: warningGroup, // group
+    lineIdentifierPrefixBox: lineIdentifierPrefixBox, // edittext
+    lineIdentifierSuffixBox: lineIdentifierSuffixBox, // edittext
+    sizeBox: sizeBox, // edittext
+    boxTextCB: boxTextCB, // checkbox
+    fontBox: fontBox, // edittext
+    fontListDD: fontListDD, // dropdownlist
+    deleteBtn: deleteBtn, // button
+    colorBox: colorBox, // edittext
+    pickColorBtn: pickColorBtn, // button
+    antiAliasDD: antiAliasDD, // dropdownlist
+    justificationDD: justificationDD, // dropdownlist
+    languageDD: languageDD, // dropdownlist
+    capitalizationDD: capitalizationDD, // dropdownlist
+    blendModeDD: blendModeDD, // dropdownlist
+    visibleCB: visibleCB, // checkbox
+    groupedCB: groupedCB, // checkbox
+    opacitySlider: opacitySlider // slider
+  };
+
+  return tab
 }
 
 
@@ -710,7 +902,6 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
   blendModeDD.maximumSize = dropDownSizes
 
   opacitySlider.onChange = function () {
-
     opacitySlider.helpTip = opacitySlider.value
   }
   opacitySlider.onChanging = opacitySlider.onChange //? Fallback
