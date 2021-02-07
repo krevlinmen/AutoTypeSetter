@@ -85,6 +85,7 @@ ProcessingWindowObj.startBtn.onClick = function () {
 
 var textFile;
 var duplicatedLayer;
+var convertAllToRGB;
 var alreadyCreatedTextFolder = false;
 var config = {};
 var continueProcessing = true
@@ -166,6 +167,7 @@ function processText(arrayFiles) {
 
         if (file){
           if (continueProcessing) open(file)
+          if ( ensureValidColorMode() ) continue;
           if (continueProcessing) applyStarterLayerFormats()
           if (continueProcessing) insertPageTexts(content[pageKey]) //Page text Writing Loop
           if (continueProcessing) saveAndCloseFile(file)
@@ -189,6 +191,11 @@ function processText(arrayFiles) {
     } catch (error) {
       throwError("No document open.\nIf you only select a text file, you need to have a document open.")
     }
+
+    //* Assure Valid Color Mode
+    convertAllToRGB = false //? To ask only once
+    if ( ensureValidColorMode() )
+      return //? User decided not to change color mode, exit
 
     //* Populating filesOrder
     for (var pageKey in content) {
@@ -255,6 +262,19 @@ function saveAndCloseFile(file) {
   activeDocument.saveAs(saveFile)
   activeDocument.close()
   alreadyCreatedTextFolder = false;
+}
+
+function ensureValidColorMode() {
+  if (activeDocument.mode == DocumentMode.INDEXEDCOLOR){
+
+    if (convertAllToRGB === undefined)
+      convertAllToRGB = confirm("Indexed color mode don't let us change the layers.\nYou want to change all necessary files to RGB mode?", false, "Invalid Color Mode")
+
+    const res = convertAllToRGB ? true : confirm("Indexed color mode don't let us change the layers.\nYou want to change the mode to RGB?", false, "Invalid Color Mode")
+
+    if (res) activeDocument.changeMode(ChangeMode.RGB)
+    else return true //? User refused
+  }
 }
 
 function writeProgramInfo() {
