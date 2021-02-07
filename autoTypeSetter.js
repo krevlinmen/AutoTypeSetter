@@ -201,7 +201,7 @@ function processText(arrayFiles) {
     for (var pageKey in content) {
       var page = content[pageKey]
       for (var lineKey in page)
-        filesOrder.push(page[lineKey])
+        filesOrder.push(getCustomFormattedLine(page[lineKey]))
     }
 
     //* Process Function
@@ -625,24 +625,6 @@ function clearConfig(configObject){
 
 
 
-function isNewPage(line) {
-  if (config.pageIdentifierPrefix == "" && config.pageIdentifierSuffix == "") return false
-  const res = line.startsWith(config.pageIdentifierPrefix) && line.endsWith(config.pageIdentifierSuffix)
-  if (config.ignorePageNumber)
-    return res
-  else
-    return res && !isNaN(getPageNumber(line))
-}
-
-function isCustomFormatted(line, format){
-  if (!format.lineIdentifierPrefix && !format.lineIdentifierSuffix) return false
-  if (format.lineIdentifierPrefix === undefined) format.lineIdentifierPrefix = ""
-  if (format.lineIdentifierSuffix === undefined) format.lineIdentifierSuffix = ""
-
-
-  return line.startsWith(format.lineIdentifierPrefix) && line.endsWith(format.lineIdentifierSuffix)
-}
-
 
 
 
@@ -653,6 +635,15 @@ function isCustomFormatted(line, format){
 //? This Function shall not be in another file
 function getFileFromScriptPath(filename) {
   return File((new File($.fileName)).path + "/" + encodeURI(filename))
+}
+
+function isNewPage(line) {
+  if (config.pageIdentifierPrefix == "" && config.pageIdentifierSuffix == "") return false
+  const res = line.startsWith(config.pageIdentifierPrefix) && line.endsWith(config.pageIdentifierSuffix)
+  if (config.ignorePageNumber)
+    return res
+  else
+    return res && !isNaN(getPageNumber(line))
 }
 
 function getPageNumber(str) {
@@ -666,6 +657,39 @@ function getPageNumber(str) {
   } catch (error) {
     throwError("Could not read number from file", error)
   }
+}
+
+function findFormat(line, returnIndex){
+
+  //? Shall be 'line === line.trim()'
+  if (config.disableCustomTextFormats) return undefined
+  if (config.ignoreCustomWith && line.startsWith(config.ignoreCustomWith))
+    return undefined
+
+  for (var i in config.customTextFormats){
+    var format = config.customTextFormats[i]
+
+    if (!format.lineIdentifierPrefix && !format.lineIdentifierSuffix) continue;
+    if (format.lineIdentifierPrefix === undefined) format.lineIdentifierPrefix = ""
+    if (format.lineIdentifierSuffix === undefined) format.lineIdentifierSuffix = ""
+
+    if (line.startsWith(format.lineIdentifierPrefix) && line.endsWith(format.lineIdentifierSuffix))
+      return returnIndex ? i : format
+  }
+}
+
+function getCustomFormattedLine(line, format){
+
+  //? If disabled or line is blank, return unaltered
+  if (!line || config.disableCustomTextFormats) return line
+
+  //? If startsWith 'config.ignoreCustomWith'
+  if (config.ignoreCustomWith && line.startsWith(config.ignoreCustomWith))
+    return line.slice(config.ignoreCustomWith.length).trim()
+
+  if (format === undefined) format = findFormat(line)
+  if (format) return line.slice(format.lineIdentifierPrefix.length, line.length - format.lineIdentifierSuffix.length).trim()
+  return line //? Return unaltered
 }
 
 function getSpecificImage(arr, num) {
@@ -1018,26 +1042,8 @@ function insertPageTexts(page, updateAtEachLine) {
   var mainGroup
 
   for (var i in page) {
-    var line = page[i]
-    var format = undefined
-
-
-    if (!config.disableCustomTextFormats){
-      if (isNotUndef(config.ignoreCustomWith) && config.ignoreCustomWith.length && line.startsWith(config.ignoreCustomWith)){
-        line = line.slice(config.ignoreCustomWith.length)
-      }
-      else if (isNotUndef(config.customTextFormats)){
-          for (var j in config.customTextFormats){
-
-            //? Similar to isNewPage()
-            if (isCustomFormatted(line, config.customTextFormats[j])) {
-              line = line.slice(config.customTextFormats[j].lineIdentifierPrefix.length)
-              format = config.customTextFormats[j]
-              break;
-            }
-          }
-        }
-      }
+    var format = findFormat(page[i])
+    var line = getCustomFormattedLine(page[i], format)
 
     if (!continueProcessing) break;
 
@@ -1113,25 +1119,14 @@ function calculatePositions(textArray) {
 
   for (var i in textArray) {
     var line = textArray[i]
+    var format = findFormat(line)
 
-    if (config.disableCustomTextFormats){
-    layerPosition.height = (config.defaultTextFormat.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * config.defaultTextFormat.size / 7))) //! Attention
-    }
+    //? 'format' will be undefined if 'config.disableCustomTextFormats' is true
+    //? or if it was not found
+    if (!format) format = config.defaultTextFormat
 
-    else {
-          if (isNotUndef(config.customTextFormats)){
-            for (var j in config.customTextFormats){
-              //? Similar to isNewPage()
-              if (isCustomFormatted(line, config.customTextFormats[j])) {
-                layerPosition.height = (config.customTextFormats[j].size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * config.customTextFormats[j].size / 7))) //! Attention
-                break;
-              }
-            }
-          }
-        if (layerPosition.height === undefined){
-          layerPosition.height = (config.defaultTextFormat.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * config.defaultTextFormat.size / 7))) //! Attention
-        }
-    }
+    layerPosition.height = (format.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * format.size / 7))) //! Attention
+
     positionData.push(getCopy(layerPosition))
 
     layerPosition.yPosition += yBorder + layerPosition.height //*yPosition += The size of the text Box + border
