@@ -188,8 +188,6 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
   tabPanel.alignChildren = ["left","fill"];
   tabPanel_nav.minimumSize = [60, 300]
 
-  tabPanel_nav.selection = repeatIndex
-
   disableThisCB.value = isStarterLayer ? config.disableStarterLayer : config.disableCustomTextFormats
   disableThisCB.onClick = function () {
     if (isStarterLayer)
@@ -206,6 +204,7 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
     addTab(i)
 
   //? Show the right tab
+  tabPanel_nav.selection = repeatIndex
   showTab_tabPanel()
 
   //? While repeatIndex is defined, the window will be opened again
