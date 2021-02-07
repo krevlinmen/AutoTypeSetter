@@ -420,6 +420,9 @@ function clearConfig(configObject){
   //! IMPORTANT
   //* Every Object {} inside 'config' is considered a 'LayerFormatObject'
 
+  //? Validating 'defaultTextFormat' First of all
+  validateLayerFormatObject(configObject.defaultTextFormat)
+
   for (var i in defaultConfig){
 
     //* Type Validation
@@ -450,7 +453,7 @@ function clearConfig(configObject){
             //? We delete if this is not the subsequent layers of "starterLayerFormats"
             delete configObject[i][j].duplicate
 
-          validateLayerFormatObject(configObject[i][j], configObject[i][j].duplicate ? configObject[i][j-1] : undefined )
+          validateLayerFormatObject(configObject[i][j], configObject[i][j-1], i == "customTextFormats" ? configObject.defaultTextFormat : undefined)
         }
 
       } else {
@@ -555,7 +558,9 @@ function clearConfig(configObject){
     }
   }
 
-  function validateLayerFormatObject(obj, objBefore){
+  function validateLayerFormatObject(obj, objBefore, addToDefault){
+
+    const defaultLFO = getMerged(defaultConfig.LayerFormatObject, addToDefault)
 
     const optionObjects = {
       justification: justificationObj,
@@ -572,23 +577,23 @@ function clearConfig(configObject){
 
         //? If we try to parse it as the "actual useful value", and get undefined, use default
         if (undefined === ( getKeyOf(optionObjects[k], obj[k])) )
-          obj[k] = defaultConfig.LayerFormatObject[k]
+          obj[k] = defaultLFO[k]
       }
     }
 
     //? Validate "duplicate"
-    validatePropertyType(obj, defaultConfig.LayerFormatObject, "duplicate")
+    validatePropertyType(obj, defaultLFO, "duplicate")
     //? If "duplicate" is not true, set objBefore as undefined
     if (!obj["duplicate"]) objBefore = undefined
 
     for (var k in obj){
 
       //* Type Validation
-      validatePropertyType(obj, defaultConfig.LayerFormatObject, k)
+      validatePropertyType(obj, defaultLFO, k)
 
       //? We delete the property if the value is equal the default one
       //? If objBefore is defined, we only delete the property if objBefore[k] is undefined
-      if (obj[k] === defaultConfig.LayerFormatObject[k] && (isNotUndef(objBefore) ? objBefore[k] === undefined : true ))
+      if (obj[k] === defaultLFO[k] && (isNotUndef(objBefore) ? objBefore[k] === undefined : true ))
         delete obj[k]
 
     }

@@ -1,5 +1,16 @@
 function showTabbedWindow(isStarterLayer){
 
+  //? Almost everything this function does, will be cleaned on 'clearConfig' process
+  //? But it's necessary
+  function setTextDefaultConfig(LFOArray){
+    for (var i in LFOArray){
+      var obj = LFOArray[i]
+      for (var k in config.defaultTextFormat)
+        if (!obj.hasOwnProperty(k))
+          obj[k] = config.defaultTextFormat[k]
+    }
+  }
+
   function setConf(layerFormat, prop, value){
     if (isNotUndef(value)) layerFormat[prop] = value
   }
@@ -42,8 +53,10 @@ function showTabbedWindow(isStarterLayer){
   while (isNotUndef(repeatIndex)) {
 
     //? (IN TEXT EDITOR) The first one is the default
-    if (!isStarterLayer)
+    if (!isStarterLayer){
+      setTextDefaultConfig(LFOArray)
       LFOArray.unshift(config.defaultTextFormat)
+    }
 
     var obj = TabbedWindow(isStarterLayer, LFOArray, repeatIndex)
     repeatIndex = obj.repeatIndex

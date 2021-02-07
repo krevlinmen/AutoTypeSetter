@@ -111,3 +111,12 @@ function getCopy(obj){
   return copy
 }
 
+function getMerged(obj, sec){
+  const copyObj = getCopy(obj)
+  if (sec === undefined) return copyObj
+  for (var k in sec)
+    if (sec.hasOwnProperty(k))
+      copyObj[k] = sec[k]
+  return copyObj
+}
+
