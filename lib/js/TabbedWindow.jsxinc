@@ -147,8 +147,14 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
   function addTab(index){
 
     if (index === undefined || index >= LFOArray.length){
-    index = LFOArray.length
-    LFOArray.push({})
+      index = LFOArray.length
+      LFOArray.push({})
+
+      if (win.visible){
+        repeatIndex = index
+        win.close()
+        return
+      }
     }
 
     const tabName = isStarterLayer ? (index ? "Layer " + (index) : "Raw Layer") : (index ? "Format " + (index) : "Default")
@@ -160,12 +166,6 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
 
     tabPanel_nav.add ("item", tabName)
     tabPanel_nav.selection = index
-
-
-    if (win.visible){
-      repeatIndex = index
-      win.close()
-    }
   }
 
   function showTab_tabPanel() {
