@@ -670,11 +670,37 @@ function getFontNames(){
 
 function getFont(fontName) {
   if (fontName === "") return undefined
+
+  const candidates = []
+  //? Better than calling 'toLowerCase()' every time
+  const lrCaseName = fontName.toLowerCase()
+
   //? Loop through every font
   for (var i = 0; i < app.fonts.length; i++)
-    //? search a font with the name including 'fontName'
-    if (app.fonts[i].name.indexOf(fontName) > -1)
-      return app.fonts[i]
+    //? search fonts with the name including 'fontName' - case insensitive
+    if (app.fonts[i].name.toLowerCase().indexOf(lrCaseName) > -1)
+      candidates.push(app.fonts[i])
+
+  if (candidates.length === 0)
+    return undefined
+
+  if (candidates.length > 1){
+
+    //? Try to find a exact copy
+    for (var i in candidates)
+      if (candidates[i].name === fontName)
+        return candidates[i]
+    for (var i in candidates)
+      if (candidates[i].name == fontName)
+        return candidates[i]
+
+    //? Try to find a exact copy - case insensitive
+    for (var i in candidates)
+      if (candidates[i].name.toLowerCase() == lrCaseName)
+        return candidates[i]
+  }
+
+  return candidates[0]
 }
 
 function getTypeFolder(groupIndex) {

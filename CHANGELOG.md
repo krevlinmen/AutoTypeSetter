@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Color, Capitalization and Anti-Alias options for Text Format
 - lineIdentifierSuffix for customTextFormats
 
+### Fixed
+
+- Exact font names can be used now, even if another match was found first in the list of fonts
+
 ## [2.0] - 2021-02-02
 
 ### Added
