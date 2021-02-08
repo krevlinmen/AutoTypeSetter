@@ -232,14 +232,14 @@ function processText(arrayFiles) {
 
 /* --------------------------------- Helpers -------------------------------- */
 
-function throwError(message, error, notCloseWindows) {
+function throwError(message, error, notFatal) {
 
   //? Always show error message
   alert(message)
 
   //? Closes windows, else Crash
 
-  if (!notCloseWindows){
+  if (!notFatal){
     try {
       mainWindowObj.win.close()
     } catch (error) {}
@@ -247,14 +247,15 @@ function throwError(message, error, notCloseWindows) {
     try {
       ProcessingWindowObj.close()
     } catch (error) {}
+
+    if (error === undefined)
+      throw new Error(message)
+    else {
+      alert(error)
+      throw error
+    }
   }
 
-  if (error === undefined)
-    throw new Error(message)
-  else {
-    alert(error)
-    throw error
-  }
 }
 
 function saveAndCloseFile(file) {
@@ -1009,20 +1010,61 @@ function formatLayer(layer, format) {
       txt.color = color
     }
 
-    if (isNotUndef(format.justification) && format.justification.length)
-      txt.justification = Justification[format.justification.toUpperCase()]
-    if (isNotUndef(format.language) && format.language.length)
-      txt.language = Language[format.language.toUpperCase()]
-    if (isNotUndef(format.antiAlias) && format.antiAlias.length)
-      txt.antiAliasMethod = AntiAlias[format.antiAlias.toUpperCase()]
-    if (isNotUndef(format.capitalization) && format.capitalization.length)
-      txt.capitalization = TextCase[format.capitalization.toUpperCase()]
-
-
     if (isNotUndef(format.boxText)) {
       if (!format.boxText) txt.width = 9999 //! Without this, the text is cut out
       txt.kind = format.boxText ? TextType.PARAGRAPHTEXT : TextType.POINTTEXT
     }
+
+
+    if (isNotUndef(format.justification) && format.justification.length){
+
+      try {
+        var just = format.justification.toUpperCase()
+      } catch (error) {
+        throwError("Text format justification is not valid.", error)
+      }
+
+      if (txt.kind === TextType.POINTTEXT){
+        switch (just) {
+          case "CENTER":
+          case "LEFT":
+          case "RIGHT":
+            break;
+          default:
+            throwError("Point Text only supports \"CENTER\", \"LEFT\" and \"RIGHT\" justification methods. \nYou provided " + just, undefined, true)
+            just = ""
+            format.justification = undefined
+          }
+      }
+
+      if (just)
+        try {
+          txt.justification = Justification[just]
+        } catch (error) {
+          throwError("Text format justification is not valid.", error)
+        }
+    }
+
+    if (isNotUndef(format.language) && format.language.length)
+      try {
+        txt.language = Language[format.language.toUpperCase()]
+      } catch (error) {
+        throwError("Text format language is not valid.", error)
+      }
+
+    if (isNotUndef(format.antiAlias) && format.antiAlias.length)
+      try {
+        txt.antiAliasMethod = AntiAlias[format.antiAlias.toUpperCase()]
+      } catch (error) {
+        throwError("Text format anti aliasing method is not valid.", error)
+      }
+
+    if (isNotUndef(format.capitalization) && format.capitalization.length)
+      try {
+        txt.capitalization = TextCase[format.capitalization.toUpperCase()]
+      } catch (error) {
+        throwError("Text format capitalization method is not valid.", error)
+      }
 
   }
 
@@ -1157,12 +1199,9 @@ function calculatePositions(textArray) {
     if (format.boxText === undefined || format.boxText) return 0
 
     switch ( format.justification ? format.justification.toUpperCase() : "" ) {
-      case "FULLYJUSTIFIED":
       case "LEFT":
-      case "LEFTJUSTIFIED":
         return 0
       case "RIGHT":
-      case  "RIGHTJUSTIFIED":
         return layerPosition.width
       default:
         return layerPosition.width / 2
