@@ -86,6 +86,8 @@ ProcessingWindowObj.startBtn.onClick = function () {
 var textFile;
 var duplicatedLayer;
 var convertAllToRGB;
+var currentGroup;
+var mainGroup;
 var alreadyCreatedTextFolder = false;
 var config = {};
 var continueProcessing = true
@@ -268,9 +270,9 @@ function ensureValidColorMode() {
   if (activeDocument.mode == DocumentMode.INDEXEDCOLOR){
 
     if (convertAllToRGB === undefined)
-      convertAllToRGB = confirm("Indexed color mode don't let us change the layers.\nYou want to change all necessary files to RGB mode?", false, "Invalid Color Mode")
+      convertAllToRGB = confirm("Indexed color mode doesn't allow changing layers.\nWould you like to change all necessary files to RGB mode?", false, "Invalid Color Mode")
 
-    const res = convertAllToRGB ? true : confirm("Indexed color mode don't let us change the layers.\nYou want to change the mode to RGB?", false, "Invalid Color Mode")
+    const res = convertAllToRGB ? true : confirm("Indexed color mode doesn't allow changing layers.\nWould you like to change the mode to RGB?", false, "Invalid Color Mode")
 
     if (res) activeDocument.changeMode(ChangeMode.RGB)
     else return true //? User refused
@@ -1017,7 +1019,10 @@ function formatLayer(layer, format) {
       txt.capitalization = TextCase[format.capitalization.toUpperCase()]
 
 
-    if (isNotUndef(format.boxText)) txt.kind = format.boxText ? TextType.PARAGRAPHTEXT : TextType.POINTTEXT
+    if (isNotUndef(format.boxText)) {
+      if (!format.boxText) txt.width = 9999 //! Without this, the text is cut out
+      txt.kind = format.boxText ? TextType.PARAGRAPHTEXT : TextType.POINTTEXT
+    }
 
   }
 
@@ -1038,8 +1043,6 @@ function formatLayer(layer, format) {
 //? Function for inserting texts in each page
 function insertPageTexts(page, updateAtEachLine) {
   const positionArray = calculatePositions(page)
-  var currentGroup
-  var mainGroup
 
   for (var i in page) {
     var format = findFormat(page[i])
@@ -1047,14 +1050,17 @@ function insertPageTexts(page, updateAtEachLine) {
 
     if (!continueProcessing) break;
 
-    writeTextLayer(line, i < page.length - 1, positionArray[i], format, currentGroup)
-    if (updateAtEachLine) ProcessingWindowObj.update()
+    writeTextLayer(line, i < page.length - 1, positionArray[i], format)
+    if (updateAtEachLine){
+      ProcessingWindowObj.update()
+      app.refresh()
+    }
   }
 
 }
 
 
-function writeTextLayer(text, activateDuplication, positionArray, format) {
+function writeTextLayer(text, activateDuplication, positionObj, format) {
 
 
   function defaultTextLayer() {
@@ -1063,33 +1069,30 @@ function writeTextLayer(text, activateDuplication, positionArray, format) {
       mainGroup = getTypeFolder()
     }
 
-    currentGroup = getTypeFolder(config.columnGroup ? positionArray.group : undefined)
+    currentGroup = getTypeFolder(config.columnGroup ? positionObj.group : undefined)
 
     const txtLayer = currentGroup.artLayers.add()
     txtLayer.name = "PlaceHolder Layer"
     txtLayer.kind = LayerKind.TEXT
 
     //* Default Formatting
-    if (isNotUndef(config.defaultTextFormat))
-      formatLayer(txtLayer, config.defaultTextFormat)
+    formatLayer(txtLayer, config.defaultTextFormat)
     return txtLayer;
   }
 
-
   const txtLayer = duplicatedLayer === undefined ? defaultTextLayer() : duplicatedLayer
 
-
   if (config.columnGroup){
-  if (!currentGroup.name.endsWith((positionArray.group.toString()))){
-    currentGroup = getTypeFolder(positionArray.group)
-    txtLayer.move(currentGroup,ElementPlacement.INSIDE)
+    if (!currentGroup.name.endsWith((positionObj.group.toString()))){
+      currentGroup = getTypeFolder(positionObj.group)
+      txtLayer.move(currentGroup,ElementPlacement.INSIDE)
+    }
   }
-}
-  duplicatedLayer = undefined;
 
-  if (activateDuplication){
+  duplicatedLayer = undefined;
+  if (activateDuplication)
     duplicatedLayer = txtLayer.duplicate()
-  }
+
   //* Set Text
   txtLayer.textItem.contents = text
   txtLayer.name = text
@@ -1098,10 +1101,14 @@ function writeTextLayer(text, activateDuplication, positionArray, format) {
 
   //? Positioning
 
-  txtLayer.textItem.position = [positionArray.xPosition, positionArray.yPosition]
-  txtLayer.textItem.width = positionArray.width
-  txtLayer.textItem.height = positionArray.height
+  txtLayer.textItem.position = [positionObj.xPosition, positionObj.yPosition]
 
+  const boxText = format && isNotUndef(format.boxText) ? format.boxText : config.defaultTextFormat.boxText
+
+  if (boxText) {
+    txtLayer.textItem.width = positionObj.width
+    txtLayer.textItem.height = positionObj.height
+  }
 }
 
 //* Calculate the positioning of all the text in a page
@@ -1279,11 +1286,13 @@ function MainWindow() {
   }
 
   UI.starterLayersBtn.onClick = function () {
+    getUIConfigs()
     showTabbedWindow(true)
     setUIConfigs()
   }
 
   UI.customTextFormatsBtn.onClick = function () {
+    getUIConfigs()
     showTabbedWindow(false)
     setUIConfigs()
   }
