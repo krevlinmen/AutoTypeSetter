@@ -1134,7 +1134,9 @@ function calculatePositions(textArray) {
 
     layerPosition.height = (format.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * format.size / 7))) //! Attention
 
+    layerPosition.xPosition += pointTextXoffset(format)
     positionData.push(getCopy(layerPosition))
+    layerPosition.xPosition -= pointTextXoffset(format)
 
     layerPosition.yPosition += yBorder + layerPosition.height //*yPosition += The size of the text Box + border
 
@@ -1147,7 +1149,25 @@ function calculatePositions(textArray) {
 
     layerPosition.height = undefined //? Resets height for custom format check
   }
+
   return positionData
+
+
+  function pointTextXoffset(format){
+    if (format.boxText === undefined || format.boxText) return 0
+
+    switch ( format.justification ? format.justification.toUpperCase() : "" ) {
+      case "FULLYJUSTIFIED":
+      case "LEFT":
+      case "LEFTJUSTIFIED":
+        return 0
+      case "RIGHT":
+      case  "RIGHTJUSTIFIED":
+        return layerPosition.width
+      default:
+        return layerPosition.width / 2
+    }
+  }
 }
 
 
