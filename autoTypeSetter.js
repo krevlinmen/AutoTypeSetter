@@ -83,6 +83,7 @@ ProcessingWindowObj.cancelBtn.onClick = function () {
 ProcessingWindowObj.startBtn.onClick = function () {
   ProcessingWindowObj.startBtn.enabled = false;
   ProcessingWindowObj.startBtn.onClick = undefined; //? Ensure this will run only once
+  ProcessingWindowObj.update(); //? First currently working
   if (typeof ExecuteProcess === "function") ExecuteProcess();
   ProcessingWindowObj.close();
 };
@@ -96,7 +97,7 @@ var currentGroup;
 var mainGroup;
 var alreadyCreatedTextFolder = false;
 var config = {};
-var continueProcessing = true
+var continueProcessing = false //? Flag that initialize the main process
 var ExecuteProcess = function () {}
 
 /* -------------------------------------------------------------------------- */
@@ -111,28 +112,24 @@ function main() {
   //? Save Configurations
   const savedDialogMode = app.displayDialogs
   //? Change Configurations
-  app.displayDialogs = DialogModes.NO //change to NO by the End
+  app.displayDialogs = DialogModes.ERROR //change to NO by the End
 
-  writeProgramInfo() // Archive for debugging porpoises
-
-  mainWindowObj.Executing = function () {
-    alert("Executing")
-
-    //* The Whole program is this line
-    processText(mainWindowObj.arrayFiles)
-
-    //* Commented Until we discuss how to handle uncaught errors
-    // try {} catch (error) {
-    //   //? Closes the windows if an error occurs, else PhotoShop crashes
-    //   throwError("Something really bad happened", error)
-    // }
-  }
+  writeProgramInfo() // Archive for debugging purposes
 
   //? Read Configuration
   readConfig()
 
   //? Show UI window
   mainWindowObj.initialize()
+
+  //* Execute Process
+  if (continueProcessing) processText(mainWindowObj.arrayFiles)
+
+  //* Commented Until we discuss how to handle uncaught errors
+  // try {} catch (error) {
+  //   //? Closes the windows if an error occurs, else PhotoShop crashes
+  //   throwError("Something really bad happened", error)
+  // }
 
   //? Restore Configurations
   app.displayDialogs = savedDialogMode
@@ -1145,18 +1142,27 @@ function writeTextLayer(text, activateDuplication, positionObj, format) {
   txtLayer.textItem.contents = text
   txtLayer.name = text
 
-  if (format) formatLayer(txtLayer, format)
+  if (format)
+    try {
+      // alert("Formatting Layer")
+      formatLayer(txtLayer, format)
+    } catch (error) {
+      throwError("Some error occured while formating the text layer", error)
+    }
 
   //? Positioning
 
+  // alert("Positioning Layer\nX: " + positionObj.xPosition + "\nY: " + positionObj.yPosition)
   txtLayer.textItem.position = [positionObj.xPosition, positionObj.yPosition]
 
-  const boxText = format && isNotUndef(format.boxText) ? format.boxText : config.defaultTextFormat.boxText
+  const boxText = txtLayer.textItem.kind === TextType.PARAGRAPHTEXT
 
   if (boxText) {
+    // alert("Changing layer size\nWidth: " + positionObj.width + "\nHeight: " + positionObj.height)
     txtLayer.textItem.width = positionObj.width
     txtLayer.textItem.height = positionObj.height
   }
+  // alert("Layer Complete")
 }
 
 //* Calculate the positioning of all the text in a page
@@ -1179,6 +1185,12 @@ function calculatePositions(textArray) {
     //? 'format' will be undefined if 'config.disableCustomTextFormats' is true
     //? or if it was not found
     if (!format) format = config.defaultTextFormat
+    //? If 'format.size' is undefined, use from default
+    if (format.size === undefined) format.size = config.defaultTextFormat.size
+    //? If 'format.size' still is undefined, call error
+    if (format.size === undefined) throwError("Font size is undefined")
+    //? If 'format.size' is 0, use 16 as default
+    if (format.size === 0) format.size = 16
 
     layerPosition.height = (format.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * format.size / 7))) //! Attention
 
@@ -1229,7 +1241,6 @@ function MainWindow() {
 
   //* Set New Variables
   UI.arrayFiles = []
-  UI.Executing = undefined
   UI.firstFont = undefined
 
 
@@ -1410,15 +1421,14 @@ function MainWindow() {
   }
 
   UI.confirmBtn.onClick = function () {
-    UI.confirmBtn.onClick = undefined //? Ensure This will run only once
-
     //* Close Window
     UI.win.close()
 
     //* Set Configuration Object
     getUIConfigs()
 
-    if (typeof UI.Executing === "function") UI.Executing();
+    //* Flag to initialize the program
+    continueProcessing = true
   }
 
   return UI

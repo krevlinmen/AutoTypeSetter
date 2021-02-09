@@ -29,8 +29,7 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
   this.currentlyWorkingText = panel1.add("statictext", undefined, undefined, {
     name: "currentlyWorkingText",
   });
-  
-  this.currentlyWorkingText.text = "Text";
+
   this.currentlyWorkingText.justify = "center";
 
   // WIN
@@ -77,11 +76,13 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
 
   this.win.cancelElement = this.cancelBtn
   this.win.defaultElement = this.startBtn
+  this.currentlyWorkingText.text = "Nothing";
 
   this.initialize = function initialize(filesOrder) {
     //? Clear All
     this.listBox.removeAll();
     this.startBtn.enabled = true;
+    this.progressSlider.value = 0;
 
     //? Adds each file and page to the box element on the progress Bar.
     if (Array.isArray(filesOrder))
@@ -89,7 +90,7 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
     else
       for (var page in filesOrder){
         var text = "Page " + page +  "  ->  " +   (filesOrder[page] ? filesOrder[page].name : "")
-        
+
         this.listBox.add(
           "item",
           text
@@ -97,9 +98,6 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
 
     //? fullLength is used in Updating the bar
     this.fullLength = getKeys(filesOrder).length;
-
-    //? First currently working
-    this.update();
 
     //? Open the window
     this.win.show();
@@ -111,9 +109,9 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
     this.progressSlider.value = 1 - this.listBox.items.length / this.fullLength;
 
     if (this.listBox.items.length) {
-      
-      
-      
+
+
+
       if (this.listBox.items[0].text.length > 25){//! Hardcoded number, looked up through experimentation
         if(this.listBox.items[0].text.length > 40){
           this.listBox.items[0].text = this.listBox.items[0].text.slice(0,35) + "(...)"
