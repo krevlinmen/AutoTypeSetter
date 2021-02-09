@@ -277,18 +277,9 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
 
 function createCustomFormatTab(index, layerFormat, tabPanel_innerwrap, tabName){
 
-
-
-
-var antiAliasDD_array = getKeys(antiAliasObj)
-var justificationDD_array = getKeys(justificationObj)
-var languageDD_array = getKeys(languageObj)
-var capitalizationDD_array = getKeys(capitalizationObj)
-var blendModeDD_array = getKeys(blendModeObj)
-
    /*
     Code for Import https://scriptui.joonas.me — (Triple click to select):
-    {"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"text":"Custom Layer Editor","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["left","top"],"varName":"tabPanel_innerwrap","windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"enabled":true}},"item-42":{"id":42,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-43":{"id":43,"type":"StaticText","parentId":42,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Prefix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-44":{"id":44,"type":"EditText","parentId":42,"style":{"enabled":true,"varName":"lineIdentifierPrefixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-48":{"id":48,"type":"Checkbox","parentId":102,"style":{"enabled":true,"varName":"visibleCB","text":"Visible","preferredSize":[0,0],"alignment":null,"helpTip":"Visibility of the layer","checked":true}},"item-51":{"id":51,"type":"Panel","parentId":96,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Font","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-56":{"id":56,"type":"Checkbox","parentId":102,"style":{"enabled":true,"varName":"groupedCB","text":"Clipping Mask","preferredSize":[0,0],"alignment":null,"helpTip":""}},"item-58":{"id":58,"type":"Slider","parentId":59,"style":{"enabled":true,"varName":"opacitySlider","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-59":{"id":59,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-60":{"id":60,"type":"StaticText","parentId":59,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Opacity","justify":"left","preferredSize":[0,0],"alignment":"center","helpTip":null}},"item-61":{"id":61,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-64":{"id":64,"type":"Button","parentId":107,"style":{"enabled":true,"varName":"deleteBtn","text":"Delete","justify":"center","preferredSize":[200,0],"alignment":"fill","helpTip":"Delete this format"}},"item-67":{"id":67,"type":"Panel","parentId":105,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":8,"alignChildren":["fill","top"],"alignment":"fill"}},"item-68":{"id":68,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-69":{"id":69,"type":"StaticText","parentId":68,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Blend Mode","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-70":{"id":70,"type":"DropDownList","parentId":68,"style":{"enabled":true,"varName":"blendModeDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-71":{"id":71,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-72":{"id":72,"type":"StaticText","parentId":71,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Suffix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-73":{"id":73,"type":"EditText","parentId":71,"style":{"enabled":true,"varName":"lineIdentifierSuffixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-74":{"id":74,"type":"EditText","parentId":51,"style":{"enabled":true,"varName":"fontBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-75":{"id":75,"type":"DropDownList","parentId":51,"style":{"enabled":true,"varName":"fontListDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-76":{"id":76,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-77":{"id":77,"type":"StaticText","parentId":76,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Size (px)","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-78":{"id":78,"type":"EditText","parentId":76,"style":{"enabled":true,"varName":"sizeBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":"fill","helpTip":"Leave 0 to not change text size"}},"item-80":{"id":80,"type":"EditText","parentId":103,"style":{"enabled":true,"varName":"colorBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":"Leave blank to not change text color"}},"item-81":{"id":81,"type":"Button","parentId":103,"style":{"enabled":true,"varName":"pickColorBtn","text":"Pick Color","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"Open window to select a color","selection":0}},"item-82":{"id":82,"type":"Checkbox","parentId":101,"style":{"enabled":true,"varName":"boxTextCB","text":"Box Text","preferredSize":[0,0],"alignment":null,"helpTip":"If marked, a \"Text Box\" will be used instead of a \"Point Text\""}},"item-83":{"id":83,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-84":{"id":84,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-85":{"id":85,"type":"StaticText","parentId":84,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Justification","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-86":{"id":86,"type":"DropDownList","parentId":84,"style":{"enabled":true,"varName":"justificationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-87":{"id":87,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-88":{"id":88,"type":"StaticText","parentId":87,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Language","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-89":{"id":89,"type":"DropDownList","parentId":87,"style":{"enabled":true,"varName":"languageDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-90":{"id":90,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-91":{"id":91,"type":"StaticText","parentId":90,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Capitalization","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-92":{"id":92,"type":"DropDownList","parentId":90,"style":{"enabled":true,"varName":"capitalizationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-93":{"id":93,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-94":{"id":94,"type":"StaticText","parentId":93,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Anti Aliasing","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-95":{"id":95,"type":"DropDownList","parentId":93,"style":{"enabled":true,"varName":"antiAliasDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-96":{"id":96,"type":"Group","parentId":106,"style":{"enabled":true,"varName":"column1","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-97":{"id":97,"type":"Group","parentId":106,"style":{"enabled":true,"varName":"column2","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-99":{"id":99,"type":"StaticText","parentId":100,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"WARNING:\nBoth Line Identifiers\nare Blank!\nThis page is deactivated...","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-100":{"id":100,"type":"Group","parentId":96,"style":{"enabled":true,"varName":"warningGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","top"],"alignment":null}},"item-101":{"id":101,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-102":{"id":102,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-103":{"id":103,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-104":{"id":104,"type":"StaticText","parentId":103,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Color","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-105":{"id":105,"type":"Group","parentId":0,"style":{"enabled":true,"varName":"tab","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","fill"],"alignment":null}},"item-106":{"id":106,"type":"Group","parentId":67,"style":{"enabled":true,"varName":"columnWrapper","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","bottom"],"alignment":null}},"item-107":{"id":107,"type":"Group","parentId":67,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}}},"order":[0,105,67,106,96,100,99,42,43,44,71,72,73,101,82,76,77,78,51,74,75,97,83,93,94,95,84,85,86,87,88,89,90,91,92,68,69,70,61,103,104,80,81,59,60,58,102,48,56,107,64],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"functionWrapper":false,"compactCode":false,"showDialog":true,"afterEffectsDockable":false,"itemReferenceList":"var"},"activeId":67}
+    {"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"text":"Custom Layer Editor","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["left","top"],"varName":"tabPanel_innerwrap","windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"enabled":true}},"item-42":{"id":42,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-43":{"id":43,"type":"StaticText","parentId":42,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Prefix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-44":{"id":44,"type":"EditText","parentId":42,"style":{"enabled":true,"varName":"lineIdentifierPrefixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-48":{"id":48,"type":"Checkbox","parentId":102,"style":{"enabled":true,"varName":"visibleCB","text":"Visible","preferredSize":[0,0],"alignment":null,"helpTip":"Visibility of the layer","checked":true}},"item-51":{"id":51,"type":"Panel","parentId":96,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Font","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-56":{"id":56,"type":"Checkbox","parentId":102,"style":{"enabled":true,"varName":"groupedCB","text":"Clipping Mask","preferredSize":[0,0],"alignment":null,"helpTip":""}},"item-58":{"id":58,"type":"Slider","parentId":59,"style":{"enabled":true,"varName":"opacitySlider","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-59":{"id":59,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-60":{"id":60,"type":"StaticText","parentId":59,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Opacity","justify":"left","preferredSize":[0,0],"alignment":"center","helpTip":null}},"item-61":{"id":61,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-64":{"id":64,"type":"Button","parentId":107,"style":{"enabled":true,"varName":"deleteBtn","text":"Delete","justify":"center","preferredSize":[200,0],"alignment":"fill","helpTip":"Delete this format"}},"item-67":{"id":67,"type":"Panel","parentId":105,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":8,"alignChildren":["fill","top"],"alignment":"fill"}},"item-68":{"id":68,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-69":{"id":69,"type":"StaticText","parentId":68,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Blend Mode","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-70":{"id":70,"type":"DropDownList","parentId":68,"style":{"enabled":true,"varName":"blendModeDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-71":{"id":71,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-72":{"id":72,"type":"StaticText","parentId":71,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Suffix","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-73":{"id":73,"type":"EditText","parentId":71,"style":{"enabled":true,"varName":"lineIdentifierSuffixBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-74":{"id":74,"type":"EditText","parentId":51,"style":{"enabled":true,"varName":"fontBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[100,0],"alignment":"fill","helpTip":null}},"item-75":{"id":75,"type":"DropDownList","parentId":51,"style":{"enabled":true,"varName":"fontDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-76":{"id":76,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":6,"alignChildren":["right","center"],"alignment":null}},"item-77":{"id":77,"type":"StaticText","parentId":76,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Size (px)","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-78":{"id":78,"type":"EditText","parentId":76,"style":{"enabled":true,"varName":"sizeBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":"fill","helpTip":"Leave 0 to not change text size"}},"item-80":{"id":80,"type":"EditText","parentId":103,"style":{"enabled":true,"varName":"colorBox","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"","justify":"left","preferredSize":[50,0],"alignment":null,"helpTip":"Leave blank to not change text color"}},"item-81":{"id":81,"type":"Button","parentId":103,"style":{"enabled":true,"varName":"pickColorBtn","text":"Pick Color","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"Open window to select a color","selection":0}},"item-82":{"id":82,"type":"Checkbox","parentId":101,"style":{"enabled":true,"varName":"boxTextCB","text":"Box Text","preferredSize":[0,0],"alignment":null,"helpTip":"If marked, a \"Text Box\" will be used instead of a \"Point Text\""}},"item-83":{"id":83,"type":"Panel","parentId":97,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-84":{"id":84,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-85":{"id":85,"type":"StaticText","parentId":84,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Justification","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-86":{"id":86,"type":"DropDownList","parentId":84,"style":{"enabled":true,"varName":"justificationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-87":{"id":87,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-88":{"id":88,"type":"StaticText","parentId":87,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Language","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-89":{"id":89,"type":"DropDownList","parentId":87,"style":{"enabled":true,"varName":"languageDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-90":{"id":90,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-91":{"id":91,"type":"StaticText","parentId":90,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Capitalization","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-92":{"id":92,"type":"DropDownList","parentId":90,"style":{"enabled":true,"varName":"capitalizationDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-93":{"id":93,"type":"Group","parentId":83,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}},"item-94":{"id":94,"type":"StaticText","parentId":93,"style":{"enabled":true,"varName":"","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Anti Aliasing","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-95":{"id":95,"type":"DropDownList","parentId":93,"style":{"enabled":true,"varName":"antiAliasDD","text":"DropDownList","listItems":"Item","preferredSize":[0,0],"alignment":"fill","selection":0,"helpTip":null}},"item-96":{"id":96,"type":"Group","parentId":106,"style":{"enabled":true,"varName":"column1","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-97":{"id":97,"type":"Group","parentId":106,"style":{"enabled":true,"varName":"column2","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-99":{"id":99,"type":"StaticText","parentId":100,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":true,"text":"WARNING:\nBoth Line Identifiers\nare Blank!\nThis page is deactivated...","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-100":{"id":100,"type":"Group","parentId":96,"style":{"enabled":true,"varName":"warningGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","top"],"alignment":null}},"item-101":{"id":101,"type":"Group","parentId":96,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-102":{"id":102,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-103":{"id":103,"type":"Group","parentId":61,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["right","center"],"alignment":null}},"item-104":{"id":104,"type":"StaticText","parentId":103,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Color","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-105":{"id":105,"type":"Group","parentId":0,"style":{"enabled":true,"varName":"tab","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","fill"],"alignment":null}},"item-106":{"id":106,"type":"Group","parentId":67,"style":{"enabled":true,"varName":"columnWrapper","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","bottom"],"alignment":null}},"item-107":{"id":107,"type":"Group","parentId":67,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["center","center"],"alignment":null}}},"order":[0,105,67,106,96,100,99,42,43,44,71,72,73,101,82,76,77,78,51,74,75,97,83,93,94,95,84,85,86,87,88,89,90,91,92,68,69,70,61,103,104,80,81,59,60,58,102,48,56,107,64],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"functionWrapper":false,"compactCode":false,"showDialog":true,"afterEffectsDockable":false,"itemReferenceList":"var"},"activeId":67}
     */
 
 // TAB
@@ -417,9 +408,9 @@ var fontBox = panel2.add('edittext {properties: {name: "fontBox"}}');
     fontBox.preferredSize.width = 100;
     fontBox.alignment = ["fill","top"];
 
-var fontListDD = panel2.add("dropdownlist", undefined, undefined, {name: "fontListDD", items: fontListDD_array});
-    fontListDD.selection = 0;
-    fontListDD.alignment = ["fill","top"];
+var fontDD = panel2.add("dropdownlist", undefined, undefined, {name: "fontDD", items: fontDD_array});
+    fontDD.selection = 0;
+    fontDD.alignment = ["fill","top"];
 
 // COLUMN2
 // =======
@@ -599,19 +590,6 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
   //? --------- Variables ---------
 
   var changedByBox = true
-  var warningShowing = false
-
-  //? --------- Conditional Object Creation ---------
-
-
-  if (index){
-    //? Index is more than 1
-  } else {
-    //? Index is 0
-    group1.enabled = false
-    group2.enabled = false
-    deleteBtn.enabled = false
-  }
 
   //? --------- Functions ---------
 
@@ -621,8 +599,8 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
   }
 
   function updateFontListDD(fontString) {
-    var fontListDDFont = getFont(fontString)
-    fontListDD.selection = isNotUndef(fontListDDFont) ? fontListDD.find(fontListDDFont.name) | 0 : 0
+    var fontDDFont = getFont(fontString)
+    fontDD.selection = isNotUndef(fontDDFont) ? fontDD.find(fontDDFont.name) | 0 : 0
   }
 
   function warning(show){
@@ -641,8 +619,6 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
     else
       for (var i = 0; i < 4; i++)
         statictext1.children[i].text = ""
-
-
   }
 
   //? --------- Set Properties ---------
@@ -651,7 +627,7 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
   tab.visible = false;
   columnWrapper.alignChildren = ["fill","bottom"];
 
-  fontListDD.maximumSize = dropDownSizes
+  fontDD.maximumSize = dropDownSizes
   antiAliasDD.maximumSize = dropDownSizes
   justificationDD.maximumSize = dropDownSizes
   languageDD.maximumSize = dropDownSizes
@@ -665,61 +641,17 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
   colorBox.preferredSize.width = identifiersWidth
   sizeBox.preferredSize.width = identifiersWidth * 0.8
 
+  if (!index){
+    //? Index is 0
+    group1.enabled = false
+    group2.enabled = false
+    deleteBtn.enabled = false
+  }
+
+  //? --------- Set Values ---------
+
   lineIdentifierPrefixBox.text = isNotUndef(layerFormat.lineIdentifierPrefix) ?  layerFormat.lineIdentifierPrefix : defaultConfig.LayerFormatObject.lineIdentifierPrefix
   lineIdentifierSuffixBox.text = isNotUndef(layerFormat.lineIdentifierSuffix) ?  layerFormat.lineIdentifierSuffix : defaultConfig.LayerFormatObject.lineIdentifierSuffix
-  //? Setting the onChanging() after setting the text is necessary
-  lineIdentifierPrefixBox.onChanging = warning
-  lineIdentifierSuffixBox.onChanging = warning
-
-  opacitySlider.onChange = function () {
-    opacitySlider.helpTip = opacitySlider.value
-  }
-  opacitySlider.onChanging = opacitySlider.onChange //? Fallback
-
-  sizeBox.onChanging = function () {
-    ensureFontSizeUI(sizeBox)
-  }
-  sizeBox.onChange = sizeBox.onChanging
-
-  colorBox.onChanging = function () {
-    const s = colorBox.text
-    if (s){
-      s = s.replace(/[^0-9A-F]/i,"").toUpperCase()
-      s = "#" + s.replace("#","")
-      s = s.slice(0,"#000000".length)
-    }
-    colorBox.text = s
-  }
-  colorBox.onChange = function () {
-    if (colorBox.active) return
-    const s = colorBox.text
-    if (s && !isHexColor(s)) s = "#000000"
-    colorBox.text = s
-  }
-
-  pickColorBtn.onClick = function (){
-    colorBox.text = getAnotherColor(colorBox.text)
-  }
-
-  fontBox.onChanging = function () {
-    changedByBox = true
-    updateFontListDD(fontBox.text)
-  }
-
-  fontListDD.onChange = function () {
-    if (changedByBox){
-      changedByBox = false
-      return
-    }
-    changedByBox = false
-    fontBox.text = fontListDD.selection.index ? fontListDD.selection.text : defaultConfig.LayerFormatObject.font
-  }
-
-  deleteBtn.onClick = function () {
-    tabPanel_innerwrap.deleteTab(tabName)
-  }
-
-
   sizeBox.text = isNotUndef(layerFormat.size) ?  layerFormat.size : defaultConfig.LayerFormatObject.size
   boxTextCB.value = isNotUndef(layerFormat.boxText) ?  layerFormat.boxText : defaultConfig.LayerFormatObject.boxText
   fontBox.text = isNotUndef(layerFormat.font) ?  layerFormat.font : defaultConfig.LayerFormatObject.font
@@ -736,7 +668,61 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
 
   updateFontListDD(isNotUndef(layerFormat.font) ? layerFormat.font :  defaultConfig.LayerFormatObject.font)
 
-  opacitySlider.onChange()
+  //? --------- Set Callbacks ---------
+
+  lineIdentifierPrefixBox.onChanging = warning
+  lineIdentifierSuffixBox.onChanging = warning
+
+  opacitySlider.onChanging = function () {
+    opacitySlider.helpTip = opacitySlider.value
+  }
+  opacitySlider.onChange = opacitySlider.onChanging //? Fallback
+
+  sizeBox.onChanging = function () {
+    ensureFontSizeUI(sizeBox)
+  }
+  sizeBox.onChange = sizeBox.onChanging
+
+  colorBox.onChanging = function () {
+    const s = colorBox.text
+    if (s){
+      s = s.replace(/[^0-9A-F]/i,"").toUpperCase()
+      s = "#" + s.replace("#","")
+      s = s.slice(0,"#000000".length)
+      colorBox.text = s
+    }
+  }
+  colorBox.onChange = function () {
+    if (colorBox.active) return
+    const s = colorBox.text
+    if (s && !isHexColor(s)) colorBox.text = "#000000"
+  }
+
+  pickColorBtn.onClick = function (){
+    colorBox.text = getAnotherColor(colorBox.text)
+    colorBox.onChange()
+  }
+
+  fontBox.onChanging = function () {
+    changedByBox = true
+    updateFontListDD(fontBox.text)
+  }
+
+  fontDD.onChange = function () {
+    if (changedByBox){
+      changedByBox = false
+      return
+    }
+    changedByBox = false
+    fontBox.text = fontDD.selection.index ? fontDD.selection.text : defaultConfig.LayerFormatObject.font
+  }
+
+  deleteBtn.onClick = function () {
+    tabPanel_innerwrap.deleteTab(tabName)
+  }
+
+
+  opacitySlider.onChanging()
   sizeBox.onChanging()
   colorBox.onChanging()
   colorBox.onChange()
@@ -750,7 +736,7 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
     sizeBox: sizeBox, // edittext
     boxTextCB: boxTextCB, // checkbox
     fontBox: fontBox, // edittext
-    fontListDD: fontListDD, // dropdownlist
+    fontDD: fontDD, // dropdownlist
     deleteBtn: deleteBtn, // button
     colorBox: colorBox, // edittext
     pickColorBtn: pickColorBtn, // button
@@ -775,8 +761,6 @@ var deleteBtn = group13.add("button", undefined, undefined, {name: "deleteBtn"})
 
 
 function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
-
-  var blendModeDD_array = getKeys(blendModeObj)
 
   /*
   Just Tab Part:
@@ -902,8 +886,6 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
 
   //? --------- Conditional Object Creation ---------
 
-
-
   if (index){
     //? Index is more than 1
 
@@ -929,20 +911,20 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
 
   //? --------- Functions ---------
 
-
   function changeOne(element, enabled, value){
     element.enabled = enabled
 
     if (isNotUndef(value)){
-
-    if (element.type == "checkbox"){
-      element.value = value
-
-    } else if (element.type == "slider" && !value){
-      element.value = 100
-      element.onChange()
-    }
-
+      if (element.type == "checkbox"){
+        element.value = value
+        if (element.onClick) element.onClick()
+      } else if (element.type == "slider" && !value){
+        element.value = 100
+        if (element.onChanging) element.onChanging()
+      } else if (element.type == "dropdownlist" && !value){
+        element.selection = 0
+        if (element.onChange) element.onChange()
+      }
     }
   }
 
@@ -951,61 +933,15 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
     changeOne(array[i], enabled, value)
   }
 
-
-
   //? --------- Set Properties ---------
 
   tab.alignment = ["fill","fill"];
   tab.visible = false;
 
   blendModeDD.maximumSize = dropDownSizes
+  groupedCB.enabled = !index
 
-  opacitySlider.onChange = function () {
-    opacitySlider.helpTip = opacitySlider.value
-  }
-  opacitySlider.onChanging = opacitySlider.onChange //? Fallback
-
-  allLockedCB.onClick = function () {
-    if (allLockedCB.value)
-    changeAll([transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], false, false)
-     else
-    changeAll([transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], true)
-  }
-
-
-  nameBox.onChange = function () {
-    if (!nameBox.text.length)
-    nameBox.text = defaultConfig.LayerFormatObject.name
-  }
-
-
-  if (index){
-    //? Index is more than 1
-
-    duplicateCB.value = isNotUndef(layerFormat.duplicate) ? layerFormat.duplicate : defaultConfig.LayerFormatObject.duplicate
-    deleteBtn.onClick = function () {
-      tabPanel_innerwrap.deleteTab(tabName)
-    }
-
-  } else {
-    //? Index is 0
-
-    isBackgroundLayerCB.onClick = function () {
-    if (isBackgroundLayerCB.value){
-      changeOne(visibleCB, false, true)
-      changeAll([nameBox,opacitySlider,allLockedCB,transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], false, false)
-    } else {
-      changeOne(visibleCB, true)
-      changeAll([nameBox,opacitySlider,allLockedCB,transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], true)
-    }
-    }
-
-    isBackgroundLayerCB.value = isNotUndef(layerFormat.isBackgroundLayer) ? layerFormat.isBackgroundLayer : defaultConfig.LayerFormatObject.isBackgroundLayer
-    isBackgroundLayerCB.onClick()
-
-    groupedCB.enabled = false
-  }
-
+  //? --------- Set Values ---------
 
   nameBox.text = isNotUndef(layerFormat.name) ? layerFormat.name : defaultConfig.LayerFormatObject.name
   opacitySlider.value = isNotUndef(layerFormat.opacity) ? layerFormat.opacity : defaultConfig.LayerFormatObject.opacity
@@ -1019,10 +955,56 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
   var blendModeDDKey = getKeyOf(blendModeObj, isNotUndef(layerFormat.blendMode) ? layerFormat.blendMode.toUpperCase() : defaultConfig.LayerFormatObject.blendMode)
   blendModeDD.selection = blendModeDD.find( blendModeDDKey ) | 0
 
+  if (index)
+    duplicateCB.value = isNotUndef(layerFormat.duplicate) ? layerFormat.duplicate : defaultConfig.LayerFormatObject.duplicate
+  else
+    isBackgroundLayerCB.value = isNotUndef(layerFormat.isBackgroundLayer) ? layerFormat.isBackgroundLayer : defaultConfig.LayerFormatObject.isBackgroundLayer
 
-  allLockedCB.onClick()
-  opacitySlider.onChange()
+  //? --------- Set Callbacks ---------
 
+  opacitySlider.onChanging = function () {
+    opacitySlider.helpTip = opacitySlider.value
+  }
+  opacitySlider.onChange = opacitySlider.onChanging //? Fallback
+
+  allLockedCB.onClick = function () {
+    if (allLockedCB.value)
+      changeAll([transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], false, false)
+    else
+      changeAll([transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], true)
+  }
+
+
+  nameBox.onChange = function () {
+    if (!nameBox.text.length)
+      nameBox.text = defaultConfig.LayerFormatObject.name
+  }
+
+  if (index){
+    //? Index is more than 1
+
+    deleteBtn.onClick = function () {
+      tabPanel_innerwrap.deleteTab(tabName)
+    }
+  } else {
+    //? Index is 0
+
+    isBackgroundLayerCB.onClick = function () {
+      if (isBackgroundLayerCB.value){
+        changeOne(visibleCB, false, true)
+        changeAll([nameBox,blendModeDD,opacitySlider,allLockedCB,transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], false, false)
+      } else {
+        changeOne(visibleCB, true)
+        changeAll([nameBox,blendModeDD,opacitySlider,allLockedCB,transparentPixelsLockedCB, pixelsLockedCB, positionLockedCB], true)
+      }
+    }
+  }
+
+
+
+  if (!index && isBackgroundLayerCB.value) isBackgroundLayerCB.onClick()
+  if (allLockedCB.value) allLockedCB.onClick()
+  opacitySlider.onChanging()
 
   tab.items = {
     tab: tab, // dialog

@@ -2,6 +2,20 @@ function isHexColor(string){
   return /^#[0-9A-F]{6}$/i.test(string)
 }
 
+function timeMean(func, qtd){
+  var sum = 0;
+  const arr = []
+  for (var i = 0; i < qtd; i++) {
+      $.hiresTimer
+      func()
+      arr.push($.hiresTimer)
+      sum += arr[arr.length - 1]
+  }
+  const mean = sum / qtd
+  alert("Mean: " + mean + "\n" + arr)
+  return mean
+}
+
 function getAnotherColor(initial) {
   const decimalRGB = $.colorPicker(initial ? "0x" + initial.slice(1) : 0);
   if (decimalRGB === -1) return initial;
@@ -104,6 +118,9 @@ function getKeys(obj){
 
 
 function getCopy(obj){
+  if (obj === null || typeof obj != "object")
+    return obj
+
   const copy = Array.isArray(obj) ? [] : {}
   for (var k in obj)
     if (obj.hasOwnProperty(k))

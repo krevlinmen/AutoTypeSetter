@@ -55,7 +55,13 @@ const blendModeObj = readJson("lib/dropdown/blendModeOptions.json", "Blend Mode 
 const languageObj = readJson("lib/dropdown/languageOptions.json", "Language options list")
 const antiAliasObj = readJson("lib/dropdown/antiAliasOptions.json", "Anti Aliasing options list")
 const capitalizationObj = readJson("lib/dropdown/capitalizationOptions.json", "Capitalization options list")
-const fontListDD_array = getFontNames()
+
+const justificationDD_array = getKeys(justificationObj)
+const blendModeDD_array = getKeys(blendModeObj)
+const languageDD_array = getKeys(languageObj)
+const antiAliasDD_array = getKeys(antiAliasObj)
+const capitalizationDD_array = getKeys(capitalizationObj)
+const fontDD_array = getFontNames()
 
 //* ------- MainWindow ------
 
@@ -1219,7 +1225,7 @@ function calculatePositions(textArray) {
 function MainWindow() {
 
   //* Create a new one by default
-  const UI = new createMainWindow(getKeys(justificationObj), getKeys(languageObj), fontListDD_array)
+  const UI = new createMainWindow()
 
   //* Set New Variables
   UI.arrayFiles = []
@@ -1228,7 +1234,7 @@ function MainWindow() {
 
 
   //* Dropdown Sizes
-  UI.fontListDD.maximumSize = dropDownSizes
+  UI.fontDD.maximumSize = dropDownSizes
   UI.justificationDD.maximumSize = dropDownSizes
   UI.languageDD.maximumSize = dropDownSizes
 
@@ -1265,9 +1271,9 @@ function MainWindow() {
 
     //? Complex Ones - this is used to select the valid option on every dropdown
 
-    var fontListDDFont = getFont(isNotUndef(config.defaultTextFormat.font) ? config.defaultTextFormat.font :  defaultConfig.LayerFormatObject.font)
-    UI.fontListDD.selection = isNotUndef(fontListDDFont) ? UI.fontListDD.find(fontListDDFont.name) | 0 : 0
-    if (UI.firstFont === undefined) UI.firstFont = UI.fontListDD.selection.text
+    var fontDDFont = getFont(isNotUndef(config.defaultTextFormat.font) ? config.defaultTextFormat.font :  defaultConfig.LayerFormatObject.font)
+    UI.fontDD.selection = isNotUndef(fontDDFont) ? UI.fontDD.find(fontDDFont.name) | 0 : 0
+    if (UI.firstFont === undefined) UI.firstFont = UI.fontDD.selection.text
 
     var justificationDDKey = getKeyOf(justificationObj, isNotUndef(config.defaultTextFormat.justification) ? config.defaultTextFormat.justification.toUpperCase() :  defaultConfig.LayerFormatObject.justification)
     UI.justificationDD.selection = UI.justificationDD.find( justificationDDKey ) | 0
@@ -1303,8 +1309,8 @@ function MainWindow() {
     config.defaultTextFormat.size = UI.fontSizeBox.text
     config.defaultTextFormat.boxText = UI.boxTextCB.value
 
-    if (UI.firstFont != UI.fontListDD.selection.text)
-      config.defaultTextFormat.font = UI.fontListDD.selection.index ? UI.fontListDD.selection.text : defaultConfig.LayerFormatObject.font
+    if (UI.firstFont != UI.fontDD.selection.text)
+      config.defaultTextFormat.font = UI.fontDD.selection.index ? UI.fontDD.selection.text : defaultConfig.LayerFormatObject.font
     config.defaultTextFormat.justification = justificationObj[UI.justificationDD.selection.text]
     config.defaultTextFormat.language = languageObj[UI.languageDD.selection.text]
 
