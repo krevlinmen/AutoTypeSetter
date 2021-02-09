@@ -1,88 +1,115 @@
-function ProcessingWindow() {
+function ProcessingWindow(filesOrder) {
+
+  const confirmationMode = filesOrder !== undefined
+
   /* ------------------------- Window Object Creation ------------------------- */
-//! Attention for listBox.minsize and .maxsize when importing joonas
+  //! Attention for listBox.minsize and .maxsize when importing joonas
 
   /*
-Code for Import https://scriptui.joonas.me — (Triple click to select):
-{"activeId":3,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":"win","windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":false,"borderless":false,"resizeable":false},"text":"Process Files","preferredSize":[0,397],"margins":16,"orientation":"column","spacing":10,"alignChildren":["fill","top"]}},"item-1":{"id":1,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Currently Working","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-2":{"id":2,"type":"StaticText","parentId":1,"style":{"enabled":true,"varName":"currentlyWorkingText","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Text","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-3":{"id":3,"type":"ListBox","parentId":0,"style":{"enabled":true,"varName":"listBox","creationProps":{"multiselect":false,"numberOfColumns":1,"columnWidths":"[]","columnTitles":"[]","showHeaders":false},"listItems":"Item 1, Item 2","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-4":{"id":4,"type":"Button","parentId":5,"style":{"enabled":true,"varName":"cancelBtn","text":"Cancel","justify":"center","preferredSize":[150,0],"alignment":null,"helpTip":null}},"item-5":{"id":5,"type":"Group","parentId":0,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-6":{"id":6,"type":"Button","parentId":5,"style":{"enabled":true,"varName":"startBtn","text":"Start","justify":"center","preferredSize":[150,0],"alignment":null,"helpTip":null}},"item-7":{"id":7,"type":"Slider","parentId":0,"style":{"enabled":false,"varName":"progressSlider","preferredSize":[0,0],"alignment":null,"helpTip":null}}},"order":[0,1,2,7,3,5,4,6],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"var"}}
-*/
+  Code for Import https://scriptui.joonas.me — (Triple click to select):
+  {"activeId":5,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":"win","windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":false,"borderless":false,"resizeable":false},"text":"Process Files","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["fill","top"]}},"item-1":{"id":1,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Currently Working","preferredSize":[0,0],"margins":15,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-2":{"id":2,"type":"StaticText","parentId":1,"style":{"enabled":true,"varName":"currentlyWorkingText","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Nothing","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-3":{"id":3,"type":"ListBox","parentId":0,"style":{"enabled":true,"varName":"listBox","creationProps":{"multiselect":false,"numberOfColumns":1,"columnWidths":"[]","columnTitles":"[]","showHeaders":false},"listItems":"","preferredSize":[350,300],"alignment":null,"helpTip":null,"selection":[0]}},"item-4":{"id":4,"type":"Button","parentId":5,"style":{"enabled":true,"varName":"cancelBtn","text":"Cancel","justify":"center","preferredSize":[170,0],"alignment":null,"helpTip":null}},"item-5":{"id":5,"type":"Group","parentId":0,"style":{"enabled":true,"varName":null,"preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":"center"}},"item-6":{"id":6,"type":"Button","parentId":5,"style":{"enabled":true,"varName":"startBtn","text":"Start","justify":"center","preferredSize":[170,0],"alignment":null,"helpTip":null}},"item-8":{"id":8,"type":"Progressbar","parentId":9,"style":{"enabled":true,"varName":"progressBar","preferredSize":[0,20],"alignment":null,"helpTip":null}},"item-9":{"id":9,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":10,"alignChildren":["fill","top"],"alignment":null}},"item-10":{"id":10,"type":"StaticText","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"This will be done:","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":null}}},"order":[0,1,2,9,8,10,3,5,4,6],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"var"}}
+  */
 
   // WIN
   // ===
-  this.win = new Window("dialog", undefined, undefined, { closeButton: false });
+  this.win = new Window(confirmationMode ? "dialog" : "window");
   this.win.text = "Process Files";
-  this.win.preferredSize.height = 397;
   this.win.orientation = "column";
   this.win.alignChildren = ["fill", "top"];
   this.win.spacing = 10;
   this.win.margins = 16;
 
-  // PANEL1
-  // ======
-  var panel1 = this.win.add("panel", undefined, undefined, { name: "panel1" });
-  panel1.text = "Currently Working";
-  panel1.orientation = "column";
-  panel1.alignChildren = ["fill", "top"];
-  panel1.spacing = 10;
-  panel1.margins = 10;
+  if (!confirmationMode){
+    // PANEL1
+    // ======
+    var panel1 = this.win.add("panel", undefined, undefined, { name: "panel1" });
+    panel1.text = "Currently Working";
+    panel1.orientation = "column";
+    panel1.alignChildren = ["fill", "top"];
+    panel1.spacing = 10;
+    panel1.margins = 15;
 
-  this.currentlyWorkingText = panel1.add("statictext", undefined, undefined, {
-    name: "currentlyWorkingText",
-  });
+    this.currentlyWorkingText = panel1.add("statictext", undefined, undefined, {name: "currentlyWorkingText"});
+    this.currentlyWorkingText.justify = "center";
+    this.currentlyWorkingText.text = "Nothing";
 
-  this.currentlyWorkingText.justify = "center";
+    // PANEL2
+    // ======
+    var panel2 = this.win.add("panel", undefined, undefined, {name: "panel2"});
+    panel2.orientation = "column";
+    panel2.alignChildren = ["fill","top"];
+    panel2.spacing = 10;
+    panel2.margins = 0;
 
-  // WIN
-  // ===
-  this.progressSlider = this.win.add(
-    "slider",
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    { name: "progressSlider" }
-  );
-  this.progressSlider.enabled = false;
-  this.progressSlider.minvalue = 0;
-  this.progressSlider.maxvalue = 1;
-  this.progressSlider.value = 0;
+    this.progressBar = panel2.add("progressbar", undefined, undefined, {name: "progressBar"});
+    this.progressBar.preferredSize.height = 20;
+  }
 
-  this.listBox = this.win.add("listbox", undefined, undefined, {
-    name: "listBox",
-  });
-  this.listBox.maximumSize.width = 350
-  this.listBox.minimumSize.height = 50
-  // GROUP1
-  // ======
-  var group1 = this.win.add("group", undefined, { name: "group1" });
-  group1.orientation = "row";
-  group1.alignChildren = ["left", "center"];
-  group1.spacing = 10;
-  group1.margins = 0;
 
-  this.cancelBtn = group1.add("button", undefined, undefined, {
-    name: "cancelBtn",
-  });
-  this.cancelBtn.text = "Cancel";
-  this.cancelBtn.preferredSize.width = 150;
+  if (confirmationMode){
+    var statictext1 = this.win.add("statictext", undefined, undefined, {name: "statictext1"});
+    statictext1.text = "This will be done:";
+    statictext1.justify = "center";
+  }
 
-  this.startBtn = group1.add("button", undefined, undefined, {
-    name: "startBtn",
-  });
-  this.startBtn.text = "Start";
-  this.startBtn.preferredSize.width = 150;
+  this.listBox = this.win.add("listbox", undefined, undefined, {name: "listBox"});
+
+  if (confirmationMode){
+    // GROUP1
+    // ======
+    var group1 = this.win.add("group", undefined, { name: "group1" });
+    group1.orientation = "row";
+    group1.alignChildren = ["left", "center"];
+    group1.spacing = 10;
+    group1.margins = 0;
+    group1.alignment = ["center","top"];
+
+    this.cancelBtn = group1.add("button", undefined, undefined, {name: "cancelBtn"});
+    this.cancelBtn.text = "Cancel";
+    this.cancelBtn.preferredSize.width = 170;
+
+    this.startBtn = group1.add("button", undefined, undefined, {name: "startBtn"});
+    this.startBtn.text = "Start";
+    this.startBtn.preferredSize.width = 170;
+  }
 
   /* ---------------------------- Set Class Methods --------------------------- */
 
-  this.win.cancelElement = this.cancelBtn
-  this.win.defaultElement = this.startBtn
-  this.currentlyWorkingText.text = "Nothing";
+  this.listBox.preferredSize.width = 350;
+  this.listBox.preferredSize.height = 300;
+  this.listBox.maximumSize.width = 350
+  this.listBox.minimumSize.height = 50
+  this.fullLength = 0
+  this.continueProcessing = false
+
+  if (confirmationMode){
+    this.win.cancelElement = this.cancelBtn
+    this.win.defaultElement = this.startBtn
+
+    this.startBtn.onClick = function () {
+      continueProcessing = true
+      this.close()
+    }
+  } else {
+    this.currentlyWorkingText.text = "Nothing";
+    this.progressBar.enabled = false;
+    this.progressBar.minvalue = 0;
+    this.progressBar.maxvalue = 1;
+    this.progressBar.value = 0;
+
+    this.win.onClose = function () {
+      continueProcessing = false
+    }
+  }
+
+  this.close = function close() {
+    this.win.close();
+  };
 
   this.initialize = function initialize(filesOrder) {
     //? Clear All
     this.listBox.removeAll();
-    this.startBtn.enabled = true;
-    this.progressSlider.value = 0;
+    if (this.progressBar) this.progressBar.value = 0;
 
     //? Adds each file and page to the box element on the progress Bar.
     if (Array.isArray(filesOrder))
@@ -103,10 +130,13 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
     this.win.show();
   };
 
+  if (confirmationMode) return this.initialize(filesOrder)
+
+
   this.update = function update() {
     //? Change Progress bar value
     if (!this.fullLength) throwError("No Files to Process (this.fullLength == 0)")
-    this.progressSlider.value = 1 - this.listBox.items.length / this.fullLength;
+    this.progressBar.value = 1 - this.listBox.items.length / this.fullLength;
 
     if (this.listBox.items.length) {
 
@@ -130,7 +160,5 @@ Code for Import https://scriptui.joonas.me — (Triple click to select):
     }
   };
 
-  this.close = function close() {
-    this.win.close();
-  };
+
 }

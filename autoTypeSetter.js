@@ -63,30 +63,13 @@ const antiAliasDD_array = getKeys(antiAliasObj)
 const capitalizationDD_array = getKeys(capitalizationObj)
 const fontDD_array = getFontNames()
 
-//* ------- MainWindow ------
+//* ------- Windows ------
 
 const mainWindowObj = MainWindow()
+const progressWindowObj = new ProcessingWindow()
 
-//* ------- ProcessingWindow ------
 
-//? Create Window
-const ProcessingWindowObj = new ProcessingWindow()
 
-//? Cancel Button Function
-ProcessingWindowObj.cancelBtn.onClick = function () {
-  continueProcessing = false
-  //? Close Window
-  ProcessingWindowObj.close()
-}
-
-//? Start Button Method
-ProcessingWindowObj.startBtn.onClick = function () {
-  ProcessingWindowObj.startBtn.enabled = false;
-  ProcessingWindowObj.startBtn.onClick = undefined; //? Ensure this will run only once
-  ProcessingWindowObj.update(); //? First currently working
-  if (typeof ExecuteProcess === "function") ExecuteProcess();
-  ProcessingWindowObj.close();
-};
 
 /* ---------------------------- Global Variables ---------------------------- */
 
@@ -98,7 +81,6 @@ var mainGroup;
 var alreadyCreatedTextFolder = false;
 var config = {};
 var continueProcessing = false //? Flag that initialize the main process
-var ExecuteProcess = function () {}
 
 /* -------------------------------------------------------------------------- */
 /*                                    Main                                    */
@@ -152,6 +134,7 @@ function processText(arrayFiles) {
   const imageFileArray = multipleArchives ? createImageArray(arrayFiles) : undefined
   const content = createContentObj(multipleArchives)
   const filesOrder = multipleArchives ? {} : []
+  var ExecuteProcess = function () {}
 
   if (multipleArchives) {
 
@@ -179,7 +162,7 @@ function processText(arrayFiles) {
         }
 
         //? Update Window
-        ProcessingWindowObj.update()
+        progressWindowObj.update()
       }
     }
 
@@ -221,8 +204,17 @@ function processText(arrayFiles) {
     }
   }
 
-  //* Open Window
-  ProcessingWindowObj.initialize(filesOrder)
+  //? This will show and await for a user confirmation
+  continueProcessing = false
+  ProcessingWindow(filesOrder)
+
+  if (continueProcessing){
+    //? if the user confirms
+
+    //* Open Progress Window
+    progressWindowObj.initialize(filesOrder)
+    ExecuteProcess()
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -248,7 +240,7 @@ function throwError(message, error, notFatal) {
     } catch (error) {}
 
     try {
-      ProcessingWindowObj.close()
+      progressWindowObj.close()
     } catch (error) {}
 
     if (error === undefined)
@@ -1097,7 +1089,7 @@ function insertPageTexts(page, updateAtEachLine) {
 
     writeTextLayer(line, i < page.length - 1, positionArray[i], format)
     if (updateAtEachLine){
-      ProcessingWindowObj.update()
+      progressWindowObj.update()
       app.refresh()
     }
   }
