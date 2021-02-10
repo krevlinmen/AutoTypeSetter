@@ -1088,10 +1088,7 @@ function insertPageTexts(page, updateAtEachLine) {
     if (!continueProcessing) break;
 
     writeTextLayer(line, i < page.length - 1, positionArray[i], format)
-    if (updateAtEachLine){
-      progressWindowObj.update()
-      app.refresh()
-    }
+    if (updateAtEachLine) progressWindowObj.update()
   }
 
 }

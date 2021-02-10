@@ -126,6 +126,9 @@ function ProcessingWindow(filesOrder) {
     //? fullLength is used in Updating the bar
     this.fullLength = getKeys(filesOrder).length;
 
+    //? First iteration
+    if (!confirmationMode) this.update()
+
     //? Open the window
     this.win.show();
   };
@@ -139,9 +142,6 @@ function ProcessingWindow(filesOrder) {
     this.progressBar.value = 1 - this.listBox.items.length / this.fullLength;
 
     if (this.listBox.items.length) {
-
-
-
       if (this.listBox.items[0].text.length > 25){//! Hardcoded number, looked up through experimentation
         if(this.listBox.items[0].text.length > 40){
           this.listBox.items[0].text = this.listBox.items[0].text.slice(0,35) + "(...)"
@@ -154,8 +154,10 @@ function ProcessingWindow(filesOrder) {
       this.currentlyWorkingText.text = this.listBox.items[0].text;
       //? Delete the file name already processed
       this.listBox.remove(0);
+      app.refresh()
     } else {
       this.currentlyWorkingText.text = "Done";
+      app.refresh()
       this.close();
     }
   };

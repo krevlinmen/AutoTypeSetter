@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TODO
 
-- Test Color, Capitalization and Anti-Alias options for Text Format
-- Test lineIdentifierSuffix for customTextFormats
+- It's a good idea in Text Format Editor to only save CHANGES, and update each control manually
+- Try to use a win.layout automatic layout to update window
+- Test Color option for Text Format
 
 - Check Page identifying
 - Check Getting archive number and ambiguous files
@@ -31,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Exact font names can be used now, even if another match was found first in the list of fonts
+- Point Text positioning and sizing
 
 ## [2.0] - 2021-02-02
 
