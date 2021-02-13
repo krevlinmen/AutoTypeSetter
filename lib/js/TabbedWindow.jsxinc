@@ -131,7 +131,7 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
 
   var addTabBtn = group1.add("button", undefined, undefined, {name: "addTabBtn"});
     addTabBtn.helpTip = "Create a new layer below all others";
-    addTabBtn.text = "Add Layer";
+    addTabBtn.text = isStarterLayer ? "Add Layer" : "Add Format";
 
   var closeBtn = group1.add("button", undefined, undefined, {name: "closeBtn"});
     closeBtn.text = "Close";
@@ -229,6 +229,7 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
       config.disableCustomTextFormats = disableThisCB.value
 
     const enabled = !disableThisCB.value
+    addTabBtn.enabled = enabled
     if (isStarterLayer)
       tabPanel.enabled = enabled
     else {

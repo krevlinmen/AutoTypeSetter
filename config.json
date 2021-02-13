@@ -1,9 +1,9 @@
-{
+﻿{
   "pageIdentifierPrefix": "PÁGINA",
   "pageIdentifierSuffix": "",
   "ignorePageNumber": false,
   "prioritizePSD": false,
-  "selectAllFiles": false,
+  "selectAllFiles": true,
   "alwaysCreateGroup": false,
   "ignoreCustomWith": "",
   "columnGroup": false,
@@ -18,10 +18,17 @@
     "boxText": true,
     "font": "CCWildWords",
     "justification": "CENTER",
-    "language": "BRAZILLIANPORTUGUESE"
+    "language": "BRAZILLIANPORTUGUESE",
+    "antiAlias": "SMOOTH",
+    "capitalization": "NORMAL",
+    "blendMode": "NORMAL"
   },
   "customTextFormats": [
-    
+    {
+      "boxText": false,
+      "font": "Chinacat",
+      "lineIdentifierPrefix": "#"
+    }
   ],
   "starterLayerFormats": [
     {

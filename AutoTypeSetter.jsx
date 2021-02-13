@@ -1169,7 +1169,7 @@ function writeTextLayer(text, activateDuplication, positionObj, format) {
       // alert("Formatting Layer")
       formatLayer(txtLayer, format)
     } catch (error) {
-      throwError("Some error occured while formating the text layer", error)
+      throwError("Some error occurred while formatting the text layer", error)
     }
 
   //? Positioning
@@ -1272,9 +1272,6 @@ function MainWindow() {
 
   //* Dropdown Sizes
   UI.fontDD.maximumSize = dropDownSizes
-  UI.justificationDD.maximumSize = dropDownSizes
-  UI.languageDD.maximumSize = dropDownSizes
-
 
   //* Set New Properties
   UI.win.defaultElement = UI.confirmBtn;
@@ -1297,7 +1294,6 @@ function MainWindow() {
     UI.alwaysCreateGroupCB.value = config.alwaysCreateGroup
 
     UI.columnGroupCB.value = config.columnGroup
-    UI.disableCustomTextFormatsCB.value = config.disableCustomTextFormats
 
     UI.groupNameBox.text = isNotUndef(config.groupLayer.name) ? config.groupLayer.name : defaultConfig.groupLayer.name
     UI.visibleGroupCB.value = isNotUndef(config.groupLayer.visible) ? config.groupLayer.visible : defaultConfig.LayerFormatObject.visible
@@ -1311,12 +1307,6 @@ function MainWindow() {
     var fontDDFont = getFont(isNotUndef(config.defaultTextFormat.font) ? config.defaultTextFormat.font :  defaultConfig.LayerFormatObject.font)
     UI.fontDD.selection = isNotUndef(fontDDFont) ? UI.fontDD.find(fontDDFont.name) | 0 : 0
     if (UI.firstFont === undefined) UI.firstFont = UI.fontDD.selection.text
-
-    var justificationDDKey = getKeyOf(justificationObj, isNotUndef(config.defaultTextFormat.justification) ? config.defaultTextFormat.justification.toUpperCase() :  defaultConfig.LayerFormatObject.justification)
-    UI.justificationDD.selection = UI.justificationDD.find( justificationDDKey ) | 0
-
-    var languageDDKey = getKeyOf(languageObj, isNotUndef(config.defaultTextFormat.language) ? config.defaultTextFormat.language.toUpperCase() :  defaultConfig.LayerFormatObject.language)
-    UI.languageDD.selection = UI.languageDD.find( languageDDKey ) | 0
 
     app.refresh(); //? Fallback
   }
@@ -1334,7 +1324,6 @@ function MainWindow() {
     config.alwaysCreateGroup = UI.alwaysCreateGroupCB.value
 
     config.columnGroup = UI.columnGroupCB.value
-    config.disableCustomTextFormats = UI.disableCustomTextFormatsCB.value
 
     //? groupLayer Properties
 
@@ -1348,8 +1337,6 @@ function MainWindow() {
 
     if (UI.firstFont != UI.fontDD.selection.text)
       config.defaultTextFormat.font = UI.fontDD.selection.index ? UI.fontDD.selection.text : defaultConfig.LayerFormatObject.font
-    config.defaultTextFormat.justification = justificationObj[UI.justificationDD.selection.text]
-    config.defaultTextFormat.language = languageObj[UI.languageDD.selection.text]
 
     clearConfig() //* Asserting Integrity
   }
@@ -1388,9 +1375,7 @@ function MainWindow() {
   }
 
   UI.starterLayersBtn.onClick = function () {
-    getUIConfigs()
     showTabbedWindow(true)
-    setUIConfigs()
   }
 
   UI.customTextFormatsBtn.onClick = function () {
