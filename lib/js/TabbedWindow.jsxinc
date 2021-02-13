@@ -227,6 +227,18 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
       config.disableStarterLayer = disableThisCB.value
     else
       config.disableCustomTextFormats = disableThisCB.value
+
+    const enabled = !disableThisCB.value
+    if (isStarterLayer)
+      tabPanel.enabled = enabled
+    else {
+      tabPanel_nav.enabled = enabled
+      group2.enabled = enabled //ignoreCustomWithBox
+      if (!enabled){
+        tabPanel_nav.selection = 0
+        showTab_tabPanel()
+      }
+    }
   }
 
   //? --------- Execution ---------
@@ -239,6 +251,7 @@ function TabbedWindow(isStarterLayer, LFOArray, repeatIndex){
   //? Show the right tab
   tabPanel_nav.selection = repeatIndex
   showTab_tabPanel()
+  disableThisCB.onClick()
 
   win.onShow = function () {
     //? This is necessary because onShow() is called after
