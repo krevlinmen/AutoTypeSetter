@@ -65,11 +65,8 @@ const fontDD_array = getFontNames()
 
 //* ------- Windows ------
 
-const mainWindowObj = MainWindow()
-const progressWindowObj = new ProcessingWindow()
-
-
-
+const mainWindowObj = isWindowAvailable ? MainWindow() : undefined
+const progressWindowObj = isWindowAvailable ? new ProcessingWindow() : undefined
 
 /* ---------------------------- Global Variables ---------------------------- */
 
@@ -81,6 +78,7 @@ var mainGroup;
 var alreadyCreatedTextFolder = false;
 var config = {};
 var continueProcessing = false //? Flag that initialize the main process
+var arrayFiles = []
 
 /* -------------------------------------------------------------------------- */
 /*                                    Main                                    */
@@ -102,10 +100,16 @@ function main() {
   readConfig()
 
   //? Show UI window
-  mainWindowObj.initialize()
+
+  if (isWindowAvailable)
+    mainWindowObj.initialize()
+  else {
+    continueProcessing = confirm("Unfortunately, we were unable to create the window where you can edit all the settings. We recommend that you acquire a more updated version of PhotoShop.\nBut not everything is lost. If you want to use the program anyway, you need to manually edit the configuration file \"config.json\" according to our documentation. If you have already done so, press OK to select your files and run the program!", false, "The window could not be created")
+    if (continueProcessing) getArrayFiles()
+  }
 
   //* Execute Process
-  if (continueProcessing) processText(mainWindowObj.arrayFiles)
+  if (continueProcessing) processText()
 
   //* Commented Until we discuss how to handle uncaught errors
   // try {} catch (error) {
@@ -117,22 +121,20 @@ function main() {
   app.displayDialogs = savedDialogMode
 }
 
-function processText(arrayFiles) {
+function processText() {
 
 
   //? Get Files
 
-  var multipleArchives = false
+  const multipleArchives = arrayFiles.length > 1
 
   if (arrayFiles.length === 0)
     throwError("No files were selected!")
   else if (arrayFiles.length === 1)
     textFile = arrayFiles[0]
-  else
-    multipleArchives = true
 
   const imageFileArray = multipleArchives ? createImageArray(arrayFiles) : undefined
-  const content = createContentObj(multipleArchives)
+  const content = createContentObj()
   const filesOrder = multipleArchives ? {} : []
   var ExecuteProcess = function () {}
 
@@ -158,11 +160,12 @@ function processText(arrayFiles) {
           if ( ensureValidColorMode() ) continue;
           if (continueProcessing) applyStarterLayerFormats()
           if (continueProcessing) insertPageTexts(content[pageKey]) //Page text Writing Loop
+          if (continueProcessing) selectTypeGroup()
           if (continueProcessing) saveAndCloseFile(file)
         }
 
         //? Update Window
-        progressWindowObj.update()
+        if (isWindowAvailable) progressWindowObj.update()
       }
     }
 
@@ -201,18 +204,34 @@ function processText(arrayFiles) {
         if (!continueProcessing) break;
         insertPageTexts(content[pageKey], true)
       }
+      if (continueProcessing) selectTypeGroup()
     }
   }
 
   //? This will show and await for a user confirmation
   continueProcessing = false
-  ProcessingWindow(filesOrder)
+  if (isWindowAvailable)
+    ProcessingWindow(filesOrder)
+  else {
+    var text = "This is what will be done:"
+
+    if (Array.isArray(filesOrder)){
+      text = "This will be placed in the document:"
+      for (var i in filesOrder) text += "\n" + filesOrder[i]
+    }
+    else
+      for (var page in filesOrder)
+        text += "\nPage " + page +  "  ->  " +   (filesOrder[page] ? filesOrder[page].name : "")
+
+    continueProcessing = confirm(text, false, "Processing Files")
+  }
+
 
   if (continueProcessing){
     //? if the user confirms
 
     //* Open Progress Window
-    progressWindowObj.initialize(filesOrder)
+    if (isWindowAvailable) progressWindowObj.initialize(filesOrder)
     ExecuteProcess()
   }
 }
@@ -253,9 +272,15 @@ function throwError(message, error, notFatal) {
 
 }
 
-function saveAndCloseFile(file) {
-  formatLayer(getTypeFolder(), config.groupLayer)
+function selectTypeGroup(){
+  if (alreadyCreatedTextFolder){
+    const folder = getTypeFolder()
+    activeDocument.activeLayer = folder
+    formatLayer(folder, config.groupLayer)
+  }
+}
 
+function saveAndCloseFile(file) {
   const saveFile = File(file.fullName.withoutExtension() + '.psd')
   activeDocument.saveAs(saveFile)
   activeDocument.close()
@@ -273,6 +298,19 @@ function ensureValidColorMode() {
     if (res) activeDocument.changeMode(ChangeMode.RGB)
     else return true //? User refused
   }
+}
+
+function getArrayFiles(){
+
+  try {
+    if (config.selectAllFiles || config.selectAllFiles === undefined)
+      arrayFiles = File.openDialog("Select Files", ["All:*.txt;*.png;*.jpeg;*.jpg;*.psd;*.psb", "Text:*.txt", "Images:*.png;*.jpeg;*.jpg;*.psd;*.psb"], true)
+    else
+      arrayFiles = Folder.selectDialog("Select Folder").getFiles()
+  } catch (error) {}
+
+  if (!Array.isArray(arrayFiles)) arrayFiles = []
+
 }
 
 function writeProgramInfo() {
@@ -767,15 +805,16 @@ function getTypeFolder(groupIndex) {
   try {
     //? Try to find a folder with name given
     if (!groupIndex){ //? If its not an indexed group (column Group only)
-    textFolder = activeDocument.layerSets.getByName(groupName)}
-    else{
-        textFolder = mainGroup.layerSets.getByName(groupName) //? Gets nested groups inside the main group
-    }
+      textFolder = activeDocument.layerSets.getByName(groupName)}
+    else
+      textFolder = mainGroup.layerSets.getByName(groupName) //? Gets nested groups inside the main group
+
   } catch (error) {
     //? If not found, create one
 
     textFolder = createGroupFolder(groupName, groupIndex)
   }
+  alreadyCreatedTextFolder = true
   return textFolder;
 }
 
@@ -799,9 +838,8 @@ function getTypeFolder(groupIndex) {
 
 
 
-function createImageArray(arrayFiles) {
+function createImageArray() {
   const imageArray = []
-  const fileNames = []
 
   for (var i in arrayFiles) {
     var file = arrayFiles[i]
@@ -879,7 +917,7 @@ function createImageArray(arrayFiles) {
   return imageArray
 }
 
-function createContentObj(multipleArchives) {
+function createContentObj() {
 
   if (!textFile || !textFile.name.endsWith('.txt')) {
     throwError("No text file was selected!")
@@ -905,9 +943,8 @@ function createContentObj(multipleArchives) {
     }
   }
 
-  if (multipleArchives)
+  if (arrayFiles.length > 1)
     delete content[0] //? Deletes text before the first identifier
-
 
   //? Check if have lines to process
   var haveLines = false
@@ -960,11 +997,9 @@ function formatLayer(layer, format) {
 
   //* Is Background - This property can break many of the other ones
   //! it breaks 'Naming', 'Locking' and Text Features(probably)
-  if (isNotUndef(format.isBackgroundLayer)) layer.isBackgroundLayer = format.isBackgroundLayer
-  if (layer.isBackgroundLayer) {
-    if (isNotUndef(format.visible)) layer.visible = format.visible
-    return;
-  }
+  if (isNotUndef(format.isBackgroundLayer) || getKeys(format).length )
+    layer.isBackgroundLayer = !!format.isBackgroundLayer
+  if (layer.isBackgroundLayer) return
 
   //* Naming
   if (isNotUndef(format.name)) layer.name = format.name
@@ -1088,7 +1123,7 @@ function insertPageTexts(page, updateAtEachLine) {
     if (!continueProcessing) break;
 
     writeTextLayer(line, i < page.length - 1, positionArray[i], format)
-    if (updateAtEachLine) progressWindowObj.update()
+    if (updateAtEachLine && isWindowAvailable) progressWindowObj.update()
   }
 
 }
@@ -1106,7 +1141,6 @@ function writeTextLayer(text, activateDuplication, positionObj, format) {
     currentGroup = getTypeFolder(config.columnGroup ? positionObj.group : undefined)
 
     const txtLayer = currentGroup.artLayers.add()
-    txtLayer.name = "PlaceHolder Layer"
     txtLayer.kind = LayerKind.TEXT
 
     //* Default Formatting
@@ -1129,7 +1163,6 @@ function writeTextLayer(text, activateDuplication, positionObj, format) {
 
   //* Set Text
   txtLayer.textItem.contents = text
-  txtLayer.name = text
 
   if (format)
     try {
@@ -1156,14 +1189,20 @@ function writeTextLayer(text, activateDuplication, positionObj, format) {
 
 //* Calculate the positioning of all the text in a page
 function calculatePositions(textArray) {
-  const yBorder = activeDocument.height * 0.02
-  const xBorder = activeDocument.width * 0.02
+  const docWidth  = activeDocument.width
+  const docHeight = activeDocument.height
+  docWidth.convert("px")
+  docHeight.convert("px")
+
+  const yBorder = docHeight * 0.02
+  const xBorder = docWidth * 0.02
+
   positionData = []
   const layerPosition = {
     yPosition: yBorder, //*Initially, the margin of the document
     xPosition: xBorder,
     height: undefined,
-    width: activeDocument.width * 0.2, //*maybe customizable in the future
+    width: docWidth * 0.2, //*maybe customizable in the future
     group: 1
   }
 
@@ -1189,7 +1228,7 @@ function calculatePositions(textArray) {
 
     layerPosition.yPosition += yBorder + layerPosition.height //*yPosition += The size of the text Box + border
 
-    if (layerPosition.yPosition >= activeDocument.height) { //*if the bottom of the file is reached
+    if (layerPosition.yPosition >= docHeight) { //*if the bottom of the file is reached
       layerPosition.yPosition = yBorder //*Reset yPosition
       layerPosition.xPosition += xBorder + layerPosition.width //*increment the x value to create a new column
       layerPosition.group += 1 //*Goes to the next group
@@ -1229,9 +1268,7 @@ function MainWindow() {
   const UI = new createMainWindow()
 
   //* Set New Variables
-  UI.arrayFiles = []
   UI.firstFont = undefined
-
 
   //* Dropdown Sizes
   UI.fontDD.maximumSize = dropDownSizes
@@ -1390,16 +1427,12 @@ function MainWindow() {
   UI.fontSizeBox.onChanging()
 
   UI.selectFilesBtn.onClick = function () {
-    try {
-      if (UI.selectAllFilesCB.value)
-        UI.arrayFiles = File.openDialog("Select Files", ["All:*.txt;*.png;*.jpeg;*.jpg;*.psd;*.psb", "Text:*.txt", "Images:*.png;*.jpeg;*.jpg;*.psd;*.psb"], true)
-      else
-        UI.arrayFiles = Folder.selectDialog("Select Folder").getFiles()
-    } catch (error) {}
 
-    if (!Array.isArray(UI.arrayFiles)) arrayFiles = []
+    config.selectAllFiles = UI.selectAllFilesCB.value
 
-    if (UI.arrayFiles.length) {
+    getArrayFiles()
+
+    if (arrayFiles.length) {
       UI.confirmBtn.enabled = true;
       UI.selectFilesBtn.text = "Select Again"
     } else {
