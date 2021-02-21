@@ -719,13 +719,14 @@ function getCustomFormattedLine(line, format){
   //? If disabled or line is blank, return unaltered
   if (!line || config.disableCustomTextFormats) return line
 
+  var newLine = "";
   //? If startsWith 'config.ignoreCustomWith'
   if (config.ignoreCustomWith && line.startsWith(config.ignoreCustomWith))
-    return line.slice(config.ignoreCustomWith.length).trim()
+    newLine = line.slice(config.ignoreCustomWith.length).trim()
 
   if (format === undefined) format = findFormat(line)
-  if (format) return line.slice(format.lineIdentifierPrefix.length, line.length - format.lineIdentifierSuffix.length).trim()
-  return line //? Return unaltered
+  if (format) newLine = line.slice(format.lineIdentifierPrefix.length, line.length - format.lineIdentifierSuffix.length).trim()
+  return newLine || line //? Return new line (if not blank) or unaltered
 }
 
 function getSpecificImage(arr, num) {
