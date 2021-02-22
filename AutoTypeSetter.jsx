@@ -1071,6 +1071,7 @@ function formatLayer(layer, format) {
       txt.kind = format.boxText ? TextType.PARAGRAPHTEXT : TextType.POINTTEXT
     }
 
+    if (isNotUndef(format.hyphenation)) txt.hyphenation = format.hyphenation
 
     if (isNotUndef(format.justification) && format.justification.length){
 
