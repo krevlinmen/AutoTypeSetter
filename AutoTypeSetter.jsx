@@ -695,12 +695,14 @@ function getPageNumber(str) {
   }
 }
 
-function findFormat(line, returnIndex){
+function findFormat(line){
 
   //? Shall be 'line === line.trim()'
   if (config.disableCustomTextFormats) return undefined
   if (config.ignoreCustomWith && line.startsWith(config.ignoreCustomWith))
     return undefined
+
+  const candidates = [];
 
   for (var i in config.customTextFormats){
     var format = config.customTextFormats[i]
@@ -709,9 +711,32 @@ function findFormat(line, returnIndex){
     if (format.lineIdentifierPrefix === undefined) format.lineIdentifierPrefix = ""
     if (format.lineIdentifierSuffix === undefined) format.lineIdentifierSuffix = ""
 
-    if (line.startsWith(format.lineIdentifierPrefix) && line.endsWith(format.lineIdentifierSuffix))
-      return returnIndex ? i : format
+    if (  line.startsWith(format.lineIdentifierPrefix) &&
+          line.endsWith(format.lineIdentifierSuffix) &&
+          getCustomFormattedLine(line, format) !== line )
+      candidates.push(format);
   }
+
+  if (candidates.length > 1)
+    candidates.sort(
+      function (a, b) {
+        const aS = a.lineIdentifierSuffix;
+        const bS = b.lineIdentifierSuffix;
+        if (!aS ^ !bS)
+          //? If one or another, but not both
+          return aS ? -1 : 1; //? use the one with more identifiers
+
+        const aP = a.lineIdentifierPrefix;
+        const bP = b.lineIdentifierPrefix;
+        if (!aP ^ !bP) return aP ? -1 : 1;
+
+        const aR = aP.length + aS.length;
+        const bR = bP.length + bS.length;
+
+        return bR - aR; //? Compare the total length, and use the longest sequence
+    });
+
+  if (candidates.length) return candidates[0];
 }
 
 function getCustomFormattedLine(line, format){
