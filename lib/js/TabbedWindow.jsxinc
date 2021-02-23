@@ -11,40 +11,77 @@ function showTabbedWindow(isStarterLayer){
     }
   }
 
-  function setConf(layerFormat, prop, value){
-    if (isNotUndef(value)) layerFormat[prop] = value
+  const propSuffixObj = {
+    "edittext":"Box",
+    "slider":"Slider",
+    "checkbox":"CB",
+    "dropdownlist":"DD"
+  }
+
+  function setConf(layerFormat, item, DDObj, prop){
+
+    //? These two are obligatory
+    if (!item || !layerFormat) return;
+    var value;
+
+    if (item.type === "dropdownlist"){
+      //? A DropDownObj is necessary here
+      if (DDObj && item.selection !== undefined) value = DDObj[item.selection.text];
+    }
+    else value = item[item.type === "edittext" ? "text" : "value"];
+
+    if (value === undefined) return
+
+    if (!prop) {
+      //? Area to remove suffixes of UI Object names
+      //? Example: 'visibleCB' -> 'visible' and 'nameBox' -> 'name'
+      const name = item.properties && item.properties.name
+      if (!name)
+        return throwError("Trying to apply setConf() on a UI Object without a name and 'prop'.", undefined, true)
+
+      const propSuffix = propSuffixObj[item.type] || ""
+      if (!propSuffix)
+        throwError("UI Object '" + name + "' of type '" + item.type + "' don't have a supported suffix registered. Ignoring suffix.", undefined, true)
+
+      if (!name.endsWith(propSuffix))
+        return throwError("UI Object '" + name + "' not terminated in '" + propSuffix + "'.", undefined, true)
+
+      prop = name.slice(0, name.length - propSuffix.length)
+    }
+
+    layerFormat[prop] = value
   }
 
   function getUIConfigs(tabs, LFOArray){
 
     for (var i = 0, len = tabs.length; i < len; i++){
-      var tabItems = tabs[i].items
-      var layerFormat = LFOArray[i]
+      var TI = tabs[i].items  // Tab Items
+      var LF = LFOArray[i] // Layer Format
 
-      if (isNotUndef(tabItems.nameBox)) setConf(layerFormat, "name", tabItems.nameBox.text)
-      if (isNotUndef(tabItems.duplicateCB)) setConf(layerFormat, "duplicate", tabItems.duplicateCB.value)
-      if (isNotUndef(tabItems.isBackgroundLayerCB)) setConf(layerFormat, "isBackgroundLayer", tabItems.isBackgroundLayerCB.value)
-      if (isNotUndef(tabItems.opacitySlider)) setConf(layerFormat, "opacity", tabItems.opacitySlider.value)
-      if (isNotUndef(tabItems.visibleCB)) setConf(layerFormat, "visible", tabItems.visibleCB.value)
-      if (isNotUndef(tabItems.groupedCB)) setConf(layerFormat, "grouped", tabItems.groupedCB.value)
-      if (isNotUndef(tabItems.allLockedCB)) setConf(layerFormat, "allLocked", tabItems.allLockedCB.value)
-      if (isNotUndef(tabItems.transparentPixelsLockedCB)) setConf(layerFormat, "transparentPixelsLocked", tabItems.transparentPixelsLockedCB.value)
-      if (isNotUndef(tabItems.pixelsLockedCB)) setConf(layerFormat, "pixelsLocked", tabItems.pixelsLockedCB.value)
-      if (isNotUndef(tabItems.positionLockedCB)) setConf(layerFormat, "positionLocked", tabItems.positionLockedCB.value)
+      setConf(LF, TI.nameBox)
+      setConf(LF, TI.duplicateCB)
+      setConf(LF, TI.isBackgroundLayerCB)
+      setConf(LF, TI.opacitySlider)
+      setConf(LF, TI.visibleCB)
+      setConf(LF, TI.groupedCB)
+      setConf(LF, TI.allLockedCB)
+      setConf(LF, TI.transparentPixelsLockedCB)
+      setConf(LF, TI.pixelsLockedCB)
+      setConf(LF, TI.positionLockedCB)
 
-      if (isNotUndef(tabItems.lineIdentifierPrefixBox)) setConf(layerFormat, "lineIdentifierPrefix", tabItems.lineIdentifierPrefixBox.text)
-      if (isNotUndef(tabItems.lineIdentifierSuffixBox)) setConf(layerFormat, "lineIdentifierSuffix", tabItems.lineIdentifierSuffixBox.text)
-      if (isNotUndef(tabItems.sizeBox)) setConf(layerFormat, "size", tabItems.sizeBox.text)
-      if (isNotUndef(tabItems.boxTextCB)) setConf(layerFormat, "boxText", tabItems.boxTextCB.value)
-      if (isNotUndef(tabItems.hyphenationCB)) setConf(layerFormat, "hyphenation", tabItems.hyphenationCB.value)
-      if (isNotUndef(tabItems.fontBox)) setConf(layerFormat, "font", tabItems.fontBox.text)
-      if (isNotUndef(tabItems.colorBox)) setConf(layerFormat, "color", tabItems.colorBox.text)
+      setConf(LF, TI.lineIdentifierPrefixBox)
+      setConf(LF, TI.lineIdentifierSuffixBox)
+      setConf(LF, TI.sizeBox)
+      setConf(LF, TI.boxTextCB)
+      setConf(LF, TI.hyphenationCB)
+      setConf(LF, TI.fontBox)
+      setConf(LF, TI.colorBox)
 
-      if (isNotUndef(tabItems.antiAliasDD)) setConf(layerFormat, "antiAlias", antiAliasObj[tabItems.antiAliasDD.selection.text])
-      if (isNotUndef(tabItems.justificationDD)) setConf(layerFormat, "justification", justificationObj[tabItems.justificationDD.selection.text])
-      if (isNotUndef(tabItems.languageDD)) setConf(layerFormat, "language", languageObj[tabItems.languageDD.selection.text])
-      if (isNotUndef(tabItems.capitalizationDD)) setConf(layerFormat, "capitalization", capitalizationObj[tabItems.capitalizationDD.selection.text])
-      if (isNotUndef(tabItems.blendModeDD)) setConf(layerFormat, "blendMode", blendModeObj[tabItems.blendModeDD.selection.text])
+      setConf(LF, TI.antiAliasDD, antiAliasObj)
+      setConf(LF, TI.justificationDD, justificationObj)
+      setConf(LF, TI.languageDD, languageObj)
+      setConf(LF, TI.capitalizationDD, capitalizationObj)
+      setConf(LF, TI.blendModeDD, blendModeObj)
     }
   }
 
