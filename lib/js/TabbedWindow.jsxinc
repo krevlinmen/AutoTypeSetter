@@ -932,7 +932,7 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
 
   //* -------------------------------------------------------------
 
-  //? --------- Fallbacks ---------
+  //? --------- Mocks ---------
 
   var duplicateCB = { value:false }
   var isBackgroundLayerCB = { value:false }
@@ -1065,8 +1065,8 @@ function createStarterLayerTab(index, layerFormat, tabPanel_innerwrap, tabName){
     opacitySlider: opacitySlider, // slider
     visibleCB: visibleCB, // checkbox
     groupedCB: groupedCB, // checkbox
-    isBackgroundLayerCB: isBackgroundLayerCB, // checkbox
-    duplicateCB: duplicateCB, // checkbox
+    isBackgroundLayerCB: (!index ? isBackgroundLayerCB : undefined), // checkbox
+    duplicateCB: (index ? duplicateCB : undefined), // checkbox
     allLockedCB: allLockedCB, // checkbox
     transparentPixelsLockedCB: transparentPixelsLockedCB, // checkbox
     pixelsLockedCB: pixelsLockedCB, // checkbox
