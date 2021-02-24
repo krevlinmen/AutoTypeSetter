@@ -17,6 +17,10 @@
   "customTextFormats": [],
   "starterLayerFormats": [],
 
+  "docResolution": 0,
+  "docColorMode": "",
+  "docColorProfile": "",
+
   "LayerFormatObject": {
     "name": "Default Name",
     "visible": true,

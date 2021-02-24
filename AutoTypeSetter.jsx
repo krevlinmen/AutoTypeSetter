@@ -73,6 +73,7 @@ const progressWindowObj = isWindowAvailable ? new ProcessingWindow() : undefined
 var textFile;
 var duplicatedLayer;
 var convertAllToRGB;
+var previousResolution;
 var currentGroup;
 var mainGroup;
 var alreadyCreatedTextFolder = false;
@@ -157,10 +158,10 @@ function processText() {
 
         if (file){
           if (continueProcessing) open(file)
-          if ( ensureValidColorMode() ) continue;
+          if (continueProcessing) preProcessDocument();
           if (continueProcessing) applyStarterLayerFormats()
           if (continueProcessing) insertPageTexts(content[pageKey]) //Page text Writing Loop
-          if (continueProcessing) selectTypeGroup()
+          if (continueProcessing) postProcessDocument()
           if (continueProcessing) saveAndCloseFile(file)
         }
 
@@ -183,10 +184,8 @@ function processText() {
       throwError("No document open.\nIf you only select a text file, you need to have a document open.")
     }
 
-    //* Assure Valid Color Mode
-    convertAllToRGB = false //? To ask only once
-    if ( ensureValidColorMode() )
-      return //? User decided not to change color mode, exit
+    //* To ask only once when assuring Valid Color Mode
+    convertAllToRGB = false
 
     //* Populating filesOrder
     for (var pageKey in content) {
@@ -197,6 +196,8 @@ function processText() {
 
     //* Process Function
     ExecuteProcess = function () {
+
+      if (continueProcessing) preProcessDocument();
       if (continueProcessing) applyStarterLayerFormats()
 
       //? Everything will be used
@@ -204,7 +205,7 @@ function processText() {
         if (!continueProcessing) break;
         insertPageTexts(content[pageKey], true)
       }
-      if (continueProcessing) selectTypeGroup()
+      if (continueProcessing) postProcessDocument()
     }
   }
 
@@ -287,16 +288,129 @@ function saveAndCloseFile(file) {
   alreadyCreatedTextFolder = false;
 }
 
+function changeDocumentMode(mode){
+
+  //? Check if mode given is a string
+  if (typeof mode != "string"){
+    throwError("Tried to change Document mode to '" + mode + "'.", undefined, true)
+    return true; //* Error
+  }
+
+
+  const modes = ["RGB", "GRAYSCALE", "CMYK", "LAB", "MULTICHANNEL"]
+  //? BITMAP and INDEXEDCOLOR are not supported because it needs further options to work
+
+  mode = mode.toUpperCase()
+
+  if (getKeyOf(modes, mode) !== undefined){
+
+    try {
+      if (activeDocument.mode === DocumentMode[mode])
+        return //? No need to change
+
+      if (mode === "BITMAP") //? To change to BITMAP, change to GRAYSCALE First
+        activeDocument.changeMode(ChangeMode.GRAYSCALE)
+      activeDocument.changeMode(ChangeMode[mode])
+
+    } catch (error) {
+      throwError("Some error ocurred while trying to change document color mode to '" + mode + "'.", error)
+      return true; //* Error
+    }
+
+  } else {
+    throwError("Document mode '" + mode + "' not supported.", undefined, true)
+    return true; //* Error
+  }
+
+}
+
 function ensureValidColorMode() {
   if (activeDocument.mode == DocumentMode.INDEXEDCOLOR){
 
-    if (convertAllToRGB === undefined)
-      convertAllToRGB = confirm("Indexed color mode doesn't allow changing layers.\nWould you like to change all necessary files to RGB mode?", false, "Invalid Color Mode")
+    if (!convertAllToRGB) convertAllToRGB = confirm("Indexed color mode doesn't allow changing layers.\nWould you like to change all necessary files to RGB mode? Refusing will close the program.", false, "Invalid Color Mode")
 
-    const res = convertAllToRGB ? true : confirm("Indexed color mode doesn't allow changing layers.\nWould you like to change the mode to RGB?", false, "Invalid Color Mode")
+    if (convertAllToRGB) changeDocumentMode("RGB")
+    else continueProcessing = false //? User refused
+  }
+}
 
-    if (res) activeDocument.changeMode(ChangeMode.RGB)
-    else return true //? User refused
+function preProcessDocument(){
+
+  //* Ensure Valid Color Mode - Can Terminate Program
+  ensureValidColorMode()
+  if (!continueProcessing) return
+
+  //* We can't edit with this being true
+  activeDocument.quickMaskMode = false
+
+  //* Check if 'config.docResolution' is not a number
+  if (typeof config.docResolution != "number"){
+    throwError("Tried to change Document resolution to " + config.docResolution + " (" + parseInt(config.docResolution) + "), which is of type '" + typeof(config.docResolution) + "'.", undefined, true)
+    config.docResolution = 0
+  }
+
+  //* Check if 'config.docResolution' is a negative number
+  if (config.docResolution < 0){
+    throwError("Tried to change Document resolution to a negative number: " + config.docResolution + ".", undefined, true)
+    config.docResolution = 0
+  }
+
+  if (!config.docResolution){
+
+    if (previousResolution === undefined){
+      //* Store the first file resolution in a variable
+      previousResolution = parseInt(activeDocument.resolution) || undefined // NaN -> undefined
+
+    } else if (previousResolution){
+      //* When a file opens with different resolution
+      //? warn the user, and ask if it can be changed to the same as previous ones
+      if (previousResolution !== parseInt(activeDocument.resolution))
+      {
+        const res = confirm("We opened a file with a resolution ("+ activeDocument.resolution +" ppi) other than those we opened before (" + previousResolution + " ppi). In this way, the size of the text will probably be different. Do you allow us to change the resolution of this file and subsequent files for the same resolution that we were using so far?\n\n\n\n(Tip: You can set a resolution in configuration file, so every file will be automatically converted to a given resolution.)", false, "Different Resolution")
+
+        if (res) config.docResolution = previousResolution //? Will convert to this resolution
+        previousResolution = false //? No need to ask anymore
+      }
+    }
+  }
+
+  //* Change Resolution
+  //? If resolution between two images are different, the size of texts will be also different
+  if (config.docResolution && parseInt(config.docResolution) != parseInt(activeDocument.resolution)){
+    try {
+      activeDocument.resizeImage(activeDocument.width, activeDocument.height, parseInt(config.docResolution))
+    } catch (error) {
+      throwError("Some error ocurred while trying to change document resolution to " + parseInt(config.docResolution) + ".", error)
+    }
+  }
+
+}
+
+function postProcessDocument(){
+
+  //* Select Type Folder
+  selectTypeGroup()
+
+  //* Change Document Mode
+  if (config.docColorMode){
+    const error = changeDocumentMode(config.docColorMode)
+    if (error) config.docColorMode = undefined
+  }
+
+  //* Change Document Color Profile
+  if (config.docColorProfile) {
+
+    if (typeof config.docColorProfile != "string"){
+      throwError("Tried to change Document color profile to '" + config.docColorProfile + "'.", undefined, true)
+      config.docColorProfile = undefined
+
+    } else try {
+        activeDocument.convertProfile(config.docColorProfile, Intent.RELATIVECOLORIMETRIC, true, true)
+      } catch (error) {
+        if (error.number === 8007)
+          throwError( "'" + config.docColorProfile  + "' is a invalid color profile. Photoshop automatically opened a window to you configure a valid one, and you closed it.", undefined, true)
+        else throwError("Some error ocurred while trying to change document color profile to '" + config.docColorProfile + "'.", error)
+      }
   }
 }
 
