@@ -200,11 +200,13 @@ function processText() {
       if (continueProcessing) preProcessDocument();
       if (continueProcessing) applyStarterLayerFormats()
 
-      //? Everything will be used
-      for (var pageKey in content) {
-        if (!continueProcessing) break;
-        insertPageTexts(content[pageKey], true)
-      }
+      //? Creating a big page with everything
+      var page = []
+      if (continueProcessing)
+        for (var pageKey in content)
+          page = page.concat(content[pageKey])
+
+      if (continueProcessing) insertPageTexts(page, true)
       if (continueProcessing) postProcessDocument()
     }
   }
@@ -319,7 +321,7 @@ function changeDocumentMode(mode){
 function ensureValidColorMode() {
   if (activeDocument.mode == DocumentMode.INDEXEDCOLOR){
 
-    if (!convertAllToRGB) convertAllToRGB = confirm("Indexed color mode doesn't allow changing layers.\nWould you like to change all necessary files to RGB mode? Refusing will close the program.", false, "Invalid Color Mode")
+    if (!convertAllToRGB) convertAllToRGB = confirm("Indexed color mode doesn't allow changing layers.\nWould you like to change all necessary files to RGB mode?\nRefusing will close the program.", false, "Invalid Color Mode")
 
     if (convertAllToRGB) changeDocumentMode("RGB")
     else continueProcessing = false //? User refused
