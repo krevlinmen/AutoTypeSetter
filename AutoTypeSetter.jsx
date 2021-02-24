@@ -273,14 +273,6 @@ function throwError(message, error, notFatal) {
 
 }
 
-function selectTypeGroup(){
-  if (alreadyCreatedTextFolder){
-    const folder = getTypeFolder()
-    activeDocument.activeLayer = folder
-    formatLayer(folder, config.groupLayer)
-  }
-}
-
 function saveAndCloseFile(file) {
   const saveFile = File(file.fullName.withoutExtension() + '.psd')
   activeDocument.saveAs(saveFile)
@@ -389,7 +381,11 @@ function preProcessDocument(){
 function postProcessDocument(){
 
   //* Select Type Folder
-  selectTypeGroup()
+  if (alreadyCreatedTextFolder){
+    const folder = getTypeFolder()
+    activeDocument.activeLayer = folder
+    formatLayer(folder, config.groupLayer)
+  }
 
   //* Change Document Mode
   if (config.docColorMode){
