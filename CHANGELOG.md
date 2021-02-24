@@ -9,24 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TODO
 
-- It's a good idea in Text Format Editor to only save CHANGES, and update each control manually
-- Try to use a win.layout automatic layout to update window
-- Test Color option for Text Format
+- Fix: Text files not formatted as UTF-8 break the program
+- Check a way to open WORD files
+- Check if it's a good idea in Text Format Editor to only save CHANGES, and update each control manually
+- Try to use a win.layout automatic layout to update window without resetting
 
-- Check Page identifying
-- Check Getting archive number and ambiguous files
+- Try to develop a better way to get and check archive number and ambiguous files
 - calculatePositions, check if border of file has been reached
-- Check column groups
 
-- Test all features in CC 2018
-- Retro-compatibility with PhotoShop CS6 - Some scripts have UI, but i don't know how - other people having this problem are probably using windows 7
-- Automatic Update Checking - Only possible with C dll libraries, socket from ExtendScript is a piece of shit
+- Automatic Update Checking - Only possible with C dll libraries, the socket from ExtendScript is a piece of shit
 
 ### Added
 
 - New window: Text Format Editor!
 - Option to see and cancel files currently being processed
-- Color, Capitalization and Anti-Alias options for Text Format
+- Option to change ppi, Image Mode and Color Profile
+- Color, Capitalization, Anti-Aliasing, Hyphenation options for Text Format
 - lineIdentifierSuffix for customTextFormats
 
 ### Fixed
