@@ -24,7 +24,6 @@ function getAnotherColor(initial) {
 }
 
 function readFile(file) {
-  file.encoding = "UTF8";
   file.open("r");
   const rawText = file.read();
   file.close();
@@ -33,7 +32,6 @@ function readFile(file) {
 
 function writeFile(file, string) {
   if (!string) return;
-  file.encoding = "UTF8";
   file.open("w");
   file.write(string);
   file.close();
