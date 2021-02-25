@@ -43,7 +43,8 @@
 
 
 const dropDownSizes = [130, 300]
-const identifiersWidth = 60 // identifiers
+const identifiersWidth = 60
+const supportedImageFiles = ['.png', '.jpg', '.jpeg', '.psd', '.psb']
 
 const isWindowAvailable = !!$.global.Window;
 const savedConfigPath = "config.json"
@@ -440,7 +441,7 @@ function getArrayFiles(){
 
   try {
     if (config.selectAllFiles || config.selectAllFiles === undefined)
-      arrayFiles = File.openDialog("Select Files", ["All:*.txt;*.png;*.jpeg;*.jpg;*.psd;*.psb", "Text:*.txt", "Images:*.png;*.jpeg;*.jpg;*.psd;*.psb"], true)
+      arrayFiles = File.openDialog("Select Files", ["All:*.txt;*" + supportedImageFiles.join(";*"), "Text:*.txt", "Images:*" + supportedImageFiles.join(";*")], true)
     else
       arrayFiles = Folder.selectDialog("Select Folder").getFiles()
   } catch (error) {}
@@ -1006,7 +1007,7 @@ function createImageArray() {
 
   for (var i in arrayFiles) {
     var file = arrayFiles[i]
-    if (!file.name.endsWithArray(['.txt', '.png', '.jpeg', '.jpg', '.psd', '.psb']))
+    if (!file.name.endsWithArray(supportedImageFiles.concat('.txt')))
       unsupportedFiles.push(decodeURI(file.name))
     else if (file.name.endsWith('.txt'))
       textFile = !textFile ? file : throwError("More than one text file recognized.")
@@ -1015,14 +1016,14 @@ function createImageArray() {
   }
 
   if (unsupportedFiles.length)
-    throwError("These files are not supported by this script:\n" + unsupportedFiles.join("\n") + "\n\nThis script only supports the extensions:\n.png, .jpg, .jpeg, .psd, .psb, .txt", undefined, true)
+    throwError("These files are not supported by this script:\n" + unsupportedFiles.join("\n") + "\n\nThis script only supports the extensions:\n" + supportedImageFiles.join(", ") + ", .txt", undefined, true)
 
   if (!imageArray.length)
     throwError("Not enough valid image files")
 
 
   //* Prioritize Order
-  const prioritizeOrder = ['.png', '.jpg', '.jpeg', '.psd', '.psb']
+  const prioritizeOrder = supportedImageFiles.concat() //? A copy
 
   if (config.prioritizePSD) {
     prioritizeOrder.unshift(prioritizeOrder.pop())
