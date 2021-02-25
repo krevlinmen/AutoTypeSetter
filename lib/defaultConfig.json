@@ -1,7 +1,6 @@
 {
   "pageIdentifierPrefix": ">>",
   "pageIdentifierSuffix": "",
-  "ignorePageNumber": true,
 
   "prioritizePSD": false,
   "selectAllFiles": false,

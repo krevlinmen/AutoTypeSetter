@@ -146,9 +146,7 @@ function processText() {
     //* Populating filesOrder
     for (var pageKey in content) {
       var pageNumber = parseInt(pageKey)
-      if (config.ignorePageNumber && (pageNumber - 1) >= imageFileArray.length)
-        break; //? No files left
-      filesOrder[pageKey] = config.ignorePageNumber ? imageFileArray[pageNumber - 1] : getSpecificImage(imageFileArray, pageNumber)
+      filesOrder[pageKey] = getSpecificImage(imageFileArray, pageNumber)
     }
 
     //* Process Function
@@ -813,10 +811,7 @@ function getFileFromScriptPath(filename) {
 function isNewPage(line) {
   if (config.pageIdentifierPrefix == "" && config.pageIdentifierSuffix == "") return false
   const res = line.startsWith(config.pageIdentifierPrefix) && line.endsWith(config.pageIdentifierSuffix)
-  if (config.ignorePageNumber)
-    return res
-  else
-    return res && !isNaN(getPageNumber(line))
+  return res && !isNaN(getPageNumber(line))
 }
 
 function getPageNumber(str) {
@@ -1039,7 +1034,7 @@ function createImageArray() {
 
   const filename = function (str) { //? Removes extension from str and parses number if it is a number
     try {
-      return config.ignorePageNumber ? str.withoutExtension() : parseInt(str.withoutExtension())
+      return parseInt(str.withoutExtension())
     } catch (error) {
       throwError("Could not read number from file", error)
     }
@@ -1100,7 +1095,7 @@ function createContentObj() {
     if (!line) continue; //* Remove Blank strings
 
     if (isNewPage(line)) {
-      current = config.ignorePageNumber ? current + 1 : getPageNumber(line)
+      current = getPageNumber(line)
       content[current] = []
     } else {
       content[current].push(line)
@@ -1452,7 +1447,6 @@ function MainWindow() {
 
     UI.pageIdentifierPrefixBox.text = config.pageIdentifierPrefix
     UI.pageIdentifierSuffixBox.text = config.pageIdentifierSuffix
-    UI.ignorePageNumberCB.value = config.ignorePageNumber
 
     UI.prioritizePSDCB.value = config.prioritizePSD
     UI.selectAllFilesCB.value = config.selectAllFiles
@@ -1482,7 +1476,6 @@ function MainWindow() {
 
     config.pageIdentifierPrefix = UI.pageIdentifierPrefixBox.text
     config.pageIdentifierSuffix = UI.pageIdentifierSuffixBox.text
-    config.ignorePageNumber = UI.ignorePageNumberCB.value
 
     config.prioritizePSD = UI.prioritizePSDCB.value
     config.selectAllFiles = UI.selectAllFilesCB.value
