@@ -1002,22 +1002,23 @@ function getTypeFolder(groupIndex) {
 
 function createImageArray() {
   const imageArray = []
+  const unsupportedFiles = []
 
   for (var i in arrayFiles) {
     var file = arrayFiles[i]
     if (!file.name.endsWithArray(['.txt', '.png', '.jpeg', '.jpg', '.psd', '.psb']))
-      alert("One or more files are not supported by this script!\nThis script only supports the extensions:\n.png, .jpg, .jpeg, .psd, .psb, .txt")
+      unsupportedFiles.push(decodeURI(file.name))
     else if (file.name.endsWith('.txt'))
       textFile = !textFile ? file : throwError("More than one text file recognized.")
     else
       imageArray.push(file)
-
   }
+
+  if (unsupportedFiles.length)
+    throwError("These files are not supported by this script:\n" + unsupportedFiles.join("\n") + "\n\nThis script only supports the extensions:\n.png, .jpg, .jpeg, .psd, .psb, .txt", undefined, true)
 
   if (!imageArray.length)
     throwError("Not enough valid image files")
-
-
 
   //* Prioritize Order
 
