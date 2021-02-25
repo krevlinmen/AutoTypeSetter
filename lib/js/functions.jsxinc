@@ -16,6 +16,14 @@ function timeMean(func, qtd){
   return mean
 }
 
+function getFilenameNumber(file) {
+  //? Try to get a number from file name
+  //? '0page%20012.png' -> '0page 012.png' -> '0page 012 ' -> '0012' -> 12
+  //? If not a single number is present, it returns NaN
+  if (file === undefined) return NaN
+  return parseInt(decodeURI(file.name).withoutExtension().replace(/\D/g, ''))
+}
+
 function getAnotherColor(initial) {
   const decimalRGB = $.colorPicker(initial ? "0x" + initial.slice(1) : 0);
   if (decimalRGB === -1) return initial;

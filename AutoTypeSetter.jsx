@@ -887,12 +887,9 @@ function getCustomFormattedLine(line, format){
 }
 
 function getSpecificImage(arr, num) {
-  for (var i in arr) {
-    var str = arr[i].name
-    if (num === parseInt(str.withoutExtension() ))
+  for (var i in arr)
+    if (num === getFilenameNumber(arr[i]))
       return arr[i];
-  }
-  return undefined;
 }
 
 function getFontNames(){
@@ -1032,25 +1029,13 @@ function createImageArray() {
     return str.slice(str.lastIndexOf("."))
   }
 
-  const filename = function (str) { //? Removes extension from str and parses number if it is a number
-    try {
-      return parseInt(str.withoutExtension())
-    } catch (error) {
-      throwError("Could not read number from file", error)
-    }
-  }
-
-
-
-
-
   for (var i = 0; i < imageArray.length; i++) {
 
-    var n = filename(imageArray[i].name)
+    var n = getFilenameNumber(imageArray[i])
     var duplicates = []
 
     for (var j in imageArray) //? Search for file duplicates
-      if (n == filename(imageArray[j].name))
+      if (n == getFilenameNumber(imageArray[j]))
         duplicates.push(imageArray[j])
 
       if (duplicates.length > 1) {
