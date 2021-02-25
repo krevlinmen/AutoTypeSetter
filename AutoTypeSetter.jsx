@@ -1020,13 +1020,13 @@ function createImageArray() {
   if (!imageArray.length)
     throwError("Not enough valid image files")
 
+
   //* Prioritize Order
+  const prioritizeOrder = ['.png', '.jpg', '.jpeg', '.psd', '.psb']
 
-  const prioritizeOrder = ['.psd', '.psb', '.png', '.jpg', '.jpeg']
-
-  if (!config.prioritizePSD) {
-    prioritizeOrder.push(prioritizeOrder.shift())
-    prioritizeOrder.push(prioritizeOrder.shift())
+  if (config.prioritizePSD) {
+    prioritizeOrder.unshift(prioritizeOrder.pop())
+    prioritizeOrder.unshift(prioritizeOrder.pop())
   }
 
 
