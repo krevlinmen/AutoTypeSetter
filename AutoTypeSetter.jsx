@@ -143,19 +143,24 @@ function processText() {
 
   if (multipleArchives) {
 
-    //* Populating filesOrder
-    for (var pageKey in content) {
-      var pageNumber = parseInt(pageKey)
-      filesOrder[pageKey] = getSpecificImage(imageFileArray, pageNumber)
+    function getSpecificImage(num) {
+      for (var i in imageFileArray)
+        if (num === getFilenameNumber(imageFileArray[i]))
+          return imageFileArray[i];
     }
+
+    //* Populating filesOrder
+    for (var pageKey in content)
+      filesOrder[pageKey] = getSpecificImage(parseInt(pageKey))
+
 
     //* Process Function
     ExecuteProcess = function () {
       for (var pageKey in filesOrder){
-        var file = filesOrder[pageKey]
 
         if (!continueProcessing) break;
 
+        var file = filesOrder[pageKey]
         if (file){
           if (continueProcessing) open(file)
           if (continueProcessing) preProcessDocument();
@@ -166,7 +171,7 @@ function processText() {
         }
 
         //? Update Window
-        if (isWindowAvailable) progressWindowObj.update()
+        if (isWindowAvailable && continueProcessing) progressWindowObj.update()
       }
     }
 
@@ -891,12 +896,6 @@ function getCustomFormattedLine(line, format){
   if (format === undefined) format = findFormat(line)
   if (format) newLine = line.slice(format.lineIdentifierPrefix.length, line.length - format.lineIdentifierSuffix.length).trim()
   return newLine || line //? Return new line (if not blank) or unaltered
-}
-
-function getSpecificImage(arr, num) {
-  for (var i in arr)
-    if (num === getFilenameNumber(arr[i]))
-      return arr[i];
 }
 
 function getFontNames(){
