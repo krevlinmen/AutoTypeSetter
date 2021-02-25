@@ -994,21 +994,33 @@ function getTypeFolder(groupIndex) {
 
 
 function createImageArray() {
-  const imageArray = []
-  const unsupportedFiles = []
+  const imageArray = [];
 
-  for (var i in arrayFiles) {
-    var file = arrayFiles[i]
-    if (!file.name.endsWithArray(supportedImageFiles.concat('.txt')))
-      unsupportedFiles.push(decodeURI(file.name))
-    else if (file.name.endsWith('.txt'))
-      textFile = !textFile ? file : throwError("More than one text file recognized.")
-    else
-      imageArray.push(file)
-  }
+  //? Function wrapper to not save these other constants in memory
+  (function () {
+    const unsupportedFiles = []
+    const filesWithoutNumbers = []
 
-  if (unsupportedFiles.length)
-    throwError("These files are not supported by this script:\n" + unsupportedFiles.join("\n") + "\n\nThis script only supports the extensions:\n" + supportedImageFiles.join(", ") + ", .txt", undefined, true)
+    for (var i in arrayFiles) {
+      var file = arrayFiles[i]
+      if (!file.name.endsWithArray(supportedImageFiles.concat('.txt')))
+        unsupportedFiles.push(decodeURI(file.name))
+      else if (file.name.endsWith('.txt'))
+        textFile = !textFile ? file : throwError("More than one text file recognized.")
+      else {
+        if (isNaN(getFilenameNumber(file)))
+          filesWithoutNumbers.push(decodeURI(file.name))
+        else
+          imageArray.push(file)
+      }
+    }
+
+    if (unsupportedFiles.length)
+      throwError("The following files are not supported by this script:\n" + unsupportedFiles.join("\n") + "\n\nThis script only supports the extensions:\n" + supportedImageFiles.join(", ") + ", .txt", undefined, true)
+
+    if (filesWithoutNumbers.length)
+      throwError("The following files do not have page numbers in their filenames:\n" + filesWithoutNumbers.join("\n") + "\n\nPlease add page numbers to their filenames if you want to edit those files.\nThis step is necessary to correlate the text and the respective file.", undefined, true)
+  })()
 
   if (!imageArray.length)
     throwError("Not enough valid image files")
