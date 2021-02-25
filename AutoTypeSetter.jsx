@@ -445,6 +445,13 @@ function getArrayFiles(){
   } catch (error) {}
 
   if (!Array.isArray(arrayFiles)) arrayFiles = []
+  else {
+    for (var i in arrayFiles)
+      if (arrayFiles[i].name === "debug.log"){
+        arrayFiles.splice(i,1);
+        break;
+      }
+  }
 
 }
 
