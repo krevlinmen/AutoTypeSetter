@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### TODO
 
 - Add a warning in Text Format Editor when a identifier is the same as page identifiers, or other identifiers
-- Check a way to open WORD files
 - Check if it's a good idea in Text Format Editor to only save CHANGES, and update each control manually
 - Try to use a win.layout automatic layout to update window without resetting
 
@@ -30,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Text files not encoded as UTF-8 no longer breaks the program
+- Different resolutions no more affect text size
 - Exact font names can be used now, even if another match was found first in the list of fonts
 - Point Text positioning and sizing
 

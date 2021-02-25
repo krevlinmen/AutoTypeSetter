@@ -73,6 +73,7 @@ const progressWindowObj = isWindowAvailable ? new ProcessingWindow() : undefined
 var textFile;
 var duplicatedLayer;
 var convertAllToRGB;
+var savedResolution;
 var previousResolution;
 var currentGroup;
 var mainGroup;
@@ -282,6 +283,32 @@ function saveAndCloseFile(file) {
   alreadyCreatedTextFolder = false;
 }
 
+function changeDocumentResolution(resolution, lookErrors){
+
+  //* Check if 'resolution' is not a number
+  if (typeof resolution != "number"){
+    throwError("Tried to change Document resolution to " + resolution + " (" + parseInt(resolution) + "), which is of type '" + typeof(resolution) + "'.", undefined, true)
+    return true //? Error
+  }
+
+  //* Check if 'resolution' is a negative number
+  if (resolution < 0){
+    throwError("Tried to change Document resolution to a negative number: " + resolution + ".", undefined, true)
+    return true //? Error
+  }
+
+  if (!resolution || lookErrors) return
+
+  if (parseInt(resolution) === parseInt(activeDocument.resolution))
+    return
+
+  try {
+    activeDocument.resizeImage(activeDocument.width, activeDocument.height, parseInt(resolution))
+  } catch (error) {
+    throwError("Some error ocurred while trying to change document resolution to " + parseInt(resolution) + ".", error)
+  }
+}
+
 function changeDocumentMode(mode){
 
   //? Check if mode given is a string
@@ -337,18 +364,31 @@ function preProcessDocument(){
   //* We can't edit with this being true
   activeDocument.quickMaskMode = false
 
-  //* Check if 'config.docResolution' is not a number
-  if (typeof config.docResolution != "number"){
-    throwError("Tried to change Document resolution to " + config.docResolution + " (" + parseInt(config.docResolution) + "), which is of type '" + typeof(config.docResolution) + "'.", undefined, true)
-    config.docResolution = 0
+  //* Save this document resolution
+  savedResolution = parseInt(activeDocument.resolution)
+
+  //* Change to default resolution
+  changeDocumentResolution(72)
+
+}
+
+function postProcessDocument(){
+
+  //* Select Type Folder
+  if (alreadyCreatedTextFolder){
+    const folder = getTypeFolder()
+    activeDocument.activeLayer = folder
+    formatLayer(folder, config.groupLayer)
   }
 
-  //* Check if 'config.docResolution' is a negative number
-  if (config.docResolution < 0){
-    throwError("Tried to change Document resolution to a negative number: " + config.docResolution + ".", undefined, true)
-    config.docResolution = 0
-  }
+  //* Change Resolution to a previous saved one
+  changeDocumentResolution(savedResolution)
 
+  //? Look for errors on 'config.docResolution'
+  if (changeDocumentResolution(config.docResolution, true))
+    config.docResolution = 0
+
+  //? This will check for files with different resolutions, and ask the user if we can uniform it
   if (!config.docResolution){
 
     if (previousResolution === undefined){
@@ -368,26 +408,10 @@ function preProcessDocument(){
     }
   }
 
+
   //* Change Resolution
-  //? If resolution between two images are different, the size of texts will be also different
-  if (config.docResolution && parseInt(config.docResolution) != parseInt(activeDocument.resolution)){
-    try {
-      activeDocument.resizeImage(activeDocument.width, activeDocument.height, parseInt(config.docResolution))
-    } catch (error) {
-      throwError("Some error ocurred while trying to change document resolution to " + parseInt(config.docResolution) + ".", error)
-    }
-  }
-
-}
-
-function postProcessDocument(){
-
-  //* Select Type Folder
-  if (alreadyCreatedTextFolder){
-    const folder = getTypeFolder()
-    activeDocument.activeLayer = folder
-    formatLayer(folder, config.groupLayer)
-  }
+  if (config.docResolution && parseInt(config.docResolution) != parseInt(activeDocument.resolution))
+    changeDocumentResolution(config.docResolution)
 
   //* Change Document Mode
   if (config.docColorMode){
@@ -1170,7 +1194,7 @@ function formatLayer(layer, format) {
       if (isNotUndef(font)) txt.font = font.postScriptName
     }
     if (isNotUndef(format.size) && format.size > 0)
-      txt.size = format.size
+      txt.size = new UnitValue(format.size, "px");
 
     if (isNotUndef(format.color) && format.color.length && isHexColor(format.color)){
       const color = new SolidColor();
