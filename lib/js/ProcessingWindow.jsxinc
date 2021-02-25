@@ -116,7 +116,7 @@ function ProcessingWindow(filesOrder) {
       for (var i in filesOrder) this.listBox.add("item", filesOrder[i]);
     else
       for (var page in filesOrder){
-        var text = "Page " + page +  "  ->  " +   (filesOrder[page] ? filesOrder[page].name : "")
+        var text = "Page " + page +  "  ->  " +   (filesOrder[page] ? decodeURI(filesOrder[page].name) : "")
 
         this.listBox.add(
           "item",
