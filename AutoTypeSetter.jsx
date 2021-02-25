@@ -1002,6 +1002,7 @@ function getTypeFolder(groupIndex) {
 function createImageArray() {
   const imageArray = [];
 
+  //* Filter Files
   //? Function wrapper to not save these other constants in memory
   (function () {
     const unsupportedFiles = []
@@ -1009,16 +1010,17 @@ function createImageArray() {
 
     for (var i in arrayFiles) {
       var file = arrayFiles[i]
-      if (!file.name.endsWithArray(supportedImageFiles.concat('.txt')))
-        unsupportedFiles.push(decodeURI(file.name))
-      else if (file.name.endsWith('.txt'))
+      var filename = file.name
+
+      if (filename.endsWith('.txt'))
         textFile = !textFile ? file : throwError("More than one text file recognized.")
-      else {
+      else if (filename.endsWithArray(supportedImageFiles)){
         if (isNaN(getFilenameNumber(file)))
-          filesWithoutNumbers.push(decodeURI(file.name))
+          filesWithoutNumbers.push(decodeURI(filename))
         else
           imageArray.push(file)
       }
+      else unsupportedFiles.push(decodeURI(filename))
     }
 
     if (unsupportedFiles.length)
@@ -1028,25 +1030,30 @@ function createImageArray() {
       throwError("The following files do not have page numbers in their filenames:\n" + filesWithoutNumbers.join("\n") + "\n\nPlease add page numbers to their filenames if you want to edit those files.\nThis step is necessary to correlate the text and the respective file.", undefined, true)
   })()
 
+  //* Check if is not blank
   if (!imageArray.length)
-    throwError("Not enough valid image files")
+    throwError("Not enough valid image files");
 
+  //* Sort Array - Prioritize Order
+  (function () {
+    const prioritizeOrder = supportedImageFiles.concat() //? A copy
+    const getExtension = function (str) { return str.slice(str.lastIndexOf(".")) }
 
-  //* Prioritize Order
-  const prioritizeOrder = supportedImageFiles.concat() //? A copy
+    if (config.prioritizePSD) {
+      prioritizeOrder.unshift(prioritizeOrder.pop())
+      prioritizeOrder.unshift(prioritizeOrder.pop())
+    }
 
-  if (config.prioritizePSD) {
-    prioritizeOrder.unshift(prioritizeOrder.pop())
-    prioritizeOrder.unshift(prioritizeOrder.pop())
-  }
-
+    imageArray.sort(function (a, b) { //? Sort duplicate files
+      const aR = getKeyOf(prioritizeOrder, getExtension(a.name).toLowerCase())
+      const bR = getKeyOf(prioritizeOrder, getExtension(b.name).toLowerCase())
+      if (aR === undefined) return 1
+      if (bR === undefined) return -1
+      return aR - bR
+    })
+  })()
 
   //* Eliminate Duplicates
-
-  const getExtension = function (str) {
-    return str.slice(str.lastIndexOf("."))
-  }
-
   for (var i = 0; i < imageArray.length; i++) {
 
     var n = getFilenameNumber(imageArray[i])
@@ -1056,25 +1063,14 @@ function createImageArray() {
       if (n == getFilenameNumber(imageArray[j]))
         duplicates.push(imageArray[j])
 
-      if (duplicates.length > 1) {
-        duplicates.sort(function (a, b) {//? Sort duplicate files
-          const aR = getKeyOf(prioritizeOrder, getExtension(a.name).toLowerCase())
-          const bR = getKeyOf(prioritizeOrder, getExtension(b.name).toLowerCase())
-          if (aR === undefined) return 1
-          if (bR === undefined) return -1
-          return aR - bR
-        })
-      }
-
     for (var j = 1; j < duplicates.length; j++) { //? Remove duplicates from main array
       var index = getKeyOf(imageArray, duplicates[j])
-      var removed = imageArray.splice(index, 1)
-      //alert("removing " + removed[0].name)
+      imageArray.splice(index, 1) //? Removing and returning it
     }
   }
 
-  imageArray = imageArray.sort()
-
+  //* Sort Array - Common means
+  imageArray.sort()
 
   return imageArray
 }
