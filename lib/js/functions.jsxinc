@@ -16,6 +16,12 @@ function timeMean(func, qtd){
   return mean
 }
 
+function clamp(v, min, max){
+  if (v < min) return min
+  if (v > max) return max
+  return v
+}
+
 function getFilenameNumber(file) {
   //? Try to get a number from file name
   //? '0page%20012.png' -> '0page 012.png' -> '0page 012 ' -> '0012' -> 12

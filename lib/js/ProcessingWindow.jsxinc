@@ -142,18 +142,20 @@ function ProcessingWindow(filesOrder) {
     this.progressBar.value = 1 - this.listBox.items.length / this.fullLength;
 
     if (this.listBox.items.length) {
-      if (this.listBox.items[0].text.length > 25){//! Hardcoded number, looked up through experimentation
-        if(this.listBox.items[0].text.length > 40){
-          this.listBox.items[0].text = this.listBox.items[0].text.slice(0,35) + "(...)"
-        }else{
-        this.currentlyWorkingText.graphics.font = "dialog:" + Math.floor(18 * (1 - (this.listBox.items[0].text.length-25)/this.listBox.items[0].text.length)).toString()
-        }} else {
-          this.currentlyWorkingText.graphics.font = "dialog:18"
-        }
+
+      var text = this.listBox.items[0].text
+      var newSize = 18 * (1 - (text.length - 15) / (text.length))
+
+      newSize = clamp(newSize, 11.0, 18.0)
+      if (text.length > 40) text = text.slice(0,35) + "(...)"
+
       //? Update currently working
-      this.currentlyWorkingText.text = this.listBox.items[0].text;
-      //? Delete the file name already processed
+      this.currentlyWorkingText.text = text
+      this.currentlyWorkingText.graphics.font = "dialog:" + Math.floor(newSize).toString()
+
+      //? Delete the text already processed
       this.listBox.remove(0);
+
       app.refresh()
     } else {
       this.currentlyWorkingText.text = "Done";
