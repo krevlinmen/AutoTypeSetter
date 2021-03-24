@@ -451,6 +451,12 @@ function getArrayFiles(){
 
   if (!Array.isArray(arrayFiles)) arrayFiles = []
   else {
+    //? Remove Folders
+    for (var i in arrayFiles)
+      while (arrayFiles[i] instanceof Folder)
+        arrayFiles.splice(i,1);
+
+    //? Remove 'debug.log'
     for (var i in arrayFiles)
       if (arrayFiles[i].name === "debug.log"){
         arrayFiles.splice(i,1);
