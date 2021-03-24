@@ -26,7 +26,8 @@ String.prototype.endsWithArray = function (subArray) {
 };
 
 String.prototype.withoutExtension = function () {
-  return this.slice(0, this.lastIndexOf("."));
+  var p = this.lastIndexOf(".")
+  return p != -1 ? this.slice(0, p) : this;
 };
 
 String.prototype.repeat = function(count) {
