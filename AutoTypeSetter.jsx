@@ -110,8 +110,6 @@ function main() {
   //? Change Configurations
   app.displayDialogs = DialogModes.ERROR //change to NO by the End
 
-  writeProgramInfo() // Archive for debugging purposes
-
   //? Read Configuration
   readConfig()
 
@@ -482,47 +480,6 @@ function getArrayFiles(){
       }
   }
 
-}
-
-function writeProgramInfo() {
-  //? This function creates and updates a file containing
-  //? technical info for debugging purposes
-
-  //? This wasn't done storing a JSON because it's x5 slower
-
-  const file = getFileFromScriptPath("lib/userProgramInfo.txt");
-  const string = file.exists ? readFile(file) : "";
-
-  const appSpecifier = BridgeTalk.appSpecifier;
-
-  //? If this program (identified by appSpecifier) has already opened,
-  //? We don't need to get this info again, so return
-  if (string) {
-    const strArray = string.split("\n");
-
-    for (var i in strArray)
-      if (strArray[i].indexOf("appSpecifier: ") === 0)
-        if (strArray[i].slice("appSpecifier: ".length) === appSpecifier) return;
-  }
-
-  const infoObj = {
-    appSpecifier: appSpecifier,
-    appLocale: BridgeTalk.appLocale,
-    appDisplayName: BridgeTalk.getDisplayName(appSpecifier),
-    os: $.os,
-    locale: $.locale,
-
-    ESBuild: $.build,
-    JSVersion: $.version,
-    JSBuildDate: $.buildDate,
-    memCache: $.memCache,
-    screens: $.screens,
-  };
-
-  string += "\n";
-  for (var i in infoObj) string += i + ": " + infoObj[i] + "\n";
-
-  writeFile(file, string);
 }
 
 function applyStarterLayerFormats() {
