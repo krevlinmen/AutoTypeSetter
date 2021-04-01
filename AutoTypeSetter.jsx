@@ -320,7 +320,12 @@ function changeDocumentResolution(resolution, lookErrors){
     return
 
   try {
-    activeDocument.resizeImage(activeDocument.width, activeDocument.height, parseInt(resolution))
+    const width = activeDocument.width
+    const height = activeDocument.height
+    width.convert("px")
+    height.convert("px")
+
+    activeDocument.resizeImage(width, height, parseInt(resolution))
   } catch (error) {
     throwError("Some error ocurred while trying to change document resolution to " + parseInt(resolution) + ".", error)
   }
