@@ -45,6 +45,19 @@
 const dropDownSizes = [130, 300]
 const identifiersWidth = 60
 const supportedImageFiles = ['.png', '.jpg', '.jpeg', '.psd', '.psb']
+const textMargin = 0.02
+const textBoxWidth = 0.2
+const positionObj = {
+  x: 0,
+  y: 0,
+  initialized: false,
+  width: undefined,
+  docWidth: undefined,
+  docHeight: undefined,
+  xMargin: undefined,
+  yMargin: undefined,
+  group: 1
+}
 
 const isWindowAvailable = !!$.global.Window;
 const savedConfigPath = "config.json"
@@ -1279,7 +1292,6 @@ function formatLayer(layer, format) {
 
 //? Function for inserting texts in each page
 function insertPageTexts(page, updateAtEachLine) {
-  const positionArray = calculatePositions(page)
 
   for (var i in page) {
     var format = findFormat(page[i])
@@ -1287,14 +1299,16 @@ function insertPageTexts(page, updateAtEachLine) {
 
     if (!continueProcessing) break;
 
-    writeTextLayer(line, i < page.length - 1, positionArray[i], format)
+    writeTextLayer(line, i < page.length - 1, format)
     if (updateAtEachLine && isWindowAvailable) progressWindowObj.update()
   }
 
+  //? De-initialize after finalizing this page
+  positionObj.initialized = false
 }
 
 
-function writeTextLayer(text, activateDuplication, positionObj, format) {
+function writeTextLayer(text, activateDuplication, format) {
 
 
   function defaultTextLayer() {
@@ -1338,85 +1352,68 @@ function writeTextLayer(text, activateDuplication, positionObj, format) {
     }
 
   //? Positioning
-
-  // alert("Positioning Layer\nX: " + positionObj.xPosition + "\nY: " + positionObj.yPosition)
-  txtLayer.textItem.position = [positionObj.xPosition, positionObj.yPosition]
-
-  const boxText = txtLayer.textItem.kind === TextType.PARAGRAPHTEXT
-
-  if (boxText) {
-    // alert("Changing layer size\nWidth: " + positionObj.width + "\nHeight: " + positionObj.height)
-    txtLayer.textItem.width = positionObj.width
-    txtLayer.textItem.height = positionObj.height
-  }
-  // alert("Layer Complete")
+  setLayerPosition(txtLayer.textItem)
 }
 
-//* Calculate the positioning of all the text in a page
-function calculatePositions(textArray) {
-  const docWidth  = activeDocument.width
-  const docHeight = activeDocument.height
-  docWidth.convert("px")
-  docHeight.convert("px")
+function setLayerPosition(txt) {
 
-  const yBorder = docHeight * 0.02
-  const xBorder = docWidth * 0.02
+  //* Initialize page position info
+  if (!positionObj.initialized){
+    positionObj.docWidth = activeDocument.width
+    positionObj.docHeight = activeDocument.height
+    positionObj.docWidth.convert("px")
+    positionObj.docHeight.convert("px")
 
-  positionData = []
-  const layerPosition = {
-    yPosition: yBorder, //*Initially, the margin of the document
-    xPosition: xBorder,
-    height: undefined,
-    width: docWidth * 0.2, //*maybe customizable in the future
-    group: 1
+    positionObj.xMargin = positionObj.docWidth * textMargin
+    positionObj.yMargin = positionObj.docHeight * textMargin
+
+    positionObj.x = positionObj.xMargin
+    positionObj.y = positionObj.yMargin
+    positionObj.width = positionObj.docWidth * textBoxWidth
+    positionObj.group = 1
+    positionObj.initialized = true
   }
 
-  for (var i in textArray) {
-    var line = textArray[i]
-    var format = findFormat(line)
+  //* Declare Constants
+  const isBoxText = txt.kind === TextType.PARAGRAPHTEXT
+  const size = txt.size
+  size.convert("px")
+  //! Text height defining. Attention: black magic trickery very suspicious
+  const height = (size * 1.1) * (
+    !isBoxText ? 1 :
+    Math.ceil(txt.contents.length / (positionObj.width / (size * 6 / 7)))
+    )
 
-    //? 'format' will be undefined if 'config.disableCustomTextFormats' is true
-    //? or if it was not found
-    if (!format) format = config.defaultTextFormat
-    //? If 'format.size' is undefined, use from default
-    if (format.size === undefined) format.size = config.defaultTextFormat.size
-    //? If 'format.size' still is undefined, call error
-    if (format.size === undefined) throwError("Font size is undefined")
-    //? If 'format.size' is 0, use 16 as default
-    if (format.size === 0) format.size = 16
+  //* Positioning
+  if (isBoxText) {
+    txt.position = [positionObj.x, positionObj.y]
+    txt.width = positionObj.width
+    txt.height = height
+  } else
+    txt.position = [positionObj.x + pointTextXoffset(txt.justification), positionObj.y + (size * 1.1) / 2]
 
-    layerPosition.height = (format.size * 1.1) * Math.ceil(line.length / (layerPosition.width / (6 * format.size / 7))) //! Attention
+  //* Post Positioning
+  //? Set the y coordinate for the next text
+  positionObj.y += height + (positionObj.yMargin) / 2
 
-    layerPosition.xPosition += pointTextXoffset(format)
-    positionData.push(getCopy(layerPosition))
-    layerPosition.xPosition -= pointTextXoffset(format)
-
-    layerPosition.yPosition += yBorder + layerPosition.height //*yPosition += The size of the text Box + border
-
-    if (layerPosition.yPosition >= docHeight) { //*if the bottom of the file is reached
-      layerPosition.yPosition = yBorder //*Reset yPosition
-      layerPosition.xPosition += xBorder + layerPosition.width //*increment the x value to create a new column
-      layerPosition.group += 1 //*Goes to the next group
-
-    }
-
-    layerPosition.height = undefined //? Resets height for custom format check
+  //? Check and handle text reaching end of a page
+  if (positionObj.y >= positionObj.docHeight) {
+    positionObj.y = positionObj.yMargin              //? Reset y coordinate
+    positionObj.x += positionObj.width + positionObj.xMargin //? Move  x coordinate
+    positionObj.group += 1                   //? Set the text group flag
   }
+}
 
-  return positionData
-
-
-  function pointTextXoffset(format){
-    if (format.boxText === undefined || format.boxText) return 0
-
-    switch ( format.justification ? format.justification.toUpperCase() : "" ) {
-      case "LEFT":
-        return 0
-      case "RIGHT":
-        return layerPosition.width
-      default:
-        return layerPosition.width / 2
-    }
+function pointTextXoffset(justification){
+  //? Gives the right amount of offset to text x coordinate,
+  //? to maintaining the text in the middle
+  switch (justification) {
+    case Justification.LEFT:
+      return 0
+    case Justification.RIGHT:
+      return positionObj.width
+    default:
+      return positionObj.width / 2
   }
 }
 
