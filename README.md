@@ -2,8 +2,6 @@
 
 AutoTypeSetter is a script that automatically creates/modifies .psd files, inserting pages and text baloons, making the repetitive copy/pasting easier to do.
 
-# Warning! This script currently only works on Photoshop 2020 edition!
-
 # Results
 
 Image Input: (written in portuguese)
@@ -87,7 +85,7 @@ You must use an identifier to separate the content of diferent files. It has to 
 
 # Documentation
 
-This script was made using [Adobe Photoshop 2020 JavaScript Scripting](https://www.adobe.com/devnet/photoshop/scripting.html), which is based on [ExtendScript](https://javascript-tools-guide.readthedocs.io/index.html).
+This script was made using [Adobe Photoshop JavaScript Scripting](https://www.adobe.com/devnet/photoshop/scripting.html), which is based on [ExtendScript](https://javascript-tools-guide.readthedocs.io/index.html).
 
 Our own documentation can be found [here](https://github.com/krevlinmen/AutoTypeSetter/wiki)
 
