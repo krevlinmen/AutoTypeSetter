@@ -1,22 +1,21 @@
 {
-  "pageIdentifierPrefix": "#",
+  "pageIdentifierPrefix": "Página",
   "pageIdentifierSuffix": "",
   "prioritizePSD": false,
-  "selectAllFiles": false,
+  "selectAllFiles": true,
   "alwaysCreateGroup": false,
   "ignoreCustomWith": "",
-  "columnGroup": true,
-  "disableStarterLayer": false,
-  "disableCustomTextFormats": false,
+  "columnGroup": false,
+  "disableStarterLayer": true,
+  "disableCustomTextFormats": true,
   "docResolution": 0,
   "docColorMode": "",
   "docColorProfile": "",
   "groupLayer": {
-    "name": "Type",
-    "visible": false
+    "name": "Type"
   },
   "defaultTextFormat": {
-    "size": 12,
+    "size": 16,
     "boxText": true,
     "font": "CCWildWords",
     "justification": "CENTER",
@@ -27,13 +26,9 @@
   },
   "customTextFormats": [
     {
-      "font": "arial",
-      "lineIdentifierPrefix": "@",
-      "justification": "LEFT",
-      "antiAlias": "SHARP",
-      "capitalization": "ALLCAPS",
-      "blendMode": "DISSOLVE",
-      "color": "#3004FF"
+      "boxText": false,
+      "font": "Chinacat",
+      "lineIdentifierPrefix": "#"
     }
   ],
   "starterLayerFormats": [
@@ -42,10 +37,15 @@
       "allLocked": true
     },
     {
-      "name": "Clean",
-      "positionLocked": true,
+      "name": "Redraw",
       "duplicate": true,
-      "allLocked": false
+      "allLocked": false,
+      "transparentPixelsLocked": true,
+      "positionLocked": true
+    },
+    {
+      "name": "Clean",
+      "positionLocked": true
     }
   ]
 }
