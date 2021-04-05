@@ -197,7 +197,7 @@ function processText() {
       if (activeDocument.layers[0])
         multipleArchives = false //useless
     } catch (error) {
-      throwError("No document open.\nIf you only select a text file, you need to have a document open.")
+      throwError("No document was found.\nIf you only want to select a text file, you also need to have a document open.")
     }
 
     //* To ask only once when assuring Valid Color Mode
@@ -325,7 +325,7 @@ function changeDocumentResolution(resolution, lookErrors){
 
     activeDocument.resizeImage(width, height, parseInt(resolution))
   } catch (error) {
-    throwError("Some error ocurred while trying to change document resolution to " + parseInt(resolution) + ".", error)
+    throwError("An error ocurred while trying to change document resolution to " + parseInt(resolution) + ".", error)
   }
 }
 
@@ -354,7 +354,7 @@ function changeDocumentMode(mode){
       activeDocument.changeMode(ChangeMode[mode])
 
     } catch (error) {
-      throwError("Some error ocurred while trying to change document color mode to '" + mode + "'.", error)
+      throwError("An error ocurred while trying to change document color mode to '" + mode + "'.", error)
       return true; //* Error
     }
 
@@ -450,8 +450,8 @@ function postProcessDocument(){
         activeDocument.convertProfile(config.docColorProfile, Intent.RELATIVECOLORIMETRIC, true, true)
       } catch (error) {
         if (error.number === 8007)
-          throwError( "'" + config.docColorProfile  + "' is a invalid color profile. Photoshop automatically opened a window to you configure a valid one, and you closed it.", undefined, true)
-        else throwError("Some error ocurred while trying to change document color profile to '" + config.docColorProfile + "'.", error)
+          throwError( "'" + config.docColorProfile  + "' is a invalid color profile.", undefined, true)
+        else throwError("An error ocurred while trying to change document color profile to '" + config.docColorProfile + "'.", error)
       }
   }
 }
@@ -530,7 +530,7 @@ function readJson(pathOrFile, name, isUnnecessary){
 
   //? Check if the file Exists
   if (!file.exists)
-    return isUnnecessary ? undefined : throwError(name + " file missing.\nYou can get another one for free on github.com/krevlinmen/AutoTypeSetter")
+    return isUnnecessary ? undefined : throwError(name + " is missing.\nPlease check if all files are in the Scripts folder.\n If necessary, download this script again at github.com/krevlinmen/AutoTypeSetter")
 
   //? Reading the file
   try {
@@ -586,7 +586,7 @@ function saveConfig(configObject) {
     const newFile = getFileFromScriptPath(savedConfigPath)
     writeFile(newFile, JSON.stringify(configObject, null, 2))
   } catch (error) {
-    throwError("Something went wrong when registering configuration.", error)
+    throwError("An error occurred while saving your configuration.", error)
   }
 
   alert((importing ? "Imported" : "Saved" ) + " Successfully! :D" + (importing ? "\nUnfortunately, it may take a while we read and update the screen" : "" ))
@@ -994,7 +994,7 @@ function createImageArray() {
       var filename = file.name
 
       if (filename.endsWith('.txt'))
-        textFile = !textFile ? file : throwError("More than one text file recognized.")
+        textFile = !textFile ? file : throwError("Multiple text files have been recognized.")
       else if (filename.endsWithArray(supportedImageFiles)){
         if (isNaN(getFilenameNumber(file)))
           filesWithoutNumbers.push(decodeURI(filename))
@@ -1005,15 +1005,15 @@ function createImageArray() {
     }
 
     if (unsupportedFiles.length)
-      throwError("The following files are not supported by this script:\n" + unsupportedFiles.join("\n") + "\n\nThis script only supports the extensions:\n" + supportedImageFiles.join(", ") + ", .txt", undefined, true)
+      throwError("The following files are not supported by this script:\n" + unsupportedFiles.join("\n") + "\n\nThis script only supports the following extensions:\n" + supportedImageFiles.join(", ") + ", .txt", undefined, true)
 
     if (filesWithoutNumbers.length)
-      throwError("The following files do not have page numbers in their filenames:\n" + filesWithoutNumbers.join("\n") + "\n\nPlease add page numbers to their filenames if you want to edit those files.\nThis step is necessary to correlate the text and the respective file.", undefined, true)
+      throwError("The following files do not have page numbers in their filenames:\n" + filesWithoutNumbers.join("\n") + "\n\nPlease add page numbers to their filenames if you wish to edit those files.\n", undefined, true)
   })()
 
   //* Check if is not blank
   if (!imageArray.length)
-    throwError("Not enough valid image files");
+    throwError("Not enough valid image files.");
 
   //* Sort Array - Prioritize Order
   (function () {
@@ -1191,7 +1191,7 @@ function formatLayer(layer, format) {
       try {
         var just = format.justification.toUpperCase()
       } catch (error) {
-        throwError("Text format justification is not valid.", error)
+        throwError("Invalid text format justification.", error)
       }
 
       if (txt.kind === TextType.POINTTEXT){
@@ -1211,7 +1211,7 @@ function formatLayer(layer, format) {
         try {
           txt.justification = Justification[just]
         } catch (error) {
-          throwError("Text format justification is not valid.", error)
+          throwError("Invalid text format justification.", error)
         }
     }
 
@@ -1219,21 +1219,21 @@ function formatLayer(layer, format) {
       try {
         txt.language = Language[format.language.toUpperCase()]
       } catch (error) {
-        throwError("Text format language is not valid.", error)
+        throwError("Invalid Text format language.", error)
       }
 
     if (isNotUndef(format.antiAlias) && format.antiAlias.length)
       try {
         txt.antiAliasMethod = AntiAlias[format.antiAlias.toUpperCase()]
       } catch (error) {
-        throwError("Text format anti aliasing method is not valid.", error)
+        throwError("Invalid Text format anti-aliasing method.", error)
       }
 
     if (isNotUndef(format.capitalization) && format.capitalization.length)
       try {
         txt.capitalization = TextCase[format.capitalization.toUpperCase()]
       } catch (error) {
-        throwError("Text format capitalization method is not valid.", error)
+        throwError("Invalid Text format capitalization method.", error)
       }
 
   }
@@ -1310,7 +1310,7 @@ function writeTextLayer(text, activateDuplication, format) {
       // alert("Formatting Layer")
       formatLayer(txtLayer, format)
     } catch (error) {
-      throwError("Some error occurred while formatting the text layer", error)
+      throwError("An error occurred while formatting the text layer", error)
     }
 
   //? Positioning
@@ -1513,7 +1513,7 @@ function MainWindow() {
     try {
       savedFile.remove()
     } catch (error) {
-      throwError("Something went wrong when trying to delete saved configuration.", error)
+      throwError("An error occurred while trying to delete the saved configuration.", error)
     }
 
     UI.resetConfigBtn.enabled = false;
