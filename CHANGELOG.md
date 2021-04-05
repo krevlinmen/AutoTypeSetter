@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Automatic Update Checking - Only possible with C dll libraries, the socket from ExtendScript is a piece of shit
 
+## [3.0] - 2021-04-05
+
 ### Added
 
 - New window: Text Format Editor!
@@ -69,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Problem selecting ambiguous files (Example: `01.png` and `1.psd`)
 
-[unreleased]: https://github.com/krevlinmen/AutoTypeSetter/compare/v2.0...HEAD
+[unreleased]: https://github.com/krevlinmen/AutoTypeSetter/compare/v3.0...HEAD
+[3.0]: https://github.com/krevlinmen/AutoTypeSetter/compare/v2.0...v3.0
 [2.0]: https://github.com/krevlinmen/AutoTypeSetter/compare/v1.0...v2.0
 [1.0]: https://github.com/krevlinmen/AutoTypeSetter/releases/tag/v1.0
