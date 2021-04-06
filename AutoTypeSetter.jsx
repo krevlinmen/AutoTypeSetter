@@ -292,6 +292,10 @@ function throwError(message, error, notFatal) {
 }
 
 function saveAndCloseFile(file) {
+  //? Check if argument is a instance of File
+  if (!(file instanceof File))
+    return throwError("saveAndCloseFile() received a " + typeof(file) + " instead of a File.")
+
   const saveFile = File(file.fullName.withoutExtension() + '.psd')
   activeDocument.saveAs(saveFile)
   activeDocument.close()
@@ -526,7 +530,11 @@ function ensureFontSizeUI(sizeBox){
 
 function readJson(pathOrFile, name, isUnnecessary){
 
-  var file = typeof pathOrFile == "string" ? getFileFromScriptPath(pathOrFile) : pathOrFile
+  const file = typeof pathOrFile == "string" ? getFileFromScriptPath(pathOrFile) : pathOrFile
+
+  //? Check if argument is a instance of File
+  if (!(file instanceof File))
+    return throwError("readJson() received a " + typeof(file) + " instead of a File.")
 
   //? Check if the file Exists
   if (!file.exists)
@@ -798,7 +806,9 @@ function clearConfig(configObject){
 
 //? This Function shall not be in another file
 function getFileFromScriptPath(filename) {
+  if (typeof filename == "string")
   return File((new File($.fileName)).path + "/" + encodeURI(filename))
+  throwError("getFileFromScriptPath() received a " + typeof(filename) + " instead of a String")
 }
 
 function isNewPage(line) {

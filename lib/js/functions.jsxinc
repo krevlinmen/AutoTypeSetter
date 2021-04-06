@@ -38,6 +38,10 @@ function getAnotherColor(initial) {
 }
 
 function readFile(file) {
+  //? Check if argument is a instance of File
+  if (!(file instanceof File))
+    return throwError("readFile() received a " + typeof(file) + " instead of a File.")
+
   file.open("r");
   const rawText = file.read();
   file.close();
@@ -45,6 +49,10 @@ function readFile(file) {
 }
 
 function writeFile(file, string) {
+  //? Check if argument is a instance of File
+  if (!(file instanceof File))
+    return throwError("readFile() received a " + typeof(file) + " instead of a File.")
+
   if (!string) return;
   file.open("w");
   file.write(string);
