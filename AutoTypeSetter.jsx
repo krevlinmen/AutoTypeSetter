@@ -1003,9 +1003,9 @@ function createImageArray() {
       var file = arrayFiles[i]
       var filename = file.name
 
-      if (filename.endsWith('.txt'))
+      if (filename.toLowerCase().endsWith('.txt'))
         textFile = !textFile ? file : throwError("Multiple text files have been recognized.")
-      else if (filename.endsWithArray(supportedImageFiles)){
+      else if (filename.toLowerCase().endsWithArray(supportedImageFiles)){
         if (isNaN(getFilenameNumber(file)))
           filesWithoutNumbers.push(decodeURI(filename))
         else
@@ -1068,7 +1068,7 @@ function createImageArray() {
 
 function createContentObj() {
 
-  if (!textFile || !textFile.name.endsWith('.txt')) {
+  if (!textFile || !textFile.name.toLowerCase().endsWith('.txt')) {
     throwError("No text file was selected!")
   }
 
