@@ -1,6 +1,7 @@
 # AutoTypeSetter
 
 AutoTypeSetter is a script that automatically creates/modifies .psd files, inserting pages and text baloons, making the repetitive copy/pasting easier to do.
+
 [Tutorial PTBR](https://www.youtube.com/watch?v=mCu-vxnTNz8)
 
 # Results
